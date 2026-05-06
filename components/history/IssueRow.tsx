@@ -14,14 +14,14 @@ export default function IssueRow({ title, isTable = false }: { title: string, is
           <span className="bg-gray-100 px-2 py-1 rounded text-xs">In Progress</span>
           <span className="bg-gray-100 px-2 py-1 rounded text-xs">enhancement</span>
           <span className="bg-gray-100 px-2 py-1 rounded text-xs font-bold">medium</span>
-          <button className="text-gray-400">▼</button>
+          <button className="p-2 bg-gray-100 p-1 rounded"><img className="h-[6px]" src="/arrow.png" alt="Toggle" /></button>
         </div>
       </div>
       
       {/* 테이블 형태의 하위 리스트 (isTable일 때만 노출) */}
       {isTable && (
         <div className="p-2 border-t border-gray-100">
-          <div className="bg-white rounded border border-gray-200 overflow-hidden text-[11px]">
+          <div className="bg-white rounded border border-gray-200 overflow-hidden text-[13px]">
             {[1, 2, 3, 4].map(i => (
               <div key={i} className="flex items-center justify-between p-2 border-b border-gray-50 last:border-0">
                 <div className="flex items-center gap-2">

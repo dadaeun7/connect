@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 
-export default function Sidebar() {
+export default function Sidebar({setShowMain}:{ setShowMain: React.Dispatch<React.SetStateAction<string>> }) {
+    
     const [isExpanded, setIsExpanded] = useState(false);
     const [projects, setProjects] = useState(['프로젝트 A', '프로젝트 B', '프로젝트 C']);
     const [showProjects, setShowProjects] = useState(false);
@@ -22,13 +23,13 @@ export default function Sidebar() {
         />
     </div>
     {/* 프로젝트 리스트 */}
-    <nav className="mt-2 pb-5 space-y-2 px-2 cursor-pointer">
+    <nav className="ml-2 pb-5 space-y-2 px-2 cursor-pointer">
         <div 
             key={projects[0]} 
-            className="flex h-12 items-center p-2 rounded-md border border-gray-300 cursor-pointer group whitespace-nowrap overflow-hidden"
+            className="flex w-full h-12 items-center p-2 rounded-md border border-gray-300 cursor-pointer group whitespace-nowrap overflow-hidden"
           >
             {/* 아이콘 대용 박스 */}
-            <div className={`min-w-[38px] h-8 flex items-center justify-center text-[10px]
+            <div className={`min-w-[38px] h-8 flex items-center justify-center text-[12.5px]
                 ${isExpanded ? 'hidden' : 'flex'}`}>
               {projects[0][0]}
             </div>
@@ -43,20 +44,23 @@ export default function Sidebar() {
                 setShowProjects(!showProjects);
             }}>
                 <img 
-                className={`w-5 h-5 transition-transform duration-300 ${showProjects ? 'rotate-180' : 'rotate-0'}`}
-                src="/Chevron down.png" 
+                className={`mr-2 h-1.5 transition-transform duration-300 ${showProjects ? 'rotate-180' : 'rotate-0'}`}
+                src="/arrow.png" 
                 alt="nav-toggle"
                 />
             </div>
         </div>
       </nav>
       {/* 협업 */}
-      <nav className="mt-4 pb-10 space-y-2 px-4 border-b border-gray-200 cursor-pointer">
+      <nav className="pb-10 space-y-[0.5] px-4 border-b border-gray-200 cursor-pointer">
         <div className='mb-4 text-[15px]'>협업</div>
         {['작업라인', '타임라인', '새이슈'].map((item, idx) => (
           <div 
             key={item} 
-            className="text-[#363636] flex items-center p-2 rounded-md hover:bg-[#A7A7A7] cursor-pointer group whitespace-nowrap overflow-hidden"
+            className="text-[#363636] flex items-center p-2 rounded-md hover:bg-[#F6F6F6] cursor-pointer group whitespace-nowrap overflow-hidden"
+            onClick={()=>{
+              setShowMain(item);
+            }}
           >
             {/* 아이콘 대용 박스 */}
             <div className="min-w-[32px] h-8 bg-gray-200 rounded flex items-center justify-center text-[10px]">
@@ -71,13 +75,16 @@ export default function Sidebar() {
           </div>
         ))}
       </nav>
-    {/* 카테고리 */}
-      <nav className="mt-4 pb-10 space-y-2 px-4 border-b border-gray-200 cursor-pointer">
+    {/* 설정 */}
+      <nav className="pb-10 space-y-[0.5] px-4 border-b border-gray-200 cursor-pointer">
         <div className='mt-4 mb-4 text-[15px]'>설정</div>
         {['일반', '통합', '사용자 및 권한'].map((item, idx) => (
           <div 
             key={item} 
-            className="text-[#363636] flex items-center p-2 rounded-md hover:bg-[#A7A7A7] cursor-pointer group whitespace-nowrap overflow-hidden"
+            className="text-[#363636] flex items-center p-2 rounded-md hover:bg-[#F6F6F6] cursor-pointer group whitespace-nowrap overflow-hidden"
+            onClick={()=>{
+              setShowMain(item);
+            }}
           >
             {/* 아이콘 대용 박스 */}
             <div className="min-w-[32px] h-8 bg-gray-200 rounded flex items-center justify-center text-[10px]">
@@ -94,16 +101,16 @@ export default function Sidebar() {
       </nav>
       {/* 확장/축소 토글 버튼 */}
       <div 
-        className={`h-12 flex items-center border-b border-gray-200 cursor-pointer hover:bg-[#A7A7A7] transition-all ${
+        className={`h-12 flex items-center border-b border-gray-200 cursor-pointer hover:bg-[#F6F6F6] transition-all ${
           isExpanded ? 'px-5 justify-end' : 'justify-center'
         }`}
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <img 
-          className={`w-5 h-5 transition-transform duration-300 ${
+          className={`h-2 transition-transform duration-300 ${
             isExpanded ? 'rotate-90' : 'rotate-270'
           }`}
-          src="/Chevron down.png" 
+          src="/arrow.png" 
           alt="nav-toggle"
         />
       </div>

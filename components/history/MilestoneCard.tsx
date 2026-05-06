@@ -8,13 +8,13 @@ export default function MilestoneCard() {
       <div className="flex justify-between items-start mb-4">
         <div className="flex items-center gap-3">
           <h2 className="text-xl font-bold">마일스톤명, 이슈의 대표명을 적습니다.</h2>
-          <span className="border border-gray-300 rounded-full px-3 py-0.5 text-xs text-gray-500">
+          <span className="border border-gray-300 rounded-full px-3 py-1 text-xs text-gray-500">
             마감일 2026-04-24
           </span>
-          <span className="bg-gray-200 rounded-full px-3 py-0.5 text-xs font-bold">close 50/1</span>
-          <span className="bg-gray-200 rounded-full px-3 py-0.5 text-xs font-bold">open 70/2</span>
+          <span className="bg-gray-200 rounded-full px-3 py-1 text-xs font-bold">close 50/1</span>
+          <span className="bg-gray-200 rounded-full px-3 py-1 text-xs font-bold">open 70/2</span>
         </div>
-        <button className="bg-gray-100 p-1 rounded">▼</button>
+        <button className="p-2 bg-gray-100 p-1 rounded"><img className="h-2" src="/arrow.png" alt="Toggle" /></button>
       </div>
 
       {/* 진행률 바 */}
