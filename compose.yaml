@@ -1,0 +1,36 @@
+name: connect
+services:
+    # 서비스는 독립 실행형 출력 파일을 사용하여 프로덕션 Next.js 앱을 빌드하고 실행
+    # Next.js는 애플리케이션 실행에 필요한 파일과 종속성만 포함하는 자체 포함형 출력을 생성
+    nextjs-prod-standalone:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: nextjs-sample:prod
+        container_name: nextjs-sample-prod
+        ports:
+            - "3000:3000"
+    # 핫 모듈 교체 기능을 통해 Next.js 개발 서버를 실행
+    next-dev:
+        build:
+            context: .
+            dockerfile: Dockerfile.dev
+        image: nextjs-sample:dev
+        container_name: nextjs-sample-dev
+        ports:
+            - "3000:3000"
+        environment:
+            # Docker 내부에서 파일 변경 사항이 제대로 감지되도록 함
+            - WATCHPACK_POLLING=true
+        develop:
+            # Compose Watch를 사용하여 파일 동기화를 시작
+            watch:
+                - action: sync
+                  path: .
+                  target: /app
+                  ignore:
+                    - node_modules/
+                    - .next/
+                # rebuild작업은 package.json파일이 변경될 때 종속성이 다시 설치되도록 함 
+                - action: rebuild
+                  path: package.json

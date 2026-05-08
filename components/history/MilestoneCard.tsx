@@ -3,7 +3,7 @@ import IssueRow from "./IssueRow";
 
 export default function MilestoneCard() {
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+    <div className="bg-[var(--card)] border border-gray-200 rounded-2xl p-6 shadow-sm">
       {/* 제목 및 상태 뱃지 */}
       <div className="flex justify-between items-start mb-4">
         <div className="flex items-center gap-3">

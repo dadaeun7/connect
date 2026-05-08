@@ -10,7 +10,7 @@ export default function Sidebar({setShowMain}:{ setShowMain: React.Dispatch<Reac
 
   return (
     <aside 
-      className={`h-screen border-r border-gray-200 bg-[#fff] transition-all duration-300 flex flex-col ${
+      className={`custom-scrollbar overflow-y-auto min-h-screen border-r border-gray-200 bg-[#fff] transition-all duration-300 flex flex-col ${
         isExpanded ? 'w-64' : 'w-20'
       }`}
     >
