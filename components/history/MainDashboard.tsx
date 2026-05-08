@@ -5,7 +5,7 @@ import MilestoneCard from "./MilestoneCard";
 // #F5F5F5 
 export default function MainDashboard() {
   return (
-    <div className="mt-6 flex-1 bg-[var(--background)] min-h-screen p-6 text-[#333]">
+    <div className="flex-1 bg-[var(--background)] min-h-screen p-4 md:p-8 text-[#333]">
       {/* 상단 탭 메뉴 */}
       <div className="flex gap-6 border-b border-gray-300 mb-6 text-sm font-medium">
         {['전체', 'open', 'close'].map((tab, i) => (

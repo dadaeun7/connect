@@ -3,11 +3,16 @@
 import MainDashboard from "@/components/history/MainDashboard";
 import Sidebar from "@/components/ui/SideBar";
 import IntegrationSettings from "@/components/integration/IntegrationSettings";
+import MainTimeLine from "@/components/timeline/MainTimeLine";
+import MainNewIssue from "@/components/newIssue/MainNewIssue";
 import { useState } from "react";
 
 const MAIN:{ [key: string]: React.ReactNode } = {
     "작업라인": <MainDashboard />,
+    "타임라인": <MainTimeLine />,
+    "새이슈": <MainNewIssue />,
     "통합": <IntegrationSettings />
+    
 }
 
 export default function Home(){

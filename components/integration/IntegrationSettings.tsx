@@ -73,8 +73,11 @@ export default function IntegrationSettings() {
           직접 ID, Secret 발급없이 연동이 가능합니다. 사용량에 따라 요금이 과금됩니다.
         </p>
 
-        <div className="max-w-2xl bg-[#D9D9D9] p-4 rounded-md text-center text-xs font-bold text-gray-500">
-          현재 준비중입니다.
+        <div className="max-w-2xl bg-[#D9D9D9] p-4 rounded-md text-center text-xs font-bold text-gray-500"
+              onClick={()=>{
+                
+              }}>
+          연동하기
         </div>
       </section>
     </div>
