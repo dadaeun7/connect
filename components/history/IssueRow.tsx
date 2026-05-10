@@ -1,37 +1,36 @@
 "use client";
 
+import { ChevronDown, ExternalLink, User } from "lucide-react";
+
 export default function IssueRow({ title, isTable = false }: { title: string, isTable?: boolean }) {
   return (
-    <div className="bg-white rounded-lg border border-gray-200">
-      <div className="p-3 flex justify-between items-center text-sm">
-        <div className="flex items-center gap-2">
-          <span className="font-bold">{title}</span>
+    <div className="bg-[#121212] rounded-xl border border-white/[0.03] overflow-hidden group hover:border-[#00FFA3]/20 transition-all">
+      <div className="p-4 flex justify-between items-center">
+        <div className="flex items-center gap-3">
+          <div className="w-1.5 h-1.5 rounded-full bg-[#00FFA3]" />
+          <span className="text-sm font-bold text-white/90">{title}</span>
         </div>
+        
         <div className="flex gap-2 items-center">
-          <div className="flex gap-1 opacity-60"> {/* 아이콘들 */}
-            <span>🐙</span><span>💬</span><span>📝</span><span>🎨</span>
-          </div>
-          <span className="bg-gray-100 px-2 py-1 rounded text-xs">In Progress</span>
-          <span className="bg-gray-100 px-2 py-1 rounded text-xs">enhancement</span>
-          <span className="bg-gray-100 px-2 py-1 rounded text-xs font-bold">medium</span>
-          <button className="p-2 bg-gray-100 p-1 rounded"><img className="h-[6px]" src="/arrow.png" alt="Toggle" /></button>
+          <span className="bg-[#00FFA3]/5 text-[#00FFA3] px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-tighter border border-[#00FFA3]/10">In Progress</span>
+          <span className="bg-white/5 text-gray-500 px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-tighter border border-white/5 italic">Medium</span>
+          <ChevronDown size={14} className="text-gray-600 ml-2" />
         </div>
       </div>
       
-      {/* 테이블 형태의 하위 리스트 (isTable일 때만 노출) */}
       {isTable && (
-        <div className="p-2 border-t border-gray-100">
-          <div className="bg-white rounded border border-gray-200 overflow-hidden text-[13px]">
-            {[1, 2, 3, 4].map(i => (
-              <div key={i} className="flex items-center justify-between p-2 border-b border-gray-50 last:border-0">
-                <div className="flex items-center gap-2">
-                   <span>🐙</span>
-                   <span className="font-medium text-gray-700">content</span>
-                   <button className="bg-gray-100 px-1.5 py-0.5 rounded text-[10px]">이동 ↗</button>
+        <div className="px-4 pb-4">
+          <div className="bg-black/30 rounded-xl border border-white/[0.02] overflow-hidden">
+            {[1, 2].map(i => (
+              <div key={i} className="flex items-center justify-between p-3 border-b border-white/[0.02] last:border-0 hover:bg-white/[0.01]">
+                <div className="flex items-center gap-3">
+                   <span className="text-[10px] opacity-50">🐙</span>
+                   <span className="text-[11px] text-gray-400 font-medium">Repository Update Content...</span>
+                   <ExternalLink size={10} className="text-[#00FFA3] opacity-50" />
                 </div>
-                <div className="flex items-center gap-4 text-gray-400">
-                  <span>👤</span>
-                  <span>2026-04-29 14:23:01</span>
+                <div className="flex items-center gap-3 text-gray-600 font-mono text-[9px]">
+                  <div className="w-5 h-5 bg-[#222] rounded-full border border-white/5" />
+                  <span>2026.04.29</span>
                 </div>
               </div>
             ))}

@@ -10,110 +10,79 @@ export default function Sidebar({setShowMain}:{ setShowMain: React.Dispatch<Reac
 
   return (
     <aside 
-      className={`custom-scrollbar overflow-y-auto min-h-screen border-r border-gray-200 bg-[#fff] transition-all duration-300 flex flex-col ${
+      className={`custom-scrollbar overflow-y-auto min-h-screen border-r border-white/5 bg-[#000] transition-all duration-300 flex flex-col ${
         isExpanded ? 'w-64' : 'w-20'
       }`}
     >
-    {/*로고 영역 */}
-    <div className={`flex items-center ${isExpanded ? 'justify-start px-4' : 'justify-center'} py-4`}>
-        <img 
-            src="/logo.png" 
-            alt="Logo" 
-            className={`w-8 h-8 transition-all ${isExpanded ? 'ml-0' : ''}`} 
-        />
+    {/* 로고 영역: 이미지 상단 로고 스타일 */}
+    <div className={`flex items-center ${isExpanded ? 'justify-start px-6' : 'justify-center'} py-8`}>
+        <div className="w-8 h-8 bg-[#00FFA3] rounded-lg flex items-center justify-center">
+            <div className="w-4 h-4 border-2 border-black rounded-sm rotate-45" />
+        </div>
+        {isExpanded && <span className="ml-3 text-white font-black italic tracking-tighter text-xl">Connect</span>}
     </div>
-    {/* 프로젝트 리스트 */}
-    <nav className="ml-2 pb-5 space-y-2 px-2 cursor-pointer">
+
+    {/* 프로젝트 리스트: 레퍼런스의 드롭다운 스타일 적용 */}
+    <nav className="px-4 pb-6 space-y-2">
         <div 
-            key={projects[0]} 
-            className="flex w-full h-12 items-center p-2 rounded-md border border-gray-300 cursor-pointer group whitespace-nowrap overflow-hidden"
+            onClick={() => setShowProjects(!showProjects)}
+            className="flex w-full h-12 items-center p-[6] rounded-xl border border-white/10 bg-[#111] cursor-pointer group hover:border-[#00FFA3]/50 transition-all"
           >
-            {/* 아이콘 대용 박스 */}
-            <div className={`min-w-[38px] h-8 flex items-center justify-center text-[12.5px]
-                ${isExpanded ? 'hidden' : 'flex'}`}>
+            <div className="min-w-[32px] h-8 bg-[#00FFA3]/10 text-[#00FFA3] rounded flex items-center justify-center text-xs font-bold">
               {projects[0][0]}
             </div>
-            {/* 텍스트: 확장 상태일 때만 노출 */}
-            <div className={`text-[13px] ml-4 text-sm font-medium transition-opacity duration-200 flex-1`}>
-                {projects[0]}
-            </div>
-            <div
-            className="flex items-center justify-end"
-            onClick={(e) => {
-                e.stopPropagation(); // 부모 div의 클릭 이벤트와 겹치지 않도록 방지
-                setShowProjects(!showProjects);
-            }}>
-                <img 
-                className={`mr-2 h-1.5 transition-transform duration-300 ${showProjects ? 'rotate-180' : 'rotate-0'}`}
-                src="/arrow.png" 
-                alt="nav-toggle"
-                />
-            </div>
+            {isExpanded && (
+                <>
+                <div className="text-[13px] ml-3 text-white font-bold flex-1 truncate">{projects[0]}</div>
+                <span className={`text-[10px] text-gray-500 transition-transform ${showProjects ? 'rotate-180' : ''}`}>▼</span>
+                </>
+            )}
         </div>
-      </nav>
-      {/* 협업 */}
-      <nav className="pb-10 space-y-[0.5] px-4 border-b border-gray-200 cursor-pointer">
-        <div className='mb-4 text-[15px]'>협업</div>
-        {['작업라인', '타임라인', '새이슈'].map((item, idx) => (
-          <div 
-            key={item} 
-            className="text-[#363636] flex items-center p-2 rounded-md hover:bg-[#F6F6F6] cursor-pointer group whitespace-nowrap overflow-hidden"
-            onClick={()=>{
-              setShowMain(item);
-            }}
-          >
-            {/* 아이콘 대용 박스 */}
-            <div className="min-w-[32px] h-8 bg-gray-200 rounded flex items-center justify-center text-[10px]">
-              {item[0]}
+    </nav>
+
+    {/* 메뉴 섹션: 협업 & 설정 */}
+    {[
+        { title: '협업', items: ['작업라인', '타임라인', '새이슈'] },
+        { title: '설정', items: ['일반', '통합', '사용자 및 권한'] }
+    ].map((section) => (
+        <nav key={section.title} className="pb-10 space-y-[1] px-4 cursor-pointer">
+            {isExpanded && <div className="px-2 mb-4 text-[11px] font-black text-gray-600 uppercase tracking-[0.2em]">{section.title}</div>}
+            <div className="space-y-1">
+                {section.items.map((item) => (
+                    <div 
+                        key={item} 
+                        className="flex items-center p-2 rounded-md hover:bg-white/5 cursor-pointer group transition-colors"
+                        onClick={() => setShowMain(item)}
+                    >
+                        <div className="min-w-[32px] h-8 bg-[#1A1A1A] group-hover:bg-[#00FFA3]/20 rounded-lg flex items-center justify-center text-[10px] text-gray-400 group-hover:text-[#00FFA3] transition-colors">
+                            {item[0]}
+                        </div>
+                        {isExpanded && (
+                            <span className="text-[13px] ml-4 text-gray-400 group-hover:text-white font-medium">
+                                {item}
+                            </span>
+                        )}
+                    </div>
+                ))}
             </div>
-            {/* 텍스트: 확장 상태일 때만 노출 */}
-            <span className={`text-[13px] ml-4 text-sm font-medium transition-opacity duration-200 ${
-              isExpanded ? 'opacity-100' : 'opacity-0'
-            }`}>
-              {item}
-            </span>
-          </div>
-        ))}
-      </nav>
-    {/* 설정 */}
-      <nav className="pb-10 space-y-[0.5] px-4 border-b border-gray-200 cursor-pointer">
-        <div className='mt-4 mb-4 text-[15px]'>설정</div>
-        {['일반', '통합', '사용자 및 권한'].map((item, idx) => (
-          <div 
-            key={item} 
-            className="text-[#363636] flex items-center p-2 rounded-md hover:bg-[#F6F6F6] cursor-pointer group whitespace-nowrap overflow-hidden"
-            onClick={()=>{
-              setShowMain(item);
-            }}
-          >
-            {/* 아이콘 대용 박스 */}
-            <div className="min-w-[32px] h-8 bg-gray-200 rounded flex items-center justify-center text-[10px]">
-              {item[0]}
-            </div>
-            {/* 텍스트: 확장 상태일 때만 노출 */}
-            <span className={`text-[13px] ml-4 text-sm font-medium transition-opacity duration-200 ${
-              isExpanded ? 'opacity-100' : 'opacity-0'
-            }`}>
-              {item}
-            </span>
-          </div>
-        ))}
-      </nav>
-      {/* 확장/축소 토글 버튼 */}
-      <div 
-        className={`h-12 flex items-center border-b border-gray-200 cursor-pointer hover:bg-[#F6F6F6] transition-all ${
-          isExpanded ? 'px-5 justify-end' : 'justify-center'
-        }`}
+        </nav>
+    ))}
+
+    {/* 하단 확장/축소 토글 */}
+    <div 
+        className={`mt-auto h-16 flex items-center border-t border-white/5 cursor-pointer hover:bg-white/5 transition-all 
+            ${isExpanded ? 'px-5 justify-end' : 'justify-center'}
+            `}
         onClick={() => setIsExpanded(!isExpanded)}
-      >
-        <img 
+    >
+                <img 
           className={`h-2 transition-transform duration-300 ${
             isExpanded ? 'rotate-90' : 'rotate-270'
           }`}
           src="/arrow.png" 
           alt="nav-toggle"
         />
-      </div>
+    </div>
     </aside>
   );
 }

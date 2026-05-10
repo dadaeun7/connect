@@ -3,20 +3,19 @@
 import { signIn, signOut } from "next-auth/react";
 import { useSession } from "next-auth/react";
 
-export default function FigmaLogin() {
+export default function AppIntegrationSet({app}:{app:string}) {
   const { data: session } = useSession();
 
   return (
-    <div>
-      <h2 className="text-2xl font-bold"> Figma Login</h2>
+    <div className="p-3">
       {!session ? (
         <button
-          className="px-4 py-2 bg-black text-white rounded-md"
+          className="px-4 py-4 w-full bg-black text-white rounded-xl uppercase tracking-widest text-xs"
           onClick={() => {
-            signIn("figma");
+            signIn(app);
           }}
         >
-          Figma 연결하기
+          {app.charAt(0).toUpperCase() + app.slice(1)} 연결하기
         </button>
       ) : (
         <button
@@ -25,7 +24,7 @@ export default function FigmaLogin() {
             signOut();
           }}
         >
-          Figma 연결해제하기
+          {app.charAt(0).toUpperCase() + app.slice(1)} 연결해제하기
         </button>
       )}
     </div>

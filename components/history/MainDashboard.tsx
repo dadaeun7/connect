@@ -1,32 +1,64 @@
-"use client";
 
+import { Funnel } from "lucide-react";
 import MilestoneCard from "./MilestoneCard";
 
-// #F5F5F5 
 export default function MainDashboard() {
   return (
-    <div className="flex-1 bg-[var(--background)] min-h-screen p-4 md:p-8 text-[#333]">
-      {/* 상단 탭 메뉴 */}
-      <div className="flex gap-6 border-b border-gray-300 mb-6 text-sm font-medium">
-        {['전체', 'open', 'close'].map((tab, i) => (
-          <button key={tab} className={`pb-2 ${i === 0 ? 'border-b-2 border-black' : 'text-gray-400'}`}>
-            {tab}
-          </button>
+    <div className="flex-1 bg-black min-h-screen p-10 text-white font-sans selection:bg-[#00FFA3] selection:text-black">
+      {/* 상단 헤더: 이미지 좌상단 Welcome back 스타일 */}
+      <div className="flex justify-between items-start mb-12">
+        <div>
+          <h1 className="text-4xl font-black tracking-tighter mb-2 text-white uppercase">프로젝트 히스토리</h1>
+          <p className="text-gray-500 text-sm font-medium tracking-tight">최근 프로젝트 활동을 확인하세요.</p>
+        </div>
+        <div className="flex gap-3 scale-80">
+            <button className="bg-[#111] border border-white/10 text-white font-bold px-5 py-3 rounded-l hover:bg-[#1A1A1A] transition-all text-sm uppercase tracking-widest">
+                <Funnel />
+            </button>
+            <button className="bg-[#00FFA3] text-black font-black px-5 py-3 rounded-l hover:scale-105 active:scale-95 transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(0,255,163,0.2)] text-sm uppercase">
+              + Create Task
+            </button>
+        </div>
+      </div>
+
+      {/* 요약 카드 섹션 (기존 유지) */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+        {[
+          { label: 'Total Tasks', value: '248', trend: '+3.4%', up: true },
+          { label: 'In Progress', value: '24', trend: '-1.2%', up: false },
+          { label: 'Completed', value: '236', trend: '+2.4%', up: true },
+          { label: 'High Priority', value: '12', trend: '+4.5%', up: true },
+        ].map((stat, i) => (
+          <div key={i} className="bg-[#111] border border-white/5 px-6 py-4 rounded-xl relative overflow-hidden group hover:border-[#00FFA3]/20 transition-all">
+             <div className="absolute top-0 left-0 w-1 h-full bg-[#00FFA3] opacity-0 group-hover:opacity-100 transition-all" />
+             <p className="text-[10px] text-gray-500 font-black uppercase tracking-[0.1em] mb-3 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-gray-700" /> {stat.label}
+             </p>
+             <div className="flex justify-between items-end">
+                <span className="text-2xl font-black c tracking-tighter">{stat.value}</span>
+                <span className={`text-[11px] font-black ${stat.up ? 'text-[#00FFA3]' : 'text-red-500'} tracking-tighter`}>
+                  {stat.trend} <span className="text-gray-600 ml-1 opacity-50 uppercase">vs last month</span>
+                </span>
+             </div>
+          </div>
         ))}
       </div>
 
-      {/* 검색 및 필터 영역 */}
-      <div className="flex gap-2 mb-6">
-        <div className="relative flex-1">
-          <input className="text-[13px] w-full bg-[#E0E0E0] rounded-full py-2 px-10 outline-none" placeholder="Search..." />
-          <img src="/search.png" alt="Search" className="absolute left-4 top-3 h-4 w-4" />
+      {/* 메인 리스트 카드: MilestoneCard가 배치되는 핵심 영역 */}
+      <div className="space-y-6">
+        <div className="flex items-center gap-4 mb-4 px-2">
+            <h3 className="text-sm font-black uppercase tracking-[0.2em] text-gray-500">Active Milestones</h3>
+            <div className="flex-1 h-[1px] bg-white/5" />
         </div>
-        <button className="bg-[#E0E0E0] p-2 rounded-lg"><img src="/filter.png" alt="Filter" /></button>
-        <button className="bg-[#E0E0E0] px-4 py-2 rounded-lg font-bold text-sm">Add +</button>
+        
+        {/* MilestoneCard 렌더링 */}
+        <MilestoneCard />
+        
+        {/* 추가 마일스톤 예시 (반복 시) */}
+        <div className="opacity-50 grayscale hover:grayscale-0 hover:opacity-100 transition-all">
+            <MilestoneCard />
+        </div>
       </div>
-
-      {/* 마일스톤 카드 (이미지의 큰 흰색 박스) */}
-      <MilestoneCard />
     </div>
   );
 }
