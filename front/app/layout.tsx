@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Our Workflows",
+  title: "connect",
   description: "We Suggest you to Workflows",
 };
 

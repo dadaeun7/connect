@@ -1,19 +1,31 @@
 name: connect
 services:
-    # 서비스는 독립 실행형 출력 파일을 사용하여 프로덕션 Next.js 앱을 빌드하고 실행
-    # Next.js는 애플리케이션 실행에 필요한 파일과 종속성만 포함하는 자체 포함형 출력을 생성
-    nextjs-prod-standalone:
-        build:
-            context: .
-            dockerfile: Dockerfile
-        image: nextjs-sample:prod
-        container_name: nextjs-sample-prod
+    postgres:
+        container_name: connect-postgres
+        image: "postgres:latest"
+        restart: always
+        shm_size: 128mb
+        environment:
+            - POSTGRES_USER=${POSTGRES_USER}
+            - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+            - POSTGRES_DB=${POSTGRES_DB}
         ports:
-            - "3000:3000"
-    # 핫 모듈 교체 기능을 통해 Next.js 개발 서버를 실행
-    next-dev:
+            - "5432:5432"
+        volumes:
+            - postgres_data:/var/lib/postgresql
+
+    redis:
+        container_name: connect-redis
+        image: "redis:latest"
+        ports:
+            - "6379:6379"
+        environment:
+            - REDIS_PASSWORD=${REDIS_PASSWORD}
+        volumes:
+            - redis_data:/data
+    front:
         build:
-            context: .
+            context: ./front
             dockerfile: Dockerfile.dev
         image: nextjs-sample:dev
         container_name: nextjs-sample-dev
@@ -29,8 +41,26 @@ services:
                   path: .
                   target: /app
                   ignore:
-                    - node_modules/
-                    - .next/
-                # rebuild작업은 package.json파일이 변경될 때 종속성이 다시 설치되도록 함 
+                      - node_modules/
+                      - .next/
+                # rebuild작업은 package.json파일이 변경될 때 종속성이 다시 설치되도록 함
                 - action: rebuild
                   path: package.json
+
+    backend:
+        build:
+            context: ./back
+            dockerfile: Dockerfile.dev
+            args:
+                - JAR_FILE=./build/libs/*.jar
+        ports:
+            - 8080:8080
+        environment:
+            - SPRING_PROFILES_ACTIVE=dev
+        depends_on:
+            - postgres
+            - redis
+
+volumes:
+    postgres_data:
+    redis_data:

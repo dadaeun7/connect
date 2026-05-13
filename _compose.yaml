@@ -1,0 +1,10 @@
+name: connect
+services:
+  front:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    image: nextjs-sample:prod
+    container_name: nextjs-sample-prod
+    ports:
+      - "3000:3000"
