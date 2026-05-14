@@ -8,7 +8,7 @@ const TITLE: { [key: string] : string} = {
   "Slack" : "Workspace"
 }
 
-export default function IntegrationSettings() {
+export default function IntegrationTab() {
   const [activeTab, setActiveTab] = useState('Github');
 
   return (

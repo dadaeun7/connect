@@ -3,18 +3,19 @@
 import MainPage from "./main/MainPage";
 import MainDashboard from "@/components/history/MainDashboard";
 import Sidebar from "@/components/ui/SideBar";
-import IntegrationSettings from "@/components/integration/IntegrationSettings";
 import MainTimeLine from "@/components/timeline/MainTimeLine";
 import MainNewIssue from "@/components/newIssue/MainNewIssue";
-import { use, useState } from "react";
+import { useState } from "react";
 import { useSession } from "next-auth/react";
-import { Link } from "lucide-react";
+import InfoPage from "@/components/myinfo/InfoPage";
+import SettingPage from "@/components/project_setting/SettingPage";
 
 const MAIN: { [key: string]: React.ReactNode } = {
   작업라인: <MainDashboard />,
   타임라인: <MainTimeLine />,
   새이슈: <MainNewIssue />,
-  "프로젝트 설정": <IntegrationSettings />,
+  "프로젝트 설정": <SettingPage />,
+  "내 정보": <InfoPage />
 };
 
 export default function Home() {
