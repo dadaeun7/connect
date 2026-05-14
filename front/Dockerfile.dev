@@ -15,7 +15,7 @@ RUN --mount=type=cache,target=/root/.npm \
 COPY --chown=node:node . .
 
 ENV WATCHPACK_POLLING=true
-ENV HOSTNAME = "0.0.0.0"
+ENV HOSTNAME="0.0.0.0"
 
 # 병목 현상 발견되어 주석 처리 >> RUN chown -R node:node /app
 # 병목 로그

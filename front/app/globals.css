@@ -1,8 +1,5 @@
 /*Lucide Icons https://lucide.dev/icons/funnel*/
 
-
-
-
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -54,10 +51,11 @@
 }
 
 :root {
+  --color-black: #010101;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: #131313;
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
   --primary: oklch(0.205 0 0);
@@ -138,6 +136,6 @@
   width: 4px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(0,0,0,0.1);
+  background-color: rgba(0, 0, 0, 0.1);
   border-radius: 10px;
 }

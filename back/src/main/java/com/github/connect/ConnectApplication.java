@@ -1,4 +1,4 @@
-package com.github.dadaeun7.connect;
+package com.github.connect;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
