@@ -33,21 +33,23 @@ export default function IssueListView() {
   const filteredIssues = ["전체", "검토전", "논의중", "완료"];
 
   return (
-    <div className="flex-1 bg-black min-h-screen p-8 font-sans text-white">
-      <div className="mb-4">
-        <h1 className="text-4xl font-black tracking-tighter mb-2 text-white uppercase">
+    <div className="flex-1 bg-black min-h-screen p-10 text-white selection:bg-[#00FFA3] selection:text-black">
+      <div className="mb-12">
+        <h1 className="text-4xl font-[700] tracking-tighter mb-2 text-white uppercase">
           새이슈
         </h1>
-        <p className="text-gray-500 text-sm font-medium tracking-tight">
+        <p className="text-gray-500 text-sm font-medium tracking-widest">
           새로 감지된 이슈를 확인하여 논의해보세요.
         </p>
       </div>
-      {/* 상단 탭: 형광색 언더라인 스타일 */}
-      <IssueTap menu={filteredIssues} />
-      {/* 검색 바: 다크 모드 캡슐형 */}
-      <IssueSearch />
-      {/* 이슈 리스트: 레퍼런스 이미지의 카드 스타일 */}
-      <IssueList list={issues} />
+      <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+        {/* 상단 탭: 형광색 언더라인 스타일 */}
+        <IssueTap menu={filteredIssues} />
+        {/* 검색 바: 다크 모드 캡슐형 */}
+        <IssueSearch />
+        {/* 이슈 리스트: 레퍼런스 이미지의 카드 스타일 */}
+        <IssueList list={issues} />
+      </div>
     </div>
   );
 }

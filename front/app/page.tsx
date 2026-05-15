@@ -15,7 +15,7 @@ const MAIN: { [key: string]: React.ReactNode } = {
   타임라인: <MainTimeLine />,
   새이슈: <MainNewIssue />,
   "프로젝트 설정": <SettingPage />,
-  "내 정보": <InfoPage />
+  "내 정보": <InfoPage />,
 };
 
 export default function Home() {

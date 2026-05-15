@@ -36,12 +36,12 @@ export default function Sidebar({
       </div>
 
       {/* 프로젝트 리스트: 레퍼런스의 드롭다운 스타일 적용 */}
-      <nav className="px-4 pb-6 space-y-2">
+      <nav className="px-4 pb-6 space-y-2 mb-5">
         <div
           onClick={() => setShowProjects(!showProjects)}
-          className="flex w-full h-12 items-center p-[6] rounded-xl border border-white/10 bg-[#111] cursor-pointer group hover:border-[#00FFA3]/50 transition-all"
+          className={`flex w-full h-12 items-center px-${isExpanded ? 2 : 1} py-3 rounded-xl border border-white/10 bg-[#111] cursor-pointer group hover:border-[#00FFA3]/50 transition-all`}
         >
-          <div className="min-w-[32px] h-8 bg-[#00FFA3]/10 text-[#00FFA3] rounded flex items-center justify-center text-xs font-bold">
+          <div className="p-3 h-8 bg-[#00FFA3]/10 text-[#00FFA3] rounded flex items-center justify-center text-xs font-bold">
             {projects[0][0]}
           </div>
           {isExpanded && (
@@ -76,7 +76,7 @@ export default function Sidebar({
               {section.title}
             </div>
           )}
-          <div className="space-y-1">
+          <div className="space-y-5">
             {section.items.map((item) => (
               <div
                 key={item}
