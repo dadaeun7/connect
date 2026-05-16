@@ -1,18 +1,29 @@
 "use client";
 
+import Link from "next/link";
 import React, { useState } from "react";
 
-export default function Sidebar({
-  setShowMain,
-}: {
-  setShowMain: React.Dispatch<React.SetStateAction<string>>;
-}) {
+type menuLink = {
+  [key: string]: string;
+};
+
+export default function Sidebar() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [projects, setProjects] = useState([
     "프로젝트 A",
     "프로젝트 B",
     "프로젝트 C",
   ]);
+
+  const links: menuLink = {
+    작업라인: "/project/workline",
+    타임라인: "/project/timeline",
+    새이슈: "/project/new-issue",
+    "프로젝트 설정": "/project/project-setting",
+    "내 정보": "/project/my-info",
+    결제: "/project/payment",
+  };
+
   const [showProjects, setShowProjects] = useState(false);
 
   return (
@@ -21,15 +32,17 @@ export default function Sidebar({
         isExpanded ? "w-64" : "w-20"
       }`}
     >
-      {/* 로고 영역: 이미지 상단 로고 스타일 */}
+      {/* 로고 영역: 이미지 상단 로고 스타일 project*/}
       <div
         className={`flex items-center ${isExpanded ? "justify-start px-6" : "justify-center"} py-8`}
       >
         <div className="w-8 h-8 bg-[#00FFA3] rounded-lg flex items-center justify-center">
-          <div className="w-4 h-4 border-2 border-black rounded-sm rotate-45" />
+          <Link href={"/"}>
+            <div className="w-4 h-4 border-2 border-black rounded-sm rotate-45" />
+          </Link>
         </div>
         {isExpanded && (
-          <span className="ml-3 text-white font-black italic tracking-tighter text-xl">
+          <span className="ml-3 text-white font-[700] tracking-tighter text-xl">
             Connect
           </span>
         )}
@@ -78,10 +91,10 @@ export default function Sidebar({
           )}
           <div className="space-y-5">
             {section.items.map((item) => (
-              <div
+              <Link
+                href={links[item]}
                 key={item}
                 className="flex items-center p-2 rounded-md hover:bg-white/5 cursor-pointer group transition-colors"
-                onClick={() => setShowMain(item)}
               >
                 <div className="min-w-[32px] h-8 bg-[#1A1A1A] group-hover:bg-[#00FFA3]/20 rounded-lg flex items-center justify-center text-[10px] text-gray-400 group-hover:text-[#00FFA3] transition-colors">
                   {item[0]}
@@ -91,7 +104,7 @@ export default function Sidebar({
                     {item}
                   </span>
                 )}
-              </div>
+              </Link>
             ))}
           </div>
         </nav>

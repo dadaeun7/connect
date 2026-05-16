@@ -17,7 +17,7 @@ export default function GeneralTab() {
           <div className="flex-1 h-[1px] bg-white/5" />
         </div>
 
-        <div className="space-y-4 max-w-2xl">
+        <div className="space-y-4">
           <div>
             <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mb-2">
               이름

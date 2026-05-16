@@ -1,4 +1,6 @@
-import { Funnel } from "lucide-react";
+"use client";
+
+import { Search } from "lucide-react";
 import MilestoneCard from "./MilestoneCard";
 import AddMilestone from "./AddMilstone";
 import { useState } from "react";
@@ -51,7 +53,7 @@ export default function MainDashboard() {
       {/* 요약 카드 섹션 (기존 유지) */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         {[
-          { label: "Total Tasks", value: "248", trend: "+3.4%", up: true },
+          { label: "총 작업수", value: "248", trend: "+3.4%", up: true },
           { label: "In Progress", value: "24", trend: "-1.2%", up: false },
           { label: "Completed", value: "236", trend: "+2.4%", up: true },
           { label: "High Priority", value: "12", trend: "+4.5%", up: true },
@@ -82,21 +84,21 @@ export default function MainDashboard() {
         ))}
       </div>
       <div className="flex justify-end gap-3 mb-3">
-        <button className="bg-[#111] border border-white/10 text-white font-bold px-5 py-3 rounded-md hover:bg-[#1A1A1A] transition-all text-sm uppercase tracking-widest">
-          <Funnel size={15} />
+        <button className="bg-[#111] border border-white/10 text-white font-bold px-3 py-2 rounded-md hover:bg-[#1A1A1A] transition-all text-sm uppercase tracking-widest">
+          <Search size={15} />
         </button>
         <button
-          className="bg-[#00FFA3] text-black font-black px-5 py-3 rounded-md hover:scale-105 active:scale-95 transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(0,255,163,0.2)] text-sm uppercase"
+          className="bg-[#00FFA3] text-black font-black px-5 py-2 rounded-md hover:scale-105 active:scale-95 transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(0,255,163,0.2)] text-sm uppercase"
           onClick={oepnModal}
         >
-          + Create Task
+          + 새 작업
         </button>
       </div>
       {/* 메인 리스트 카드: MilestoneCard가 배치되는 핵심 영역 */}
       <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
         <div className="flex items-center gap-4 mb-4 px-2">
           <h3 className="text-sm font-black uppercase tracking-[0.2em] text-gray-500">
-            Active Milestones
+            작업 내역
           </h3>
           <div className="flex-1 h-[1px] bg-white/5" />
         </div>

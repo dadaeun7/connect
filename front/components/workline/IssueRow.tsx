@@ -1,5 +1,3 @@
-"use client";
-
 import { ChevronDown, ExternalLink, User } from "lucide-react";
 
 export default function IssueRow({
@@ -42,7 +40,7 @@ export default function IssueRow({
                     Repository Update Content...
                   </span>
                   <ExternalLink
-                    size={10}
+                    size={14}
                     className="text-[#00FFA3] opacity-50"
                   />
                 </div>

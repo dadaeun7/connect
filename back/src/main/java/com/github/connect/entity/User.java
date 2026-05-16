@@ -25,9 +25,14 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false)
+    @Column
     private String password;
 
+    /**
+     * @param company 자사
+     * @param github 외부
+     * @param gmail 외부
+     */
     @Column(nullable = false, name="join_type")
     private RoleType type;
 
@@ -36,6 +41,6 @@ public class User {
 
 
     public enum RoleType{
-        COMPANY, EXTERNAL
+        COMPANY, GITHUB, GMAIL
     } 
 }

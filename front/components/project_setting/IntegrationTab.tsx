@@ -1,5 +1,5 @@
 import { useState } from "react";
-import AppIntegrationSet from "@/app/api/offer/AppIntegrationSet";
+import AppIntegrationSet from "@/components/project_setting/AppIntegrationSet";
 
 const TITLE: { [key: string]: string } = {
   Github: "Repository",
