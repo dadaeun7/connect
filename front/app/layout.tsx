@@ -5,6 +5,9 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "connect",
   description: "We Suggest you to Workflows",
+  icons: {
+    icon: "/logo.png",
+  },
 };
 
 export default function RootLayout({

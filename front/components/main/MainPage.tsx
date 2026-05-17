@@ -27,7 +27,7 @@ export default function MainPage() {
             요금제
           </a>
         </div>
-        <Link href={"/login"}>
+        <Link href={"/auth/login"}>
           <button className="bg-white text-black px-5 py-2 rounded-full text-xs font-black uppercase tracking-widest hover:bg-[#00FFA3] transition-all">
             로그인
           </button>

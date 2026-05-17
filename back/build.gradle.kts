@@ -26,18 +26,23 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-webflux")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-aspectj")
+	implementation("org.springframework.boot:spring-boot-starter-mail:3.3.0")
 	compileOnly("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	developmentOnly("org.springframework.boot:spring-boot-docker-compose")
 	runtimeOnly("org.postgresql:postgresql")
 	annotationProcessor("org.projectlombok:lombok")
+
+	// test 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("org.testcontainers:testcontainers:2.0.5")
+	testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
+	testImplementation("org.testcontainers:testcontainers-junit-jupiter:2.0.5")
+	// test db
 	testImplementation("com.h2database:h2")
 	testRuntimeOnly("com.h2database:h2")
-	// 	testImplementation("org.springframework.boot:spring-boot-starter-validation-test")
-	// testImplementation("org.springframework.boot:spring-boot-starter-webclient-test")
-	// testImplementation("org.springframework.boot:spring-boot-starter-webflux-test")
-	// testImplementation("org.springframework.boot:spring-boot-starter-kafka-test")
+
+
 	testCompileOnly("org.projectlombok:lombok")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 

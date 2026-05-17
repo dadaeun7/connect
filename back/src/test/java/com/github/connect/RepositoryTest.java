@@ -8,17 +8,16 @@ import com.github.connect.entity.User;
 import com.github.connect.entity.User.RoleType;
 import com.github.connect.repository.UsersRepository;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
 @SpringBootTest
-@RequiredArgsConstructor
 class RepositoryTest {
 
-	private final UsersRepository userRepository;
+	@Autowired
+	private UsersRepository userRepository;
 
 	@Test
 	void testJpa() {
