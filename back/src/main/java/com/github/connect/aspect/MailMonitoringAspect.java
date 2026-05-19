@@ -1,5 +1,7 @@
 package com.github.connect.aspect;
 
+import com.github.connect.exception.GlobalExceptionHandler;
+import jakarta.mail.MessagingException;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.AfterThrowing;
@@ -14,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MailMonitoringAspect {
     
-    @Pointcut("execution(* com.github.connect.service.JoinEmailVerifyServiceImpl.*(..)")
+    @Pointcut("execution(* com.github.connect.service.JoinEmailVerifyServiceImpl.*(..))")
     public void emailServiceMethods(){}
 
     @AfterReturning("emailServiceMethods()")
@@ -29,7 +31,7 @@ public class MailMonitoringAspect {
         }
     }
 
-    @AfterThrowing("emailServiceMethods()")
+    @AfterThrowing(value = "emailServiceMethods()", throwing = "e")
     public void errorMailService(JoinPoint joinPoint, Exception e){
         String methodName = joinPoint.getSignature().getName();
         Object[] args = joinPoint.getArgs();

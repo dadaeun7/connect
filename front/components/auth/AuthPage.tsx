@@ -39,17 +39,19 @@ export default function AuthPage({
           <input
             type={firstInput}
             placeholder={firstInput}
-            className="w-full bg-black border border-white/5 rounded-xl py-4 pl-12 pr-4 text-xs font-bold tracking-widest focus:outline-none focus:border-[#00FFA3]/50 focus:ring-1 focus:ring-[#00FFA3]/50 transition-all text-white"
+            className={`w-full bg-${mode === "verify" ? "white/5" : "black"} border border-${mode === "verify" ? "black" : "white/5"} rounded-xl py-4 pl-12 pr-4 text-xs font-bold tracking-widest focus:outline-none focus:border-[#00FFA3]/50 focus:ring-1 focus:ring-[#00FFA3]/50 transition-all text-white`}
             value={formFirInput}
             onChange={(e) => setformFirInput(e.target.value)}
-            required
+            disabled={mode === "verify"}
           />
         </div>
         <div className="relative group">
           <Lock className="absolute left-4 top-4 w-5 h-5 text-gray-600 group-focus-within:text-[#00FFA3] transition-colors" />
           <input
             type={secondInput}
-            placeholder={secondInput}
+            placeholder={
+              secondInput === "password" ? "repaet password" : secondInput
+            }
             className="w-full bg-black border border-white/5 rounded-xl py-4 pl-12 pr-4 text-xs font-bold tracking-widest focus:outline-none focus:border-[#00FFA3]/50 focus:ring-1 focus:ring-[#00FFA3]/50 transition-all text-white"
             value={formSecInput}
             onChange={(e) => setformSecInput(e.target.value)}

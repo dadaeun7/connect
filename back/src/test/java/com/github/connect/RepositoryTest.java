@@ -9,11 +9,13 @@ import com.github.connect.entity.User.RoleType;
 import com.github.connect.repository.UsersRepository;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
 @SpringBootTest
+@ActiveProfiles("test")
 class RepositoryTest {
 
 	@Autowired

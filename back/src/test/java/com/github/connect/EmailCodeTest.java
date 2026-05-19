@@ -1,41 +1,51 @@
 package com.github.connect;
 
+import com.github.connect.service.JoinEmailVerifyServiceImpl;
+import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.test.context.ActiveProfiles;
+import org.testcontainers.containers.FixedHostPortGenericContainer;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 
 
 @SpringBootTest
 @Testcontainers
+@ActiveProfiles("test")
 public class EmailCodeTest {
 
     @Container
-    public static GenericContainer<?> redisContainer = 
-            new GenericContainer<>(DockerImageName.parse("redis:7.0"))
-                    .withExposedPorts(6379)
+    public static GenericContainer<?> redisContainer =
+            new FixedHostPortGenericContainer<>("redis:7.0")
+                    .withFixedExposedPort(6379, 6379)
                     .withReuse(true);
+
 
     static {
         redisContainer.start();
     }
 
-    // Spring Boot 설정에 동적으로 Redis 포트 주입
-    @DynamicPropertySource
-    static void redisProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.data.redis.host", redisContainer::getHost);
-        // 컨테이너 내부의 6379 포트가 외부 호스트의 어떤 무작위 포트로 매핑되었는지 가져옵니다.
-        registry.add("spring.data.redis.port", redisContainer::getFirstMappedPort);
-    }
+    @Autowired
+    JoinEmailVerifyServiceImpl joinEmailVerifyService;
+
+    @Autowired
+    StringRedisTemplate stringRedisTemplate;
 
     @Test
-    void redisTest() {
+    void redisTest() throws MessagingException {
         // 테스트 로직 작성
         System.out.println("Redis 호스트: " + redisContainer.getHost());
-        System.out.println("Redis 포트: " + redisContainer.getFirstMappedPort());
+
+        String testEmail = "dadaeun7@gmail.com";
+        String testName = "홍길동";
+        joinEmailVerifyService.sendEmail(testName, testEmail);
+
+        String code = stringRedisTemplate.opsForValue().get(testEmail);
+        joinEmailVerifyService.checkCode(testEmail, code);
+
     }
 }

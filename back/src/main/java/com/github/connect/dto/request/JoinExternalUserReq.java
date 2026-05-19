@@ -10,10 +10,13 @@ import lombok.experimental.SuperBuilder;
 @FieldDefaults(level= AccessLevel.PRIVATE, makeFinal=true)
 @SuperBuilder(toBuilder = true)
 public class JoinExternalUserReq extends CreateUserRequest{
-    
-    @NotBlank(message="External id is required")
+
+    @NotBlank(message="이름은 필수 입력 항목입니다.")
+    private String name;
+
+    @NotBlank(message="외부 FK ID는 필수 항목입니다.")
     private String externalId;
 
-    @NotBlank(message="External Type is required")
+    @NotBlank(message="외부 연동 주체 항목은 필수 입니다.")
     private String type;
 }
