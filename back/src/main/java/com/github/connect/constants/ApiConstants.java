@@ -11,6 +11,7 @@ public class ApiConstants {
 
     public static final String SIGN_UP_COMPANY = LOGIN_AUTH_BASE + "/signup";
     public static final String SIGN_UP_VERIFY = LOGIN_AUTH_BASE + "/verify";
+    public static final String SIGN_UP_REGISTER = LOGIN_AUTH_BASE + "/register";
 
     public static final String API_BASE = "/api/auth";
     public static final String CONNECT_GITHUB = API_BASE + "/github";

@@ -32,14 +32,16 @@ public class JoinEmailVerifyServiceImpl implements EmailVerifyService{
 
         String code = createVerifyCode();
         sendCodeHtmlMail(email, code);
-        joinCompanyUserRepository.saveAuthCode(name, email, code);
+
+        JoinCompnayUser user = new JoinCompnayUser(name, email, code);
+        joinCompanyUserRepository.saveAuthCode(joinCompanyUserRepository.redisJoinKey(email), user);
     }
 
     @Override
     public void checkCode(String email, String code) {
-        JoinCompnayUser user = checkVerifyCode(email, code);
-        joinCompanyUserRepository.saveVerifyUser(email, user);
-        joinCompanyUserRepository.deleteAuthCode(email);
+        JoinCompnayUser user = checkVerifyCode(joinCompanyUserRepository.redisJoinKey(email), code);
+        joinCompanyUserRepository.saveVerifyUser(joinCompanyUserRepository.redisJoinKey(email), user);
+        joinCompanyUserRepository.deleteAuthCode(joinCompanyUserRepository.redisJoinKey(email));
     }
 
     private void sendCodeHtmlMail(String email, String code){
@@ -60,14 +62,15 @@ public class JoinEmailVerifyServiceImpl implements EmailVerifyService{
     }
 
     private void retryAuthToRedis(String email){
-        if(joinCompanyUserRepository.find(email).isPresent()){
+
+        if(joinCompanyUserRepository.find(joinCompanyUserRepository.redisJoinKey(email)).isPresent()){
             throw new JoinCompanyException("이미 요청 된 작업이 있습니다. 메일을 확인해주세요");
         }
     }
 
-    public JoinCompnayUser checkVerifyCode(String email, String code) {
+    public JoinCompnayUser checkVerifyCode(String key, String code) {
 
-        Optional<JoinCompnayUser> user = joinCompanyUserRepository.find(email);
+        Optional<JoinCompnayUser> user = joinCompanyUserRepository.find(key);
 
         if(user.isEmpty()){
             throw new JoinCompanyException("만료된 코드로 시도되어 처리가 불가합니다.");
@@ -79,6 +82,7 @@ public class JoinEmailVerifyServiceImpl implements EmailVerifyService{
 
         return user.get();
     }
+
 
 
     private String createVerifyCode() {

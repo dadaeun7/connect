@@ -34,7 +34,7 @@ public class UserController{
         return ResponseEntity.status(201).body("success verify code");
     }
 
-    @PostMapping(ApiConstants.SIGN_UP_COMPANY)
+    @PostMapping(ApiConstants.SIGN_UP_REGISTER)
     public ResponseEntity<String> register(JoinCompanyRegisterReq joinCompanyRegisterReq){
         joinUserService.join(joinCompanyRegisterReq.getEmail(), joinCompanyRegisterReq.getPassword());
         return ResponseEntity.status(201).body("success join");

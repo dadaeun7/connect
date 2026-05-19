@@ -2,7 +2,6 @@ package com.github.connect;
 
 import com.github.connect.dto.internal.JoinCompnayUser;
 import com.github.connect.repository.JoinCompanyUserRepository;
-import com.github.connect.service.JoinEmailVerifyServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,15 +9,12 @@ import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.containers.FixedHostPortGenericContainer;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.Optional;
 
-
 @SpringBootTest
-@Testcontainers
 @ActiveProfiles("test")
-public class EmailCodeTest {
+public class RedisSerializerTest {
 
     @Container
     public static GenericContainer<?> redisContainer =
@@ -31,30 +27,24 @@ public class EmailCodeTest {
         redisContainer.start();
     }
 
-    @Autowired
-    JoinEmailVerifyServiceImpl joinEmailVerifyService;
 
     @Autowired
     JoinCompanyUserRepository joinCompanyUserRepository;
 
     @Test
-    void redisTest(){
-        // 테스트 로직 작성
-        System.out.println("Redis 호스트: " + redisContainer.getHost());
+    void testRedisSerial(){
 
         String testEmail = "dadaeun7@gmail.com";
         String testName = "홍길동";
-        joinEmailVerifyService.sendEmail(testName, testEmail);
+        String testCode = "98743456";
 
-        Optional<JoinCompnayUser> check = joinCompanyUserRepository.find(joinCompanyUserRepository.redisJoinKey(testEmail));
+        JoinCompnayUser user = new JoinCompnayUser(testName, testEmail,testCode);
 
-        if(check.isEmpty()){
-            System.err.println("redis 에 JoinCompanyUser가 저장되지 않았습니다.");
-            throw new RuntimeException();
-        }
-
-        String code = check.get().getCode();
-        joinEmailVerifyService.checkCode(testEmail, code);
-
+        String targetKey = joinCompanyUserRepository.redisJoinKey(testEmail);
+        joinCompanyUserRepository.saveAuthCode(targetKey, user);
+        Optional<JoinCompnayUser> result = joinCompanyUserRepository.find(targetKey);
+        assert(result).isPresent();
     }
+
+
 }

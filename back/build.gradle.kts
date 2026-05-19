@@ -35,8 +35,10 @@ dependencies {
 	annotationProcessor("org.projectlombok:lombok")
 
 	// test 
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	testImplementation("org.testcontainers:testcontainers-mongodb:2.0.1")
+	testImplementation("org.springframework.boot:spring-boot-starter-test:4.0.6")
+
+	// test container
+//	testImplementation("org.testcontainers:testcontainers-mongodb:2.0.1")
 	testImplementation("org.testcontainers:testcontainers:2.0.5")
 	testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
 	testImplementation("org.testcontainers:testcontainers-junit-jupiter:2.0.5")
