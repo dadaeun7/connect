@@ -1,129 +1,170 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import React, { useState } from "react";
-
-type menuLink = {
-  [key: string]: string;
-};
+import {
+  Layers,
+  Calendar,
+  PlusSquare,
+  Settings,
+  User,
+  CreditCard,
+  ChevronLeft,
+} from "lucide-react";
+import ThemeBtn from "./ThemeBtn";
 
 export default function Sidebar() {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [projects, setProjects] = useState([
-    "프로젝트 A",
-    "프로젝트 B",
-    "프로젝트 C",
-  ]);
-
-  const links: menuLink = {
-    작업라인: "/project/workline",
-    타임라인: "/project/timeline",
-    새이슈: "/project/new-issue",
-    "프로젝트 설정": "/project/project-setting",
-    "내 정보": "/project/my-info",
-    결제: "/project/payment",
-  };
-
+  const pathname = usePathname();
+  const [isExpanded, setIsExpanded] = useState(true); // 💡 누락되었던 핵심 확장/축소 상태 복구
+  const [projects] = useState(["프로젝트 A", "프로젝트 B"]);
   const [showProjects, setShowProjects] = useState(false);
+
+  const menuSections = [
+    {
+      title: "협업 관리",
+      items: [
+        {
+          name: "작업라인",
+          path: "/project/workline",
+          icon: <Layers size={15} />,
+        },
+        {
+          name: "타임라인",
+          path: "/project/timeline",
+          icon: <Calendar size={15} />,
+        },
+        {
+          name: "새이슈",
+          path: "/project/new-issue",
+          icon: <PlusSquare size={15} />,
+        },
+        {
+          name: "프로젝트 설정",
+          path: "/project/project-setting",
+          icon: <Settings size={15} />,
+        },
+      ],
+    },
+    {
+      title: "계정 관리",
+      items: [
+        { name: "내 정보", path: "/project/my-info", icon: <User size={15} /> },
+        {
+          name: "결제",
+          path: "/project/payment",
+          icon: <CreditCard size={15} />,
+        },
+      ],
+    },
+  ];
 
   return (
     <aside
-      className={`custom-scrollbar overflow-y-auto min-h-screen border-r border-white/5 bg-[#000] transition-all duration-300 flex flex-col ${
-        isExpanded ? "w-64" : "w-20"
+      // 💡 isExpanded 상태에 따라 가로 폭이 w-60(240px)과 w-16(64px)으로 유연하게 스위칭되도록 교정
+      className={`min-h-screen border-r border-[var(--sidebar-border)] bg-[var(--sidebar)] text-[var(--sidebar-foreground)] flex flex-col shrink-0 transition-all duration-300 ${
+        isExpanded ? "w-60" : "w-16"
       }`}
     >
-      {/* 로고 영역: 이미지 상단 로고 스타일 project*/}
-      <div
-        className={`flex items-center ${isExpanded ? "justify-start px-6" : "justify-center"} py-8`}
-      >
-        <div className="w-8 h-8 bg-[#00FFA3] rounded-lg flex items-center justify-center">
+      {/* 테마 스위처 바: 사이드바가 활성화되어 열려있을 때만 우측 정렬 매핑 */}
+      {isExpanded && (
+        <div className="flex ml-5 justify-between items-center w-full mt-1 ">
           <Link href={"/"}>
-            <div className="w-4 h-4 border-2 border-black rounded-sm rotate-45" />
+            <img
+              src="/logo.png"
+              alt="logo"
+              className="w-7 h-7 object-contain"
+            />
           </Link>
+          <ThemeBtn />
         </div>
-        {isExpanded && (
-          <span className="ml-3 text-white font-[700] tracking-tighter text-xl">
-            Connect
-          </span>
-        )}
-      </div>
+      )}
 
-      {/* 프로젝트 리스트: 레퍼런스의 드롭다운 스타일 적용 */}
-      <nav className="px-4 pb-6 space-y-2 mb-5">
+      {/* 프로젝트 셀렉터 탭 */}
+      <div className="p-3 border-b border-[var(--sidebar-border)]/60">
         <div
           onClick={() => setShowProjects(!showProjects)}
-          className={`flex w-full h-12 items-center px-${isExpanded ? 2 : 1} py-3 rounded-xl border border-white/10 bg-[#111] cursor-pointer group hover:border-[#00FFA3]/50 transition-all`}
+          className={`flex items-center bg-[var(--muted)]/80 border border-[var(--sidebar-border)] rounded-xl py-2.5 cursor-pointer hover:border-[var(--primary)]/40 transition-colors ${
+            isExpanded
+              ? "px-3 justify-between"
+              : "justify-center px-0 w-10 h-10 mx-auto"
+          }`}
         >
-          <div className="p-3 h-8 bg-[#00FFA3]/10 text-[#00FFA3] rounded flex items-center justify-center text-xs font-bold">
+          <div className="w-6 h-6 bg-[var(--sidebar-primary)] text-[var(--sidebar-primary-foreground)] text-[10px] font-black rounded flex items-center justify-center shrink-0">
             {projects[0][0]}
           </div>
           {isExpanded && (
             <>
-              <div className="text-[13px] ml-3 text-white font-bold flex-1 truncate">
+              <span className="text-xs font-bold text-[var(--foreground)] truncate flex-1 ml-3">
                 {projects[0]}
-              </div>
-              <span
-                className={`text-[10px] text-gray-500 transition-transform ${showProjects ? "rotate-180" : ""}`}
-              >
+              </span>
+              <span className="text-[10px] text-[var(--sidebar-foreground)]/50 font-mono">
                 ▼
               </span>
             </>
           )}
         </div>
-      </nav>
+      </div>
 
-      {/* 메뉴 섹션: 협업 & 설정 */}
-      {[
-        {
-          title: "협업",
-          items: ["작업라인", "타임라인", "새이슈", "프로젝트 설정"],
-        },
-        { title: "설정", items: ["내 정보", "결제"] },
-      ].map((section) => (
-        <nav
-          key={section.title}
-          className="pb-10 space-y-[2] px-4 cursor-pointer"
-        >
-          {isExpanded && (
-            <div className="px-2 mb-4 text-[11px] font-black text-gray-600 uppercase tracking-[0.2em]">
-              {section.title}
+      {/* 메인 트리 네비게이션 메뉴 리스트 */}
+      <div className="flex-1 py-4 space-y-6 overflow-y-auto overflow-x-hidden discrete-scrollbar">
+        {menuSections.map((section, idx) => (
+          <div key={idx} className="px-3">
+            {isExpanded && (
+              <div className="text-[10px] font-bold text-[var(--sidebar-foreground)]/40 mb-3 px-2 tracking-wider uppercase">
+                {section.title}
+              </div>
+            )}
+            <div className="space-y-1">
+              {section.items.map((item) => {
+                const isActive = pathname === item.path;
+                return (
+                  <Link
+                    href={item.path}
+                    key={item.name}
+                    className={`flex items-center py-2.5 rounded-xl text-sm font-semibold group transition-all ${
+                      isExpanded
+                        ? "px-3 gap-3.5"
+                        : "justify-center px-0 w-10 h-10 mx-auto"
+                    } ${
+                      isActive
+                        ? "bg-[var(--sidebar-accent)] text-[var(--sidebar-accent-foreground)] font-black shadow-sm"
+                        : "text-[var(--sidebar-foreground)]/70 hover:bg-[var(--sidebar-accent)]/40"
+                    }`}
+                  >
+                    <div
+                      className={
+                        isActive
+                          ? "text-[var(--sidebar-primary)]"
+                          : "text-[var(--sidebar-foreground)]/40 group-hover:text-[var(--sidebar-foreground)] transition-colors"
+                      }
+                    >
+                      {item.icon}
+                    </div>
+                    {isExpanded && (
+                      <span className="tracking-wide text-xs transition-opacity duration-200">
+                        {item.name}
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
             </div>
-          )}
-          <div className="space-y-5">
-            {section.items.map((item) => (
-              <Link
-                href={links[item]}
-                key={item}
-                className="flex items-center p-2 rounded-md hover:bg-white/5 cursor-pointer group transition-colors"
-              >
-                <div className="min-w-[32px] h-8 bg-[#1A1A1A] group-hover:bg-[#00FFA3]/20 rounded-lg flex items-center justify-center text-[10px] text-gray-400 group-hover:text-[#00FFA3] transition-colors">
-                  {item[0]}
-                </div>
-                {isExpanded && (
-                  <span className="text-[13px] ml-4 text-gray-400 group-hover:text-white font-medium">
-                    {item}
-                  </span>
-                )}
-              </Link>
-            ))}
           </div>
-        </nav>
-      ))}
+        ))}
+      </div>
 
-      {/* 하단 확장/축소 토글 */}
-      <div
-        className={`mt-auto h-16 flex items-center border-t border-white/5 cursor-pointer hover:bg-white/5 transition-all 
-            ${isExpanded ? "px-5 justify-end" : "justify-center"}
-            `}
-        onClick={() => setIsExpanded(!isExpanded)}
-      >
-        <img
-          className={`h-2 transition-transform duration-300 ${
-            isExpanded ? "rotate-90" : "rotate-270"
+      {/* 하단 통합 제어 영역 (테마 토글러 내장 + 오리지널 화살표 이미지 접기 단추) */}
+      <div className="mt-auto flex flex-col w-full border-t border-[var(--sidebar-border)]/80 bg-[var(--sidebar)]">
+        {/* 오리지널 하단 확장/축소 화살표 이미지 버튼 완전 결합 */}
+        <div
+          className={`h-16 flex items-center cursor-pointer hover:bg-[var(--sidebar-accent)]/40 transition-all ${
+            isExpanded ? "px-5 justify-end" : "justify-center"
           }`}
-          src="/arrow.png"
-          alt="nav-toggle"
-        />
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          <ChevronLeft size={15} />
+        </div>
       </div>
     </aside>
   );

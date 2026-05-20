@@ -2,24 +2,27 @@
 
 import { useState } from "react";
 
-export default function IssueTap({menu}:{menu:string[]}) {
+export default function IssueTap({ menu }: { menu: string[] }) {
+  const [activeTab, setActiveTab] = useState("전체");
 
-    const [activeTab, setActiveTab] = useState('전체');
-    
-    return (
-    <div className="flex gap-8 border-b border-white/5 mb-8">
-        {menu.map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`pb-4 text-sm font-black tracking-widest transition-all ${
-              activeTab === tab ? 'text-[#00FFA3] border-b-2 border-[#00FFA3]' : 'text-gray-500'
-            }`}
-          >
-            {tab.toUpperCase()}
-          </button>
-        ))}
-      </div>
-    )
-
+  return (
+    <div className="flex gap-8 border-b border-[var(--border)] mb-6 px-1">
+      {menu.map((tab) => (
+        <button
+          key={tab}
+          onClick={() => setActiveTab(tab)}
+          className={`pb-3 text-xs font-bold tracking-wider transition-all relative uppercase ${
+            activeTab === tab
+              ? "text-[var(--primary)] font-black"
+              : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+          }`}
+        >
+          {tab}
+          {activeTab === tab && (
+            <div className="absolute bottom-[-1px] left-0 w-full h-[2px] bg-[var(--primary)]" />
+          )}
+        </button>
+      ))}
+    </div>
+  );
 }

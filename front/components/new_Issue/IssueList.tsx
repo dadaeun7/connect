@@ -3,81 +3,111 @@
 import { ChevronDown, Send, User } from "lucide-react";
 import { useState } from "react";
 
-
 interface Issue {
-    id: number;
-    title: string;
-    status: string;
-    date: string;
-    contents?: string[];
+  id: number;
+  title: string;
+  status: string;
+  date: string;
+  contents?: string[];
 }
 
-export default function IssueList({list}:{list:Issue[]}) {
+export default function IssueList({ list }: { list: Issue[] }) {
+  const [expandedId, setExpandedId] = useState<number | null>(3);
 
-    const [expandedId, setExpandedId] = useState<number | null>(3);
-    
-    return(
+  return (
     <div className="space-y-4">
-        {list.map((issue) => (
-          <div key={issue.id} className="bg-[#111] border border-white/5 rounded-2xl overflow-hidden transition-all hover:border-white/10 shadow-2xl">
-            <div className="flex flex-col md:flex-row justify-between p-6 gap-4">
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center font-mono text-[#00FFA3] font-bold">
-                    {issue.id}
-                </div>
-                <div>
-                  <div className="flex items-center gap-3">
-                    <span className="font-bold text-lg tracking-tight">{issue.title}</span>
-                    <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tighter ${
-                        issue.status === '검토전' ? 'bg-red-500/10 text-red-500' : 'bg-[#FFF500]/10 text-[#FFF500]'
-                    }`}>{issue.status}</span>
-                  </div>
-                  <span className="text-[10px] text-gray-600 mt-1 block font-mono uppercase tracking-widest">{issue.date}</span>
-                </div>
+      {list.map((issue) => (
+        <div
+          key={issue.id}
+          className="bg-[var(--card)] border border-[var(--border)] rounded-xl overflow-hidden shadow-sm"
+        >
+          <div className="flex flex-col md:flex-row justify-between p-6 gap-4">
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 bg-[var(--primary)]/10 rounded-xl flex items-center justify-center font-mono text-[var(--primary)] font-bold text-sm">
+                {issue.id}
               </div>
-
-              <div className="flex items-center gap-2">
-                <button className="bg-white/5 hover:bg-red-500/10 hover:text-red-500 px-3 py-2 rounded-lg text-[10px] font-black transition-all">DELETE</button>
-                <button className="bg-white/5 hover:bg-white/10 px-3 py-2 rounded-lg text-[10px] font-black transition-all">MERGE</button>
-                {issue.status !== '검토전' && (
-                  <button 
-                    onClick={() => setExpandedId(expandedId === issue.id ? null : issue.id)}
-                    className={`p-2 rounded-lg transition-all ${expandedId === issue.id ? 'bg-[#00FFA3] text-black' : 'bg-white/5 text-white'}`}
+              <div>
+                <div className="flex items-center gap-3">
+                  <span className="font-bold text-base tracking-tight text-[var(--foreground)]">
+                    {issue.title}
+                  </span>
+                  <span
+                    className={`px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide border ${
+                      issue.status === "검토전"
+                        ? "bg-red-500/10 text-red-500 border-red-500/20"
+                        : "bg-[var(--primary)]/10 text-[var(--primary)] border-[var(--primary)]/20"
+                    }`}
                   >
-                    <ChevronDown className={`w-4 h-4 transition-transform ${expandedId === issue.id ? 'rotate-180' : ''}`} />
-                  </button>
-                )}
+                    {issue.status}
+                  </span>
+                </div>
+                <span className="text-xs mt-1.5 block font-mono text-[var(--muted-foreground)] uppercase tracking-wider">
+                  {issue.date}
+                </span>
               </div>
             </div>
 
-            {/* 아코디언 내용: 이미지의 하위 리스트 디자인 적용 */}
-            {expandedId === issue.id && issue.contents && (
-              <div className="px-6 pb-6 space-y-3 animate-fadeIn">
-                <div className="h-[1px] bg-white/5 mb-4" />
-                {issue.contents.map((content, idx) => (
-                  <div key={idx} className="bg-black/40 border border-white/5 p-4 rounded-xl flex justify-between items-center group hover:border-[#00FFA3]/30">
-                    <span className="text-xs text-gray-300 leading-relaxed">{content}</span>
-                    <div className="flex items-center gap-3 shrink-0 ml-4">
-                      <div className="w-6 h-6 bg-gray-800 rounded-full flex items-center justify-center text-[10px]"><User size={12}/></div>
-                      <span className="text-[9px] text-gray-600 font-mono tracking-tighter uppercase">2026-04-30</span>
+            <div className="flex items-center gap-2">
+              <button className="bg-[var(--muted)] hover:bg-red-500/10 hover:text-red-500 border border-[var(--border)] px-4 py-2 rounded-lg text-xs font-bold text-[var(--muted-foreground)] transition-colors">
+                DELETE
+              </button>
+              <button className="bg-[var(--muted)] hover:bg-[var(--secondary)] border border-[var(--border)] px-4 py-2 rounded-lg text-xs font-bold text-[var(--foreground)] transition-colors">
+                MERGE
+              </button>
+              {issue.status !== "검토전" && (
+                <button
+                  onClick={() =>
+                    setExpandedId(expandedId === issue.id ? null : issue.id)
+                  }
+                  className={`p-2 border rounded-lg transition-all ${expandedId === issue.id ? "bg-[var(--primary)] text-[var(--primary-foreground)] border-[var(--primary)]" : "bg-[var(--card)] text-[var(--foreground)] border-[var(--border)]"}`}
+                >
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform ${expandedId === issue.id ? "rotate-180" : ""}`}
+                  />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* 아코디언 상세 토글 뷰 */}
+          {expandedId === issue.id && issue.contents && (
+            <div className="px-6 pb-6 space-y-3 bg-[var(--muted)]/20">
+              <div className="h-[1px] bg-[var(--border)]/60 mb-4" />
+              {issue.contents.map((content, idx) => (
+                <div
+                  key={idx}
+                  className="bg-[var(--card)] border border-[var(--border)]/80 p-4 rounded-xl flex justify-between items-center hover:border-[var(--primary)]/40 transition-colors"
+                >
+                  <span className="text-sm text-[var(--foreground)]/90 leading-relaxed font-medium">
+                    {content}
+                  </span>
+                  <div className="flex items-center gap-3 shrink-0 ml-4">
+                    <div className="w-6 h-6 bg-[var(--muted)] border border-[var(--border)] rounded-full flex items-center justify-center text-xs text-[var(--muted-foreground)]">
+                      <User size={12} />
                     </div>
+                    <span className="text-xs text-[var(--muted-foreground)]/60 font-mono">
+                      2026-04-30
+                    </span>
                   </div>
-                ))}
-                
-                {/* 하단 입력바: 플로팅 캡슐 디자인 */}
-                <div className="mt-6 pt-4 border-t border-white/5">
-                    <div className="bg-black border border-[#00FFA3]/20 rounded-2xl p-3 flex gap-3 items-center">
-                        <input placeholder="Add a comment..." className="flex-1 bg-transparent text-xs py-2 px-3 outline-none" />
-                        <button className="bg-[#00FFA3] text-black p-2 rounded-xl hover:scale-105 transition-transform">
-                            <Send size={16} />
-                        </button>
-                    </div>
+                </div>
+              ))}
+
+              {/* 하단 댓글 콘트롤 캡슐 바 */}
+              <div className="mt-5 pt-4 border-t border-[var(--border)]/60">
+                <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-2.5 flex gap-3 items-center">
+                  <input
+                    placeholder="Add a comment..."
+                    className="flex-1 bg-transparent text-sm py-2 px-3 text-[var(--foreground)] placeholder:text-[var(--muted-foreground)]/40 focus:outline-none"
+                  />
+                  <button className="bg-[var(--primary)] text-[var(--primary-foreground)] p-2 rounded-lg hover:opacity-90 transition-opacity">
+                    <Send size={15} />
+                  </button>
                 </div>
               </div>
-            )}
-          </div>
-        ))}
-      </div>
-    )
-
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
 }

@@ -25,45 +25,69 @@ export default function AuthPage({
 
   return (
     <>
-      <div className="text-center mb-10">
-        <h1 className="text-3xl font-black text-white tracking-tighter uppercase">
+      {/* 상단 텍스트 헤더 제어 영역 */}
+      <div className="text-center mb-8">
+        <h1 className="text-xl font-bold tracking-tight text-[var(--foreground)] uppercase">
           {comment}
         </h1>
-        <p className="text-xs text-gray-500 mt-3 font-medium tracking-tight">
+        <div className="text-sm mt-2 font-medium">
           {mode !== "verify" && <SelectOption mode={mode} />}
-        </p>
+        </div>
       </div>
-      <form onSubmit={() => {}} className="space-y-4">
-        <div className="relative group">
-          <Mail className="absolute left-4 top-4 w-5 h-5 text-gray-600 group-focus-within:text-[#00FFA3] transition-colors" />
-          <input
-            type={firstInput}
-            placeholder={firstInput}
-            className={`w-full bg-${mode === "verify" ? "white/5" : "black"} border border-${mode === "verify" ? "black" : "white/5"} rounded-xl py-4 pl-12 pr-4 text-xs font-bold tracking-widest focus:outline-none focus:border-[#00FFA3]/50 focus:ring-1 focus:ring-[#00FFA3]/50 transition-all text-white`}
-            value={formFirInput}
-            onChange={(e) => setformFirInput(e.target.value)}
-            disabled={mode === "verify"}
-          />
+
+      {/* 폼 메인 콘셉트 제어 영역 */}
+      <form onSubmit={(e) => e.preventDefault()} className="space-y-5">
+        {/* 첫 번째 입력 필드 (이메일 등) */}
+        <div className="flex flex-col space-y-2 relative group">
+          <label className="text-[11px] font-bold uppercase tracking-wider text-[var(--muted-foreground)] px-0.5">
+            {firstInput}
+          </label>
+          <div className="relative">
+            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--muted-foreground)]/60 group-focus-within:text-[var(--primary)] transition-colors" />
+            <input
+              type={firstInput}
+              placeholder={`${firstInput} 주소를 입력하세요`}
+              className="w-full bg-[var(--muted)] border border-[var(--border)] rounded-lg py-3 pl-11 pr-4 text-xs font-semibold text-[var(--foreground)] placeholder:text-[var(--muted-foreground)]/30 focus:outline-none focus:border-[var(--primary)] transition-colors"
+              value={formFirInput}
+              onChange={(e) => setformFirInput(e.target.value)}
+              disabled={mode === "verify"}
+            />
+          </div>
         </div>
-        <div className="relative group">
-          <Lock className="absolute left-4 top-4 w-5 h-5 text-gray-600 group-focus-within:text-[#00FFA3] transition-colors" />
-          <input
-            type={secondInput}
-            placeholder={
-              secondInput === "password" ? "repaet password" : secondInput
-            }
-            className="w-full bg-black border border-white/5 rounded-xl py-4 pl-12 pr-4 text-xs font-bold tracking-widest focus:outline-none focus:border-[#00FFA3]/50 focus:ring-1 focus:ring-[#00FFA3]/50 transition-all text-white"
-            value={formSecInput}
-            onChange={(e) => setformSecInput(e.target.value)}
-            required
-          />
+
+        {/* 두 번째 입력 필드 (비밀번호 등) */}
+        <div className="flex flex-col space-y-2 relative group">
+          <label className="text-[11px] font-bold uppercase tracking-wider text-[var(--muted-foreground)] px-0.5">
+            {secondInput === "password" && mode === "verify"
+              ? "Repeat Password"
+              : secondInput}
+          </label>
+          <div className="relative">
+            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--muted-foreground)]/60 group-focus-within:text-[var(--primary)] transition-colors" />
+            <input
+              type={secondInput}
+              placeholder={
+                secondInput === "password" && mode === "verify"
+                  ? "비밀번호를 한 번 더 입력하세요"
+                  : "비밀번호를 입력하세요"
+              }
+              className="w-full bg-[var(--muted)] border border-[var(--border)] rounded-lg py-3 pl-11 pr-4 text-xs text-[var(--foreground)] placeholder:text-[var(--muted-foreground)]/30 focus:outline-none focus:border-[var(--primary)] transition-colors"
+              value={formSecInput}
+              onChange={(e) => setformSecInput(e.target.value)}
+              required
+            />
+          </div>
         </div>
+
+        {/* 메인 서브밋 액션 실행 단추 */}
         <button
           type="submit"
-          className="w-full bg-white text-black font-black py-4 rounded-xl text-xs uppercase tracking-[0.2em] hover:bg-[#00FFA3] disabled:bg-gray-800 transition-all shadow-[0_0_20px_rgba(0,0,0,0.4)] hover:shadow-[0_0_25px_rgba(0,255,163,0.2)] mt-4"
+          className="w-full bg-[var(--primary)] text-[var(--primary-foreground)] font-black py-4 rounded-lg text-xs uppercase tracking-widest shadow-md hover:opacity-90 transition-opacity mt-4"
         >
           {button}
         </button>
+
+        {/* 소셜 가입 연동 옵션 인클루드 */}
         {external && <ExternalUp />}
       </form>
     </>

@@ -1,152 +1,128 @@
-import { ChevronDown, Mail, Search } from "lucide-react";
+import { ChevronDown, Mail } from "lucide-react";
 
 export default function GeneralTab() {
   return (
-    <div className="space-y-12 animate-in fade-in duration-500">
-      {/* Project Info Section */}
-      <section>
-        <div className="flex items-center gap-4 mb-6 px-2">
-          <div>
-            <h2 className="text-xl font-black tracking-tighter uppercase text-white">
-              프로젝트 정보
-            </h2>
-            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">
-              Project 정보를 확인하고 수정합니다.
-            </p>
-          </div>
-          <div className="flex-1 h-[1px] bg-white/5" />
+    <div className="space-y-8">
+      <section className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-6 shadow-sm">
+        <div className="mb-4">
+          <h2 className="text-s font-bold text-[var(--foreground)]">
+            워크스페이스 기본 정보 관리
+          </h2>
+          <p className="text-sm text-[var(--muted-foreground)] font-medium">
+            현재 프로젝트의 이름을 지정합니다.
+          </p>
         </div>
-
         <div className="space-y-4">
-          <div>
-            <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mb-2">
-              이름
+          <div className="flex flex-col space-y-2">
+            <label className="text-[11px] font-bold uppercase text-[var(--muted-foreground)] tracking-wider">
+              프로젝트 이름
             </label>
             <input
-              className="w-full bg-[#0A0A0A] border border-white/5 rounded-xl px-4 py-3 text-white focus:border-[#00FFA3]/50 focus:outline-none transition-all"
-              placeholder="Workspace 이름"
+              className="w-full bg-[var(--muted)] border border-[var(--border)] rounded-lg px-4 py-3 text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--primary)] font-semibold transition-colors"
+              defaultValue="차후 정보를 받아서 동기화할 예정"
             />
           </div>
           <div className="flex justify-end">
-            <button className="bg-[#111] border border-white/10 text-white text-[11px] font-black uppercase tracking-widest px-6 py-2.5 rounded-lg hover:bg-[#00FFA3] hover:text-black transition-all">
-              확인 및 저장
+            <button className="bg-[var(--secondary)] border border-[var(--border)] text-[var(--secondary-foreground)] font-bold px-5 py-2.5 rounded-lg text-xs hover:bg-[var(--muted)] transition-colors">
+              프로젝트 이름 저장
             </button>
           </div>
         </div>
       </section>
 
-      {/* Member Info Section */}
-      <section>
-        <div className="flex items-center gap-4 mb-6 px-2">
-          <div>
-            <h2 className="text-xl font-black tracking-tighter uppercase text-white">
-              Member Info
-            </h2>
-            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">
-              나의 Project 에 초대된 인원들을 확인합니다.
-            </p>
-          </div>
-          <div className="flex-1 h-[1px] bg-white/5" />
+      <section className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-6 shadow-sm">
+        <div className="mb-4">
+          <h2 className="text-s font-bold text-[var(--foreground)]">
+            사용자 프로젝트 초대
+          </h2>
+          <p className="text-sm text-[var(--muted-foreground)] font-medium">
+            협업 프로젝트 공간에 동참할 사용자의 이메일을 통해 초대합니다.
+          </p>
         </div>
 
-        {/* Invite Input Row */}
-        <div className="flex gap-3 mb-8">
-          <div className="relative flex-1 group">
-            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 group-focus-within:text-[#00FFA3] transition-colors" />
+        <div className="flex gap-2 mb-6">
+          <div className="relative flex-1">
+            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--muted-foreground)]/60" />
             <input
-              className="w-full bg-[#0A0A0A] border border-white/5 rounded-xl pl-12 pr-4 py-3 text-white focus:border-[#00FFA3]/50 focus:outline-none transition-all"
-              placeholder="test@gmail.com"
+              className="w-full bg-[var(--muted)] border border-[var(--border)] rounded-lg pl-11 pr-4 py-3 text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--primary)] transition-colors"
+              placeholder="invite_user_context@gmail.com"
             />
           </div>
           <div className="relative min-w-[140px]">
-            <select className="w-full bg-[#0A0A0A] border border-white/5 rounded-xl px-4 py-3 text-white text-sm focus:border-[#00FFA3]/50 focus:outline-none appearance-none">
-              <option>권한 선택</option>
-              <option>Admin</option>
-              <option>Editor</option>
-              <option>Viewer</option>
+            <select className="w-full bg-[var(--muted)] border border-[var(--border)] rounded-lg px-4 py-3 text-sm text-[var(--foreground)] focus:outline-none appearance-none font-bold">
+              <option>Editor 권한</option>
+              <option>Admin 마스터</option>
+              <option>Viewer 참관</option>
             </select>
-            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 pointer-events-none" />
+            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--muted-foreground)]/40 pointer-events-none" />
           </div>
-          <button className="bg-[#00FFA3] text-black text-[11px] font-black uppercase tracking-widest px-8 py-3 rounded-xl hover:scale-105 active:scale-95 transition-all shadow-[0_0_15px_rgba(0,255,163,0.2)]">
-            초대
+          <button className="bg-[var(--primary)] text-[var(--primary-foreground)] font-black px-6 py-3 rounded-lg text-xs shadow-sm hover:opacity-95 transition-opacity">
+            Invite
           </button>
         </div>
 
-        {/* Member Table */}
-        <div className="bg-[#0A0A0A] border border-white/5 rounded-2xl overflow-hidden">
-          <div className="p-4 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
-            <span className="text-[10px] font-black uppercase text-gray-500 tracking-widest">
-              멤버 목록
-            </span>
-            <Search className="w-4 h-4 text-gray-600 cursor-pointer hover:text-white transition-colors" />
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-white/5 text-[10px] font-black uppercase text-gray-600 tracking-tighter">
-                  <th className="p-4">이름</th>
-                  <th className="p-4">권한</th>
-                  <th className="p-4 text-right">멤버</th>
-                </tr>
-              </thead>
-              <tbody className="text-sm">
-                {/* 데이터 예시 */}
-                <tr className="border-b border-white/5 hover:bg-white/[0.01] transition-colors group">
-                  <td className="p-4 text-white font-medium">홍길동 (나)</td>
-                  <td className="p-4">
-                    <span className="text-[#00FFA3] text-[10px] font-black border border-[#00FFA3]/30 px-2 py-0.5 rounded">
-                      ADMIN
-                    </span>
-                  </td>
-                  <td className="p-4 text-right text-gray-500">Owner</td>
-                </tr>
-              </tbody>
-            </table>
-            <div className="h-32 bg-gradient-to-b from-transparent to-black/20 flex items-center justify-center">
-              <p className="text-xs text-gray-700 uppercase font-black tracking-widest">
-                End of Member List
-              </p>
-            </div>
-          </div>
+        <div className="border border-[var(--border)] rounded-xl overflow-hidden shadow-xs">
+          <table className="w-full text-left border-collapse text-sm">
+            <thead>
+              <tr className="bg-[var(--muted)]/50 border-b border-[var(--border)] text-[11px] font-black uppercase text-[var(--muted-foreground)] tracking-wider">
+                <th className="p-4 pl-4">Account User Mail</th>
+                <th className="p-4">Role Group</th>
+                <th className="p-4 text-right pr-4">Identity Description</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[var(--border)]/50 font-medium text-[var(--muted-foreground)] bg-[var(--card)]">
+              <tr className="hover:bg-[var(--muted)]/20 transition-colors">
+                <td className="p-4 pl-4 font-bold text-[var(--foreground)] text-sm">
+                  박다은 (나)
+                </td>
+                <td className="p-4">
+                  <span className="text-[var(--primary)] bg-[var(--primary)]/10 text-[10px] font-black border border-[var(--primary)]/20 px-2 py-0.5 rounded">
+                    ADMIN MASTER
+                  </span>
+                </td>
+                <td className="p-4 text-right pr-4 text-[var(--muted-foreground)]/80 font-bold">
+                  Workspace Owner
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </section>
 
-      {/* Invite History Section */}
-      <section>
-        <div className="flex items-center gap-4 mb-6 px-2">
-          <div>
-            <h2 className="text-xl font-black tracking-tighter uppercase text-white">
-              Invite History
-            </h2>
-            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">
-              멤버 초대 관련 히스토리 입니다.
-            </p>
-          </div>
-          <div className="flex-1 h-[1px] bg-white/5" />
+      <section className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-6 shadow-sm">
+        <div className="mb-4">
+          <h2 className="text-sm font-bold text-[var(--foreground)]">
+            초대 메일 발송 이력
+          </h2>
+          <p className="text-xs text-[var(--muted-foreground)] font-medium">
+            송신 완료된 초대 명단의 실시간 인증 대기 상태 타임라인 내역입니다.
+          </p>
         </div>
 
-        <div className="space-y-2">
-          {[1, 2, 3].map((i) => (
+        <div className="border border-[var(--border)] rounded-xl overflow-hidden divide-y divide-[var(--border)]/50">
+          {[1, 2].map((i) => (
             <div
               key={i}
-              className="flex justify-between items-center p-4 bg-[#0A0A0A] border border-white/5 rounded-xl hover:border-white/10 transition-all group"
+              className="flex justify-between items-center p-4 bg-[var(--card)] hover:bg-[var(--muted)]/10 transition-colors text-sm"
             >
-              <div className="flex items-center gap-4">
-                <div className="w-2 h-2 rounded-full bg-[#00FFA3] shadow-[0_0_8px_rgba(0,255,163,0.5)]" />
+              <div className="flex items-center gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-[var(--primary)] shadow-[0_0_6px_var(--primary)]" />
                 <div>
-                  <p className="text-sm font-bold text-white group-hover:text-[#00FFA3] transition-colors">
-                    invite_user_{i}@gmail.com
+                  <p className="font-bold text-[var(--foreground)] text-sm">
+                    collaborator_dev_node_{i}@daum.net
                   </p>
-                  <p className="text-[10px] text-gray-600 font-black uppercase">
-                    Invitation Sent
+                  <p className="text-[11px] text-[var(--muted-foreground)] font-semibold mt-0.5">
+                    Invitation Dispatched
                   </p>
                 </div>
               </div>
-              <div className="text-right">
-                <p className="text-xs font-black text-gray-400 uppercase tracking-tighter italic">
+              <div className="text-right flex items-center gap-4">
+                <span className="text-[10px] font-black px-2 py-0.5 bg-[var(--muted)] border border-[var(--border)] rounded text-[var(--muted-foreground)]/70">
                   Pending
-                </p>
-                <p className="text-[10px] text-gray-600">April 29, 2026</p>
+                </span>
+                <span className="font-mono text-xs text-[var(--muted-foreground)]/40 font-bold">
+                  2026.04.29
+                </span>
               </div>
             </div>
           ))}

@@ -8,19 +8,17 @@ export default function InfoPage() {
   const [activeTab, setActiveTab] = useState<"info" | "affiliation">("info");
 
   return (
-    <div className="flex-1 bg-black min-h-screen p-10 text-white selection:bg-[#00FFA3] selection:text-black">
-      {/* Header 영역 */}
-      <div className="mb-12">
-        <h1 className="text-4xl font-[700] tracking-tighter mb-2 text-white uppercase">
+    <div className="flex-1 bg-[var(--background)] min-h-screen p-8 text-[var(--foreground)] selection:bg-[var(--primary)]/20 selection:text-[var(--primary)]">
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold tracking-tight mb-2 uppercase">
           내 정보
         </h1>
-        <p className="text-gray-500 text-sm font-medium tracking-tight">
-          개인 정보 및 프로젝트 소속을 관리하세요.
+        <p className="text-sm text-[var(--muted-foreground)] font-medium">
+          개인 프로필 양식 정보 및 워크스페이스 소속 히스토리를 관리하세요.
         </p>
       </div>
 
-      {/* Tabs - 네온 스타일 적용 */}
-      <div className="flex gap-10 border-b border-white/5 mb-10 px-2">
+      <div className="flex gap-8 border-b border-[var(--border)] mb-8 px-1">
         {[
           { id: "info", label: "일반" },
           { id: "affiliation", label: "소속" },
@@ -28,22 +26,21 @@ export default function InfoPage() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
-            className={`pb-4 text-sm font-black uppercase tracking-[0.2em] transition-all relative ${
+            className={`pb-3 text-xs font-bold uppercase tracking-wider transition-all relative ${
               activeTab === tab.id
-                ? "text-[#00FFA3]"
-                : "text-gray-600 hover:text-gray-400"
+                ? "text-[var(--primary)] font-black"
+                : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
             }`}
           >
             {tab.label}
             {activeTab === tab.id && (
-              <div className="absolute bottom-[-1px] left-0 w-full h-[2px] bg-[#00FFA3] shadow-[0_0_10px_rgba(0,255,163,0.8)]" />
+              <div className="absolute bottom-[-1px] left-0 w-full h-[2px] bg-[var(--primary)]" />
             )}
           </button>
         ))}
       </div>
 
-      {/* Content 영역 */}
-      <div className="max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-2 duration-500">
+      <div className="max-w-4xl mx-auto">
         {activeTab === "info" ? <MyInfoTab /> : <AffiliationTab />}
       </div>
     </div>

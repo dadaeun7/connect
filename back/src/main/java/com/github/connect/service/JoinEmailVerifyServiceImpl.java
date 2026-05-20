@@ -34,14 +34,18 @@ public class JoinEmailVerifyServiceImpl implements EmailVerifyService{
         sendCodeHtmlMail(email, code);
 
         JoinCompnayUser user = new JoinCompnayUser(name, email, code);
-        joinCompanyUserRepository.saveAuthCode(joinCompanyUserRepository.redisJoinKey(email), user);
+
+        String key = joinCompanyUserRepository.redisJoinKey(email);
+        joinCompanyUserRepository.saveAuthCode(key, user);
     }
 
     @Override
     public void checkCode(String email, String code) {
-        JoinCompnayUser user = checkVerifyCode(joinCompanyUserRepository.redisJoinKey(email), code);
-        joinCompanyUserRepository.saveVerifyUser(joinCompanyUserRepository.redisJoinKey(email), user);
-        joinCompanyUserRepository.deleteAuthCode(joinCompanyUserRepository.redisJoinKey(email));
+        String key = joinCompanyUserRepository.redisJoinKey(email);
+
+        JoinCompnayUser user = checkVerifyCode(key, code);
+        joinCompanyUserRepository.saveVerifyUser(key, user);
+        joinCompanyUserRepository.deleteAuthCode(key);
     }
 
     private void sendCodeHtmlMail(String email, String code){
@@ -63,7 +67,9 @@ public class JoinEmailVerifyServiceImpl implements EmailVerifyService{
 
     private void retryAuthToRedis(String email){
 
-        if(joinCompanyUserRepository.find(joinCompanyUserRepository.redisJoinKey(email)).isPresent()){
+        String key = joinCompanyUserRepository.redisJoinKey(email);
+
+        if(joinCompanyUserRepository.find(key).isPresent()){
             throw new JoinCompanyException("이미 요청 된 작업이 있습니다. 메일을 확인해주세요");
         }
     }
