@@ -1,9 +1,10 @@
 package com.github.connect.service.impl;
 
 import jakarta.mail.MessagingException;
+import reactor.core.publisher.Mono;
 
 public interface EmailVerifyService {
 
-    void sendEmail(String name, String email);
-    void checkCode(String email, String code);
+    Mono<Void> sendEmail(String name, String email);
+    Mono<Void> checkCode(String email, String code);
 }

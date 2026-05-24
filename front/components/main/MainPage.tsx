@@ -1,9 +1,7 @@
 import {
-  FileText,
   Layout,
   Zap,
   ChevronsLeftRightEllipsis,
-  Send,
   ArrowRight,
 } from "lucide-react";
 import Link from "next/link";
@@ -98,7 +96,7 @@ export default function MainPage() {
             key={idx}
             className="bg-[var(--card)] border border-[var(--border)] p-6 rounded-xl shadow-xs group hover:border-[var(--primary)]/30 transition-colors"
           >
-            <div className="w-10 h-10 bg-[var(--muted)] border border-[var(--border)] flex items-center justify-center rounded-lg mb-5 group-hover:border-[var(--primary)]/40 transition-colors">
+            <div className="w-10 h-10 bg-[var(--muted)] flex items-center justify-center rounded-lg mb-5 group-hover:border-[var(--primary)]/40 transition-colors">
               {feature.icon}
             </div>
             <h3 className="text-s font-bold uppercase mb-2 text-[var(--foreground)]">

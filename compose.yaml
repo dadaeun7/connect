@@ -1,7 +1,7 @@
 name: connect
 services:
     postgres:
-        container_name: connect-postgres
+        container_name: postgres
         image: "postgres:latest"
         restart: always
         shm_size: 128mb
@@ -11,55 +11,85 @@ services:
             - POSTGRES_DB=${POSTGRES_DB}
         ports:
             - "5432:5432"
+        healthcheck:
+            test:
+                [
+                    "CMD-SHELL",
+                    "pg_isready -d ${POSTGRES_DB} -U ${POSTGRES_USER}",
+                ]
+            interval: 10s
+            timeout: 5s
+            retries: 5
         volumes:
             - postgres_data:/var/lib/postgresql
 
-    redis:
-        container_name: connect-redis
+    inmemory:
+        container_name: inmemory
         image: "redis:latest"
         ports:
-            - "6379:6379"
-        environment:
-            - REDIS_PASSWORD=${REDIS_PASSWORD}
+            - "6380:6379"
+        # command: redis-server --requirepass ${REDIS_PASSWORD}
+        healthcheck:
+            test:
+                ["CMD-SHELL", "redis-cli -a ${REDIS_PASSWORD} ping | grep PONG"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+            start_period: 5s
         volumes:
             - redis_data:/data
-    front:
-        build:
-            context: ./front
-            dockerfile: Dockerfile.dev
-        image: nextjs-sample:dev
-        container_name: nextjs-sample-dev
-        ports:
-            - "3000:3000"
-        environment:
-            # Docker 내부에서 파일 변경 사항이 제대로 감지되도록 함
-            - WATCHPACK_POLLING=true
-        develop:
-            # Compose Watch를 사용하여 파일 동기화를 시작
-            watch:
-                - action: sync
-                  path: .
-                  target: /app
-                  ignore:
-                      - node_modules/
-                      - .next/
-                # rebuild작업은 package.json파일이 변경될 때 종속성이 다시 설치되도록 함
-                - action: rebuild
-                  path: package.json
+    # front:
+    #     build:
+    #         context: ./front
+    #         dockerfile: Dockerfile.dev
+    #     image: nextjs-sample:dev
+    #     container_name: nextjs-dev
+    #     ports:
+    #         - "3000:3000"
+    #     environment:
+    #         # Docker 내부에서 파일 변경 사항이 제대로 감지되도록 함
+    #         - WATCHPACK_POLLING=true
+    #     develop:
+    #         # Compose Watch를 사용하여 파일 동기화를 시작
+    #         watch:
+    #             - action: sync
+    #               path: ./front/app
+    #               target: /app/app
+
+    #             - action: sync
+    #               path: ./front/components
+    #               target: /app/components
+
+    #             # rebuild작업은 package.json파일이 변경될 때 종속성이 다시 설치되도록 함
+    #             - action: rebuild
+    #               path: ./front/package.json
+
+    #             - action: rebuild
+    #               path: ./front/next.config.ts
 
     backend:
         build:
             context: ./back
             dockerfile: Dockerfile.dev
             args:
-                - JAR_FILE=./build/libs/*.jar
+                - JAR_FILE=build/libs/connect-0.0.1-SNAPSHOT.jar
         ports:
             - 8080:8080
         environment:
+            - LOG_LEVEL=debug
             - SPRING_PROFILES_ACTIVE=dev
+            # - REDIS_PASSWORD=${REDIS_PASSWORD}
+            - POSTGRES_USER=${POSTGRES_USER}
+            - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+            - GMAIL_APP_USERNAME=${GMAIL_APP_USERNAME}
+            - GMAIL_APP_PASSWORD=${GMAIL_APP_PASSWORD}
         depends_on:
-            - postgres
-            - redis
+            postgres:
+                condition: service_healthy
+            inmemory:
+                condition: service_healthy
+        volumes:
+            - ./back/src/main/resources/application-dev.properties:/config/application-dev.properties
 
 volumes:
     postgres_data:

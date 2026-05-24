@@ -12,8 +12,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name="users")
-public class User {
+@Table(name = "Users")
+public class Users {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,8 +33,8 @@ public class User {
      * @param github 외부
      * @param gmail 외부
      */
-    @Column(nullable = false, name="join_type")
-    private RoleType type;
+    @Column(nullable = false, name="join_type", columnDefinition = "SMALLINT")
+    private RoleType joinType;
 
     @Column
     private String externalId;

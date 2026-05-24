@@ -2,47 +2,44 @@ package com.github.connect.repository;
 
 import com.github.connect.constants.RedisCostants;
 import com.github.connect.dto.internal.JoinCompnayUser;
-import com.github.connect.exception.custom.RedisException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
+import reactor.core.publisher.Mono;
+
+import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.time.Duration;
-import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
 public class JoinCompanyUserRepository {
 
-    private final RedisTemplate<String, Object> stringRedisTemplate;
+    private final ReactiveRedisTemplate<String, Object> reactiveRedisTemplate;
 
-    public void saveAuthCode(String key, JoinCompnayUser user){
-        stringRedisTemplate.opsForValue().set(key,user, Duration.ofMinutes(5));
+    public Mono<Boolean> saveAuthCode(String key, JoinCompnayUser user){
+        return reactiveRedisTemplate.opsForValue().set(key,user, Duration.ofMinutes(5));
     }
 
-    public void saveVerifyUser(String key, JoinCompnayUser user){
-        stringRedisTemplate.opsForValue().set(key, user, Duration.ofMinutes(5));
+    public Mono<Boolean> saveVerifyUser(String key, JoinCompnayUser user){
+        return reactiveRedisTemplate.opsForValue().set(key, user, Duration.ofMinutes(5));
     }
 
-    public void deleteAuthCode(String key){
-        stringRedisTemplate.delete(key);
+    public Mono<Long> deleteAuthCode(String key){
+        return reactiveRedisTemplate.delete(key);
     }
 
-    public void deleteVerifyUser(String key){
-        stringRedisTemplate.delete(key);
+    public Mono<Long> deleteVerifyUser(String key){
+        return reactiveRedisTemplate.delete(key);
     }
 
-    public Optional<JoinCompnayUser> find(String key){
-        JoinCompnayUser user = (JoinCompnayUser) stringRedisTemplate.opsForValue().get(key);
-
-        if(user == null){
-            return Optional.empty();
-        }
-        return Optional.of(user);
+    public Mono<JoinCompnayUser> find(String key){
+        return reactiveRedisTemplate.opsForValue().get(key)
+        .cast(JoinCompnayUser.class);
     }
 
     public String redisJoinKey(String email){
         return RedisCostants.JOIN_KEY + email;
     }
+    
     public String redisVerifyKey(String email){ return RedisCostants.VERIFY_SUC + email;}
 }

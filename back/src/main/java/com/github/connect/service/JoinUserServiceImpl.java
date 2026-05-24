@@ -7,14 +7,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password4j.BcryptPassword4jPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.github.connect.entity.User;
-import com.github.connect.entity.User.RoleType;
+import com.github.connect.entity.Users;
+import com.github.connect.entity.Users.RoleType;
 import com.github.connect.repository.UsersRepository;
 import com.github.connect.service.impl.CompanyJoinService;
 
 import lombok.RequiredArgsConstructor;
-
-import java.util.Optional;
+import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
@@ -24,20 +23,23 @@ public class JoinUserServiceImpl implements CompanyJoinService{
     private final JoinCompanyUserRepository joinCompanyUserRepository;
 
     @Override
-    public void join(String email, String password) {
+    public Mono<Void> join(String email, String password) {
+        return checkStatus(email)
+            .doOnNext(user -> {
 
-        JoinCompnayUser dtoUser = checkStatus(email);
+                Users companyUser = new Users();
+                companyUser.setName(user.getName());
+                companyUser.setEmail(user.getEmail());
+                String encodePassword = passwordEncode(password);
+                companyUser.setPassword(encodePassword);
 
-        User companyUser = new User();
-        companyUser.setName(dtoUser.getName());
-        companyUser.setEmail(dtoUser.getEmail());
-        String encodePassword = passwordEncode(password);
-        companyUser.setPassword(encodePassword);
+                companyUser.setJoinType(RoleType.COMPANY);
+                usersRepository.save(companyUser);
 
-        companyUser.setType(RoleType.COMPANY);
-        usersRepository.save(companyUser);
-
-        joinCompanyUserRepository.deleteVerifyUser(joinCompanyUserRepository.redisVerifyKey(email));
+                String key = joinCompanyUserRepository.redisVerifyKey(email);
+                joinCompanyUserRepository.deleteVerifyUser(key);
+            })
+            .then();
     }
 
     @Override
@@ -48,14 +50,14 @@ public class JoinUserServiceImpl implements CompanyJoinService{
     }
 
 
-    private JoinCompnayUser checkStatus(String email){
+    private Mono<JoinCompnayUser> checkStatus(String email){
 
-        Optional<JoinCompnayUser> user = joinCompanyUserRepository.find(joinCompanyUserRepository.redisVerifyKey(email));
+        String key = joinCompanyUserRepository.redisVerifyKey(email);
+        return joinCompanyUserRepository.find(key)
+        .switchIfEmpty(Mono.error(new JoinCompanyException("가입 인증 유효시간이 지났습니다. 다시 인증해주세요")))
+        .flatMap(user -> {
+            return Mono.just(user);
+        });
 
-        if(user.isEmpty()){
-            throw new JoinCompanyException("가입 인증 유효시간이 지났습니다. 다시 인증해주세요");
-        }
-
-        return user.get();
     }
 }

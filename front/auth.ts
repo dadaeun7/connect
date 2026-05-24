@@ -27,16 +27,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       redirectUri: process.env.AUTH_SLACK_REDIRECT_URI,
     } as any),
   ],
+  secret: process.env.AUTH_SECRET,
   callbacks: {
     async jwt({ token, account }) {
-      if(account){
+      if (account) {
         token.accessToken = account.access_token;
       }
       return token;
+    },
+    async session({ session, token }: any) {
+      session.accessToken = token.accessToken;
+      return session;
+    },
   },
-  async session({session, token}: any){
-    session.accessToken = token.accessToken;
-    return session;
-  }
-  }
 });

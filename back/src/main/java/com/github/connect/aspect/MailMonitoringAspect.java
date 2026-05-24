@@ -1,7 +1,5 @@
 package com.github.connect.aspect;
 
-import com.github.connect.exception.GlobalExceptionHandler;
-import jakarta.mail.MessagingException;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.AfterThrowing;

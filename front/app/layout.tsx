@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
-import { AuthProvider } from "../components/provider/AuthProvider";
 import "./globals.css";
 import { ThemeProvider } from "@/components/provider/ThemeProvider";
-import ThemeBtn from "@/components/share/ThemeBtn";
 
 export const metadata: Metadata = {
   title: "connect",
@@ -26,7 +24,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <AuthProvider>{children}</AuthProvider>
+          {children}
         </ThemeProvider>
       </body>
     </html>

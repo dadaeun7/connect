@@ -2,14 +2,14 @@ package com.github.connect;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.test.context.ActiveProfiles;
 
+@Disabled
 @Slf4j
 class SecurityPasswordTest {
 

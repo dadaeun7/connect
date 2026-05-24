@@ -23,11 +23,7 @@ export default function Layout({
       <div className="relative w-full max-w-md bg-[var(--card)] border border-[var(--border)] rounded-xl p-8 shadow-md dark:shadow-black/40">
         {/* 상단 엠블럼 심볼 마크 구역 */}
         <div className="flex justify-center mb-6">
-          <div className="w-14 h-14 rounded-xl border border-[var(--primary)]/30 bg-[var(--primary)]/5 flex items-center justify-center shadow-sm">
-            <div className="text-[var(--primary)] font-black italic text-xl tracking-tighter">
-              C
-            </div>
-          </div>
+          <img src="/logo.png" alt="logo" className="h-12" />
         </div>
 
         {/* 하위 자식 컴포넌트 바인딩 폼 */}

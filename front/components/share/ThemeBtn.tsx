@@ -8,14 +8,25 @@ export default function ThemeToggle() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
-  // 💡 서버 사이드 렌더링 시점과 브라우저 마운트 시점의 테마 불일치 에러를 방지합니다.
   useEffect(() => {
-    setMounted(true);
+    // requestAnimationFrame을 활용해 브라우저 렌더링 프레임 이후로 실행을 미룹니다.
+    // 이렇게 하면 Effect 본문에서 즉시 동기적으로 setState를 치는 구조를 회피할 수 있습니다.
+    const handle = requestAnimationFrame(() => {
+      setMounted(true);
+    });
+
+    return () => cancelAnimationFrame(handle);
   }, []);
 
-  // 구글 머티리얼 디자인 가이드라인 기준: 시인성이 확보된 대형 여백 컴포넌트 스케일 처리
-  if (!mounted) return <div className="w-[80px] h-[52px]" />; // 마운트 전 깜빡임 방지용 빈 공간
-
+  // 마운트되기 전(서버 렌더링 시점)에는 껍데기(UI 레이아웃만 유지) 혹은 null을 반환하여 불일치를 방지합니다.
+  if (!mounted) {
+    return (
+      <div
+        className="w-9 h-9 rounded-lg border border-[var(--border)] bg-[var(--muted)] opacity-50"
+        aria-hidden="true"
+      />
+    );
+  }
   return (
     <div
       className="p-1 scale-65 rounded-xl justify-center gap-1.5 flex border border-[var(--border)] bg-[var(--card)] shadow-[0_2px_12px_rgba(0,0,0,0.01)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.4)]"

@@ -1,7 +1,6 @@
 package com.github.connect.service;
 
 import java.security.SecureRandom;
-import java.util.Optional;
 
 import com.github.connect.dto.internal.JoinCompnayUser;
 import com.github.connect.exception.custom.JoinCompanyException;
@@ -16,6 +15,7 @@ import com.github.connect.service.impl.EmailVerifyService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
@@ -26,26 +26,32 @@ public class JoinEmailVerifyServiceImpl implements EmailVerifyService{
     private final SecureRandom secureRandom = new SecureRandom();
 
     @Override
-    public void sendEmail(String name, String email){
-        /* 중복 요청 확인 로직*/
-        retryAuthToRedis(email);
+    public Mono<Void> sendEmail(String name, String email){
 
-        String code = createVerifyCode();
-        sendCodeHtmlMail(email, code);
-
-        JoinCompnayUser user = new JoinCompnayUser(name, email, code);
-
-        String key = joinCompanyUserRepository.redisJoinKey(email);
-        joinCompanyUserRepository.saveAuthCode(key, user);
+        String code = createVerifyCode(); 
+        return Mono.fromRunnable(()-> 
+                        /* 중복 요청 확인 로직*/
+                        retryAuthToRedis(email))
+                    .then(Mono.fromRunnable(()->
+                        sendCodeHtmlMail(email, code)
+                    ))
+                    .then(Mono.fromRunnable(()->{
+                        JoinCompnayUser user = new JoinCompnayUser(name, email, code);
+                        String key = joinCompanyUserRepository.redisJoinKey(email);
+                        joinCompanyUserRepository.saveAuthCode(key, user);
+                    }));
     }
 
     @Override
-    public void checkCode(String email, String code) {
+    public Mono<Void> checkCode(String email, String code) {
         String key = joinCompanyUserRepository.redisJoinKey(email);
 
-        JoinCompnayUser user = checkVerifyCode(key, code);
-        joinCompanyUserRepository.saveVerifyUser(key, user);
-        joinCompanyUserRepository.deleteAuthCode(key);
+        return checkVerifyCode(key, code)
+            .doOnNext(user -> {
+                joinCompanyUserRepository.saveVerifyUser(key, user);
+                joinCompanyUserRepository.deleteAuthCode(key);
+            })
+            .then();
     }
 
     private void sendCodeHtmlMail(String email, String code){
@@ -68,25 +74,24 @@ public class JoinEmailVerifyServiceImpl implements EmailVerifyService{
     private void retryAuthToRedis(String email){
 
         String key = joinCompanyUserRepository.redisJoinKey(email);
-
-        if(joinCompanyUserRepository.find(key).isPresent()){
-            throw new JoinCompanyException("이미 요청 된 작업이 있습니다. 메일을 확인해주세요");
-        }
+        joinCompanyUserRepository.find(key).hasElement()
+        .subscribe(isEmpty -> {
+            if(isEmpty){
+                throw new JoinCompanyException("이미 요청 된 작업이 있습니다. 메일을 확인해주세요");
+            }
+        });
     }
 
-    public JoinCompnayUser checkVerifyCode(String key, String code) {
+    public Mono<JoinCompnayUser> checkVerifyCode(String key, String code) {
 
-        Optional<JoinCompnayUser> user = joinCompanyUserRepository.find(key);
-
-        if(user.isEmpty()){
-            throw new JoinCompanyException("만료된 코드로 시도되어 처리가 불가합니다.");
-        }
-
-        if(!user.get().getCode().equals(code)){
-            throw new JoinCompanyException("입력하신 코드가 일치하지 않습니다. 코드를 다시 확인해주세요");
-        }
-
-        return user.get();
+        return joinCompanyUserRepository.find(key)
+            .switchIfEmpty(Mono.error(new JoinCompanyException("만료된 코드로 시도되어 처리가 불가합니다.")))
+            .flatMap(user -> {
+                if (!user.getCode().equals(code)) {
+                    return Mono.error(new JoinCompanyException("입력하신 코드가 일치하지 않습니다. 코드를 다시 확인해주세요"));
+                }
+                return Mono.just(user);
+            });
     }
 
 

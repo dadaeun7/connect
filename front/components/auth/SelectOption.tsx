@@ -8,7 +8,7 @@ export default function SelectOption({ mode }: { readonly mode: string }) {
           계정이 없으신가요?
           <Link
             href="/auth/signup"
-            className="text-[var(--primary)] font-bold ml-1.5 hover:underline underline-offset-4"
+            className="font-bold ml-1.5 hover:underline underline-offset-4"
           >
             가입하기
           </Link>
@@ -18,7 +18,7 @@ export default function SelectOption({ mode }: { readonly mode: string }) {
           이미 계정이 있으신가요?
           <Link
             href="/auth/login"
-            className="text-[var(--primary)] font-bold ml-1.5 hover:underline underline-offset-4"
+            className="font-bold ml-1.5 hover:underline underline-offset-4"
           >
             로그인
           </Link>
