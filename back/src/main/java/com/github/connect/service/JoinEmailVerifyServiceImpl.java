@@ -3,9 +3,10 @@ package com.github.connect.service;
 import java.security.SecureRandom;
 
 import com.github.connect.dto.internal.JoinCompnayUser;
+import com.github.connect.dto.response.MailCodeExpiredAtResponse;
 import com.github.connect.exception.custom.JoinCompanyException;
 import com.github.connect.exception.custom.EmailSendException;
-import com.github.connect.repository.JoinCompanyUserRepository;
+import com.github.connect.repository.JoinCompanyUserRedis;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -16,12 +17,13 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @Service
 @RequiredArgsConstructor
 public class JoinEmailVerifyServiceImpl implements EmailVerifyService{
 
-    private final JoinCompanyUserRepository joinCompanyUserRepository;
+    private final JoinCompanyUserRedis joinCompanyUserRepository;
     private final JavaMailSender mailSender;
     private final SecureRandom secureRandom = new SecureRandom();
 
@@ -29,17 +31,13 @@ public class JoinEmailVerifyServiceImpl implements EmailVerifyService{
     public Mono<Void> sendEmail(String name, String email){
 
         String code = createVerifyCode(); 
-        return Mono.fromRunnable(()-> 
-                        /* 중복 요청 확인 로직*/
-                        retryAuthToRedis(email))
-                    .then(Mono.fromRunnable(()->
-                        sendCodeHtmlMail(email, code)
-                    ))
-                    .then(Mono.fromRunnable(()->{
-                        JoinCompnayUser user = new JoinCompnayUser(name, email, code);
-                        String key = joinCompanyUserRepository.redisJoinKey(email);
-                        joinCompanyUserRepository.saveAuthCode(key, user);
-                    }));
+        JoinCompnayUser user = new JoinCompnayUser(name, email, code);
+        String key = joinCompanyUserRepository.redisJoinKey(email);
+               
+        return retryAuthToRedis(email) // 중복 요청 확인 로직
+        .then(sendCodeHtmlMail(email, code))
+        .then(joinCompanyUserRepository.saveAuthCode(key, user))
+        .then();
     }
 
     @Override
@@ -54,31 +52,46 @@ public class JoinEmailVerifyServiceImpl implements EmailVerifyService{
             .then();
     }
 
-    private void sendCodeHtmlMail(String email, String code){
+    public Mono<MailCodeExpiredAtResponse> responseExpiredAt(String key){
+        // join:test@gmail.com -> 0~4번까지 redis 식별 인덱스
+        return joinCompanyUserRepository.getExpiredAt(key)
+        .map(expired -> {
+                return new MailCodeExpiredAtResponse(key.substring(5), expired.longValue());
+            }
+        );
+    }
 
-        try{
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+    private Mono<Void> sendCodeHtmlMail(String email, String code){
 
-            helper.setTo(email);
-            helper.setSubject("[connect] 이메일 인증 번호 입니다.");
-            helper.setText(mailContent(code),true);
-            mailSender.send(message);
+        return Mono.fromRunnable(()->{
+            try{
+                MimeMessage message = mailSender.createMimeMessage();
+                MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-        }catch(MessagingException e){
-            throw new EmailSendException(e);
-        }
+                helper.setTo(email);
+                helper.setSubject("[connect] 이메일 인증 번호 입니다.");
+                helper.setText(mailContent(code),true);
+                mailSender.send(message);
+
+            }catch(MessagingException e){
+                throw new EmailSendException(e);
+            }
+        })
+        .subscribeOn(Schedulers.boundedElastic())
+        .then();
 
     }
 
-    private void retryAuthToRedis(String email){
+    private Mono<Void> retryAuthToRedis(String email){
 
         String key = joinCompanyUserRepository.redisJoinKey(email);
-        joinCompanyUserRepository.find(key).hasElement()
-        .subscribe(isEmpty -> {
-            if(isEmpty){
+        return joinCompanyUserRepository.find(key).hasElement()
+        .flatMap(isEmpty -> {
+            boolean empty = isEmpty;
+            if(empty){
                 throw new JoinCompanyException("이미 요청 된 작업이 있습니다. 메일을 확인해주세요");
             }
+            return Mono.empty();
         });
     }
 

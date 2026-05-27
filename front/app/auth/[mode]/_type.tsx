@@ -8,7 +8,7 @@ export type AuthMode = "login" | "signup" | "verify" | "password";
 
 export const Menu: Record<
   AuthMode,
-  [string, string, string, boolean, string, string, string, string]
+  [string, string, string, boolean, string, string, string, string, string]
 > = {
   login: [
     "어서오세요",
@@ -19,6 +19,7 @@ export const Menu: Record<
     LOGIN_COMPANY,
     "Mail",
     "KeyRound",
+    "/project/workline",
   ],
   signup: [
     "계정 생성",
@@ -29,6 +30,7 @@ export const Menu: Record<
     SIGN_UP_COMPANY,
     "SquareUserRound",
     "Mail",
+    "/auth/verify",
   ],
   verify: [
     "계정 인증",
@@ -39,6 +41,7 @@ export const Menu: Record<
     SIGN_UP_VERIFY,
     "Mail",
     "MailCheck",
+    "/auth/password",
   ],
   password: [
     "가입 하기",
@@ -49,5 +52,6 @@ export const Menu: Record<
     LOGIN_COMPANY,
     "KeyRound",
     "KeyRound",
+    "/",
   ],
 } as const;

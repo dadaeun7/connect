@@ -1,6 +1,5 @@
 package com.github.connect.service.impl;
 
-import jakarta.mail.MessagingException;
 import reactor.core.publisher.Mono;
 
 public interface EmailVerifyService {

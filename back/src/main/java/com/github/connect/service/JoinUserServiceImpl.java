@@ -2,7 +2,7 @@ package com.github.connect.service;
 
 import com.github.connect.dto.internal.JoinCompnayUser;
 import com.github.connect.exception.custom.JoinCompanyException;
-import com.github.connect.repository.JoinCompanyUserRepository;
+import com.github.connect.repository.JoinCompanyUserRedis;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password4j.BcryptPassword4jPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,7 +20,7 @@ import reactor.core.publisher.Mono;
 public class JoinUserServiceImpl implements CompanyJoinService{
 
     private final UsersRepository usersRepository;
-    private final JoinCompanyUserRepository joinCompanyUserRepository;
+    private final JoinCompanyUserRedis joinCompanyUserRepository;
 
     @Override
     public Mono<Void> join(String email, String password) {

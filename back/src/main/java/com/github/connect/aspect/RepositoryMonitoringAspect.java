@@ -21,6 +21,14 @@ public class RepositoryMonitoringAspect {
         startTimeStore.set(System.currentTimeMillis());
     }
 
+    @AfterThrowing(pointcut = "execution(* com.github.connect.repository..*(..)", throwing = "ex")
+    public void doRecoveryActions(JoinPoint joinPoint, Exception ex){
+        log.error("[Error] Location: {}.{} Message: {}", 
+        joinPoint.getSignature().getDeclaringTypeName(), 
+        joinPoint.getSignature().getName(),
+        ex.getMessage());
+    }
+
     @After("repositoryLayer()")
     public void doAfter(JoinPoint joinPoint){
         Long startTime = startTimeStore.get();
@@ -51,35 +59,4 @@ public class RepositoryMonitoringAspect {
 
         return "["+type+" Query] " + fParam + "." +sParam + "() took "+duration+"ms";
     }
-
-//    @AfterReturning(pointcut = "repositoryLayer() && execution(* save(..))",
-//        returning = "result")
-//    public void logAfterSave(JoinPoint joinPoint, Object result){
-//        log.info("[DB Success] Entity: {} -> Saved Content: {}",
-//            joinPoint.getSignature().getDeclaringType().getSimpleName(),
-//            result);
-//    }
-
-//    @Around("repositoryLayer()")
-//    public Object logExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
-//        long start = System.currentTimeMillis();
-//
-//        try{
-//            return joinPoint.proceed();
-//        }finally{
-//            long executionTime = System.currentTimeMillis() - start;
-//            if(executionTime >= 500){
-//                log.warn("[Delay Query] {}.{}() took {}ms",
-//                    joinPoint.getSignature().getDeclaringTypeName(),
-//                    joinPoint.getSignature().getName(),
-//                    executionTime);
-//            }else{
-//                log.info("[Save Query] {}.{}() took {}ms",
-//                    joinPoint.getSignature().getDeclaringTypeName(),
-//                    joinPoint.getSignature().getName(),
-//                    executionTime
-//                );
-//            }
-//        }
-//    }
 }
