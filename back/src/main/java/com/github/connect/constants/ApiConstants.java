@@ -21,9 +21,4 @@ public class ApiConstants {
     public static final String CONNECT_NOTION = API_BASE + "/notion";
     public static final String CONNECT_SLACK = API_BASE + "/slack";
 
-    public static final String REALM_NAME = "connect";
-    public static final String KEYCLOAK_BASE = "http://localhost:8079";
-    public static final String KEYCLOAK_AUTH = KEYCLOAK_BASE + "/realms/"+REALM_NAME+"/protocol/openid-connect/auth";
-    public static final String KEYCLOAK_TOKEN = KEYCLOAK_BASE + "/realms/"+REALM_NAME+"/protocol/openid-connect/token";
-
 }

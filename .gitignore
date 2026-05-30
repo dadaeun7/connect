@@ -11,3 +11,4 @@
 /keycloak
 /ignore
 ignoreCopy.ps1
+*.zip

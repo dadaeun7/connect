@@ -6,15 +6,13 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class JoinCompnayUser {
-    String name;
+public class UserAuthenticationDto {
+    String uuid;
     String email;
-    String code;
 
-    public JoinCompnayUser(String name, String email, String code){
-        this.name = name;
+    public UserAuthenticationDto(String uuid, String email){
+        this.uuid = uuid;
         this.email = email;
-        this.code = code;
     }
 
 }

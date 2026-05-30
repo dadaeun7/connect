@@ -1,8 +1,10 @@
 package com.github.connect.exception;
 
 import com.github.connect.dto.response.DefaultErrorResponse;
-import com.github.connect.exception.custom.JoinCompanyException;
+import com.github.connect.exception.custom.UserNotActiveException;
 import com.github.connect.exception.custom.EmailSendException;
+import com.github.connect.exception.custom.KeycloakConnectException;
+
 import jakarta.mail.AuthenticationFailedException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.SendFailedException;
@@ -37,9 +39,14 @@ public class GlobalExceptionHandler extends Throwable{
         return createDefaultErrorResponse("알 수 없는 에러가 발생했습니다. 관리자에게 문의하세요", 500);
     }
 
-    @ExceptionHandler(JoinCompanyException.class)
-    public ResponseEntity<DefaultErrorResponse> handleCodeException(JoinCompanyException e){
-        return createDefaultErrorResponse(e.getMessage(), 404);
+    @ExceptionHandler(UserNotActiveException.class)
+    public ResponseEntity<DefaultErrorResponse> handleCodeException(UserNotActiveException e){
+        return createDefaultErrorResponse(e.getMessage(), 401);
+    }
+
+    @ExceptionHandler(KeycloakConnectException.class)
+    public ResponseEntity<DefaultErrorResponse> handleKeycloakConnectException(KeycloakConnectException e){
+        return createDefaultErrorResponse(e.getMessage(), 500);
     }
 
     private ResponseEntity<DefaultErrorResponse> createDefaultErrorResponse(String message, int statusCode){

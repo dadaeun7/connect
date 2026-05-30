@@ -19,14 +19,11 @@ public class Users {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column
-    private String name;
+    @Column(nullable = false, unique = true)
+    private String uuid;
     
     @Column(nullable = false, unique = true)
     private String email;
-
-    @Column
-    private String password;
 
     /**
      * @param company 자사
@@ -36,8 +33,8 @@ public class Users {
     @Column(nullable = false, name="join_type", columnDefinition = "SMALLINT")
     private RoleType joinType;
 
-    @Column
-    private String externalId;
+    @Column(nullable = false, columnDefinition = "VARCHAR(20)")
+    private String isActive;
 
 
     public enum RoleType{

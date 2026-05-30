@@ -1,6 +1,6 @@
 package com.github.connect.config;
 
-import com.github.connect.dto.internal.JoinCompnayUser;
+import com.github.connect.dto.internal.UserAuthenticationDto;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -50,7 +50,7 @@ class RedisConfig {
 
         /* JackSon 다형성에 대해 보안을 위해 타입 검증과 직렬화 클래스 범위 한정하여 PolymorphicTypeValidator 세팅 */
         PolymorphicTypeValidator ptv = BasicPolymorphicTypeValidator.builder()
-                .allowIfSubType(JoinCompnayUser.class)
+                .allowIfSubType(UserAuthenticationDto.class)
                 .build();
 
         /* https://docs.spring.io/spring-data/redis/reference/api/java/org/springframework/data/redis/serializer/GenericJacksonJsonRedisSerializer.html#builder(java.util.function.Supplier)

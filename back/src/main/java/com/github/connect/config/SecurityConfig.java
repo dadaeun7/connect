@@ -1,7 +1,9 @@
 package com.github.connect.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity.CsrfSpec;
@@ -26,21 +28,23 @@ public class SecurityConfig {
     // repository.setCookiePath("/");
 
     @Bean
-    public SecurityWebFilterChain filterChain(ServerHttpSecurity http){
+    public SecurityWebFilterChain filterChain(ServerHttpSecurity http, 
+                                            @Value("${spring.security.oauth2.resourceserver.jwt.jwk-set-uri}") String jwkSetUri) {
         http
         // 개발환경 특성상 다른 도메인에서 요청이 들어오므로, csrf 는 일시적으로 비활성화
         // 운영 환경에서는 같은 도메인으로 설정하고 .csrf(csrf -> csrf.csrfTokenRepository(repository)) 으로 진행해야함
             .csrf(CsrfSpec::disable)
             .authorizeExchange(auth -> auth
                     .pathMatchers( "/auth/**", "/").permitAll()
-                    .anyExchange().authenticated());
-            // .passwordManagement(manage -> manage
-            //     .changePasswordPage("/update-password")
-            // );
+                    .pathMatchers("/project/**").authenticated())
+            .oauth2ResourceServer(oauth2 -> oauth2.jwt(
+                (jwt) -> jwt.jwkSetUri(jwkSetUri)
+            ));
 
         
         return http.build();
     }
+
 
     @Bean
     CorsWebFilter corsWebFilter(){
