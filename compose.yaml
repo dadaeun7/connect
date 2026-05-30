@@ -1,5 +1,21 @@
 name: connect
 services:
+    whoami:
+        image: traefik/whoami
+        labels:
+            - "traefik.http.routers.whoami.rule=Host(`whoami.localhost`)"
+    traefik:
+        container_name: traefik
+        image: traefik:v3.7
+        command: 
+            - "--api.insecure=true"
+            - "--providers.docker=true"
+            - "--entrypoints.web.address=:80"
+        ports:
+            - 80:80
+            - 8081:8080
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
     keycloak:
         container_name: keycloak
         image: "quay.io/keycloak/keycloak:26.6.2"

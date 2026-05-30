@@ -7,6 +7,7 @@ import ExternalUp from "./ExternalUp";
 import { useRouter } from "next/navigation";
 import CstLoading from "../share/CstLoading";
 import CstAlert from "../share/CstAlert";
+import { LOGIN_COMPANY } from "@/app/etc/constant";
 
 interface MailCodeExpiredAtResponse {
   email: string;
@@ -52,12 +53,39 @@ export default function AuthPage({
   const LucideIcon1 = (icons as any)[firIcon];
   const LucideIcon2 = (icons as any)[secIcon];
 
-  const router = useRouter();
+  const errorCodeHandler = (code: number) => {
+
+    let message;
+
+    if(code === 401){
+      message = '이메일 인증이 되지 않은 계정입니다. 메일을 확인해주세요' 
+    }else if(code === 403)
+    setAlertConfig(props => ({
+      ...props, isOpen: true, 
+    }))
+  }
 
   const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
-
     setLoading(true);
+
+    await fetch(LOGIN_COMPANY, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email : formFirInput,
+        password: formSecInput
+      })
+    }).then(res => {
+      if(res.status === 401){
+        setAlertConfig(props => ({
+          ...props, 
+          isOpen:true, 
+          message: "비활성화 된 계정입니다."}))
+      }
+    })
   };
 
   return (

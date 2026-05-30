@@ -2,6 +2,7 @@ package com.github.connect.exception;
 
 import com.github.connect.dto.response.DefaultErrorResponse;
 import com.github.connect.exception.custom.UserNotActiveException;
+import com.github.connect.exception.custom.UserNotVerifyException;
 import com.github.connect.exception.custom.EmailSendException;
 import com.github.connect.exception.custom.KeycloakConnectException;
 
@@ -41,6 +42,11 @@ public class GlobalExceptionHandler extends Throwable{
 
     @ExceptionHandler(UserNotActiveException.class)
     public ResponseEntity<DefaultErrorResponse> handleCodeException(UserNotActiveException e){
+        return createDefaultErrorResponse(e.getMessage(), 403);
+    }
+
+    @ExceptionHandler(UserNotVerifyException.class)
+    public ResponseEntity<DefaultErrorResponse> handleCodeException(UserNotVerifyException e){
         return createDefaultErrorResponse(e.getMessage(), 401);
     }
 
