@@ -68,7 +68,7 @@ export default function Sidebar() {
     >
       {/* 테마 스위처 바: 사이드바가 활성화되어 열려있을 때만 우측 정렬 매핑 */}
       {isExpanded && (
-        <div className="flex ml-5 justify-between items-center w-full mt-1 ">
+        <div className="flex ml-5 justify-between items-center w-full mt-2 ">
           <Link href={"/"}>
             <img
               src="/logo.png"
@@ -81,7 +81,7 @@ export default function Sidebar() {
       )}
 
       {/* 프로젝트 셀렉터 탭 */}
-      <div className="p-3 border-b border-[var(--sidebar-border)]/60">
+      <div className="p-3 mt-2 border-b border-[var(--sidebar-border)]/60">
         <div
           onClick={() => setShowProjects(!showProjects)}
           className={`flex items-center bg-[var(--muted)]/80 border border-[var(--sidebar-border)] rounded-xl py-2.5 cursor-pointer hover:border-[var(--primary)]/40 transition-colors ${
@@ -95,7 +95,7 @@ export default function Sidebar() {
           </div>
           {isExpanded && (
             <>
-              <span className="text-xs font-bold text-[var(--foreground)] truncate flex-1 ml-3">
+              <span className="text-sm font-bold text-[var(--foreground)] truncate flex-1 ml-3">
                 {projects[0]}
               </span>
               <span className="text-[10px] text-[var(--sidebar-foreground)]/50 font-mono">
@@ -107,11 +107,11 @@ export default function Sidebar() {
       </div>
 
       {/* 메인 트리 네비게이션 메뉴 리스트 */}
-      <div className="flex-1 py-4 space-y-6 overflow-y-auto overflow-x-hidden discrete-scrollbar">
+      <div className="flex-1 py-4 mt-2 space-y-10 overflow-y-auto overflow-x-hidden discrete-scrollbar">
         {menuSections.map((section, idx) => (
           <div key={idx} className="px-3">
             {isExpanded && (
-              <div className="text-[10px] font-bold text-[var(--sidebar-foreground)]/40 mb-3 px-2 tracking-wider uppercase">
+              <div className="text-[13px] font-bold text-[var(--sidebar-foreground)]/40 mb-3 px-2 tracking-wider uppercase">
                 {section.title}
               </div>
             )}
@@ -142,7 +142,7 @@ export default function Sidebar() {
                       {item.icon}
                     </div>
                     {isExpanded && (
-                      <span className="tracking-wide text-xs transition-opacity duration-200">
+                      <span className="tracking-wide text-sm transition-opacity duration-200">
                         {item.name}
                       </span>
                     )}

@@ -1,4 +1,4 @@
-import { LOGIN_COMPANY, SIGN_UP_COMPANY } from "@/app/etc/constant";
+import { LOGIN_COMPANY } from "@/app/etc/constant";
 
 export type AuthMode = "login" | "signup";
 
@@ -19,11 +19,11 @@ export const Menu: Record<
   ],
   signup: [
     "계정 생성",
-    "name",
     "email",
+    "password",
     false,
     "다음",
-    SIGN_UP_COMPANY,
+    LOGIN_COMPANY,
     "Mail",
     "KeyRound",
     "/auth/verify",

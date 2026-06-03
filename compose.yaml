@@ -1,15 +1,12 @@
 name: connect
 services:
-    whoami:
-        image: traefik/whoami
-        labels:
-            - "traefik.http.routers.whoami.rule=Host(`whoami.localhost`)"
     traefik:
         container_name: traefik
         image: traefik:v3.7
-        command: 
+        command:
             - "--api.insecure=true"
             - "--providers.docker=true"
+            - "--providers.docker.exposedByDefault=false"
             - "--entrypoints.web.address=:80"
         ports:
             - 80:80
@@ -23,6 +20,10 @@ services:
         environment:
             - KC_BOOTSTRAP_ADMIN_USERNAME=${KC_BOOTSTRAP_ADMIN_USERNAME}
             - KC_BOOTSTRAP_ADMIN_PASSWORD=${KC_BOOTSTRAP_ADMIN_PASSWORD}
+            - KC_DB=${KC_POSTGRES_DB}
+            - KC_DB_URL=jdbc:postgresql://keycloak-db:5432/${KC_POSTGRES_DB}
+            - KC_DB_USERNAME=${KC_POSTGRES_USER}
+            - KC_DB_PASSWORD=${KC_POSTGRES_PASSWORD}
         ports:
             - "8079:8080"
         depends_on:
@@ -39,7 +40,7 @@ services:
             - POSTGRES_PASSWORD=${KC_POSTGRES_PASSWORD}
             - POSTGRES_DB=${KC_POSTGRES_DB}
         ports:
-            - "5433:5433"
+            - "5433:5432"
         healthcheck:
             test:
                 [
@@ -49,6 +50,8 @@ services:
             interval: 10s
             timeout: 5s
             retries: 5
+        labels:
+            - "traefik.enable=false"
         volumes:
             - keycloak_postgres_data:/var/lib/postgresql
 
@@ -72,6 +75,8 @@ services:
             interval: 10s
             timeout: 5s
             retries: 5
+        labels:
+            - "traefik.enable=false"
         volumes:
             - postgres_data:/var/lib/postgresql
 
@@ -89,10 +94,15 @@ services:
             timeout: 5s
             retries: 5
             start_period: 5s
+
+        labels:
+            - "traefik.enable=false"
         volumes:
             - redis_data:/data
 
     backend:
+        labels:
+            - "traefik.enable=true"
         build:
             context: ./back
             dockerfile: Dockerfile.dev
@@ -104,10 +114,19 @@ services:
             - LOG_LEVEL=debug
             - SPRING_PROFILES_ACTIVE=dev
             # - REDIS_PASSWORD=${REDIS_PASSWORD}
+            - POSTGRES_HOST=${POSTGRES_HOST}
+            - POSTGRES_DB=${POSTGRES_DB}
             - POSTGRES_USER=${POSTGRES_USER}
             - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
             - GMAIL_APP_USERNAME=${GMAIL_APP_USERNAME}
             - GMAIL_APP_PASSWORD=${GMAIL_APP_PASSWORD}
+            - KEYCLOAK_SECRET=${KEYCLOAK_SECRET}
+            - KEYCLOAK_JWT_SET_URI=${KEYCLOAK_JWT_SET_URI}
+            - KEYCLOAK_ISSUER_URI=${KEYCLOAK_ISSUER_URI}
+            - KEYCLOAK_BASE_URL=${KEYCLOAK_BASE_URL}
+            - KEYCLOAK_CLIENT_ID=${KEYCLOAK_CLIENT_ID}
+            - KEYCLOAK_USERNAME=${KEYCLOAK_USERNAME}
+            - KEYCLOAK_PASSWORD=${KEYCLOAK_PASSWORD}
         depends_on:
             backend-db:
                 condition: service_healthy
@@ -115,6 +134,8 @@ services:
                 condition: service_healthy
 
     # front:
+    #     labels:
+    #         - "traefik.http.routers.front.rule=Host(`front.localhost`)"
     #     build:
     #         context: ./front
     #         dockerfile: Dockerfile.dev

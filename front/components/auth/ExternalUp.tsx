@@ -1,4 +1,4 @@
-import { signIn } from "@/auth";
+import { signIn } from "next-auth/react";
 
 export default function ExternalUp() {
   return (

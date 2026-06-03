@@ -21,7 +21,7 @@ export default function IssueRow({
           <span className="bg-[var(--primary)]/10 text-[var(--primary)] px-2.5 py-0.5 rounded text-xs font-bold uppercase tracking-tight border border-[var(--primary)]/20 font-mono">
             In Progress
           </span>
-          <span className="bg-[var(--muted)] text-[var(--muted-foreground)]/80 px-2 py-0.5 rounded text-xs font-bold uppercase tracking-tight border border-[var(--border)]/60 font-mono italic">
+          <span className="bg-[var(--muted)] text-[var(--muted-foreground)]/80 px-2 py-0.5 rounded text-xs font-bold uppercase tracking-tight border border-[var(--border)]/60 font-mono">
             Medium
           </span>
           <ChevronDown

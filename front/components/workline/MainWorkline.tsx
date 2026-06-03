@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, SlidersHorizontal, ArrowUpDown, Plus } from "lucide-react";
+import { Search, SlidersHorizontal, ArrowUpDown } from "lucide-react";
 import MilestoneCard from "./MilestoneCard";
 import AddMilestone from "./AddMilstone";
 import { useState } from "react";
@@ -76,7 +76,7 @@ export default function MainDashboard() {
         ].map((stat, i) => (
           <div
             key={i}
-            className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-6 flex flex-col justify-between min-h-[120px] relative overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.02)] group"
+            className="bg-[var(--card)] rounded-xl p-6 flex flex-col justify-between min-h-[120px] relative overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.02)] group"
           >
             <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[var(--primary)] opacity-0 dark:group-hover:opacity-100 transition-opacity" />
 
@@ -91,7 +91,7 @@ export default function MainDashboard() {
                 <span
                   className={`text-[11px] font-bold font-mono border px-2 py-0.5 rounded ${stat.style}`}
                 >
-                  {stat.up ? "↗" : "↘"} {stat.trend}
+                  {stat.trend}
                 </span>
               </div>
             </div>

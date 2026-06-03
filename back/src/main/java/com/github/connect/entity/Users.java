@@ -1,28 +1,22 @@
 package com.github.connect.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
+
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-@Entity
 @Table(name = "Users")
 public class Users {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
-    @Column(nullable = false, unique = true)
     private String uuid;
     
-    @Column(nullable = false, unique = true)
     private String email;
 
     /**
@@ -30,12 +24,11 @@ public class Users {
      * @param github 외부
      * @param gmail 외부
      */
-    @Column(nullable = false, name="join_type", columnDefinition = "SMALLINT")
+    @Column("join_type")
     private RoleType joinType;
 
-    @Column(nullable = false, columnDefinition = "VARCHAR(20)")
+    @Column("is_active")
     private String isActive;
-
 
     public enum RoleType{
         COMPANY, GITHUB, GMAIL

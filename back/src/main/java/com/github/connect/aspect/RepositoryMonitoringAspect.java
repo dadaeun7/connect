@@ -1,10 +1,12 @@
 package com.github.connect.aspect;
 
-import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Aspect
 @Component
@@ -14,45 +16,34 @@ public class RepositoryMonitoringAspect {
     @Pointcut("execution(* com.github.connect.repository..*(..))")
     public void repositoryLayer() {}
 
-    private final ThreadLocal<Long> startTimeStore = new ThreadLocal<>();
+    @Around("repositoryLayer()")
+    public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
+        
+        long startTime = System.currentTimeMillis();
+        String className = joinPoint.getSignature().getDeclaringTypeName();
+        String methodName = joinPoint.getSignature().getName();
 
-    @Before("repositoryLayer()")
-    public void doBefore(JoinPoint joinPoint){
-        startTimeStore.set(System.currentTimeMillis());
-    }
+        Object result = joinPoint.proceed();
 
-    @AfterThrowing(pointcut = "execution(* com.github.connect.repository..*(..)", throwing = "ex")
-    public void doRecoveryActions(JoinPoint joinPoint, Exception ex){
-        log.error("[Error] Location: {}.{} Message: {}", 
-        joinPoint.getSignature().getDeclaringTypeName(), 
-        joinPoint.getSignature().getName(),
-        ex.getMessage());
-    }
+        if(result instanceof Mono){
+            return ((Mono<?>) result)
+            .doOnTerminate(()-> {
+                long executionTime = System.currentTimeMillis() - startTime;
+                log.info(setLogForm("Mono Query", className, methodName, executionTime-startTime));
+            });
+        } 
 
-    @After("repositoryLayer()")
-    public void doAfter(JoinPoint joinPoint){
-        Long startTime = startTimeStore.get();
-
-        if(startTime == null){
-            return;
+        if(result instanceof Flux){
+            return ((Flux<?>) result)
+            .doOnTerminate(()-> {
+                long executionTime = System.currentTimeMillis() - startTime;
+                log.info(setLogForm("Flux Query", className, methodName, executionTime-startTime));
+            });
         }
 
-        try{
-            long executionTime = System.currentTimeMillis() - startTime;
-
-            String fParam = joinPoint.getSignature().getDeclaringTypeName();
-            String sParam = joinPoint.getSignature().getName();
-
-            if(executionTime >= 500){
-                log.warn(setLogForm("Delay", fParam, sParam, executionTime));
-            }else{
-                log.info(setLogForm("Save", fParam, sParam, executionTime));
-            }
-
-        }finally {
-            startTimeStore.remove();
-        }
-
+        long executionTime = System.currentTimeMillis() - startTime;
+        log.info(setLogForm("Sync Query", className, methodName, executionTime-startTime));
+        return result;
     }
 
     private String setLogForm(String type, String fParam, String sParam, Long duration){

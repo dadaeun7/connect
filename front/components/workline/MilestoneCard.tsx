@@ -1,9 +1,9 @@
-import { Calendar, ChevronRight, Plus, Activity } from "lucide-react";
+import { Calendar, ChevronRight, Plus, Activity, ChartPie } from "lucide-react";
 import IssueRow from "./IssueRow";
 
 export default function MilestoneCard() {
   return (
-    <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-6 shadow-sm relative">
+    <div className="bg-[var(--card)] rounded-xl p-6 shadow-sm relative">
       <div className="flex justify-between items-start mb-6">
         <div className="space-y-2">
           <div className="flex items-center gap-3">
@@ -14,7 +14,7 @@ export default function MilestoneCard() {
             </h2>
           </div>
           <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1.5 text-xs text-[var(--muted-foreground)] font-bold bg-[var(--muted)] border border-[var(--border)]/80 px-2.5 py-1 rounded">
+            <span className="flex items-center gap-1.5 text-xs text-[var(--muted-foreground)] font-bold bg-[var(--muted)] px-2.5 py-2 rounded-lg">
               <Calendar size={13} className="text-[var(--primary)]" /> 마감일
               2026.04.24
             </span>
@@ -57,7 +57,7 @@ export default function MilestoneCard() {
             ))}
           </div>
           <span className="text-sm font-bold text-[var(--primary)] flex items-center gap-1 font-mono">
-            <Activity size={14} /> 64% Completed
+            <ChartPie size={14} /> 64%
           </span>
         </div>
         <div className="flex-1 max-w-sm bg-[var(--secondary)] h-2 rounded-full overflow-hidden border border-[var(--border)]/40">

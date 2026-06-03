@@ -16,7 +16,7 @@ export default function MainPage() {
         <div className="text-xl font-black tracking-tighter uppercase cursor-pointer">
           <img src="/logo.png" className="w-8" />
         </div>
-        <div className="flex gap-15 text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
+        <div className="flex gap-15 text-[12px] font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
           <a href="#" className="hover:text-[var(--primary)] transition-colors">
             작업 흐름
           </a>

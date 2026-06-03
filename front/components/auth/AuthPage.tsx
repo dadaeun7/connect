@@ -1,18 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import SelectOption from "./SelectOption";
 import { icons } from "lucide-react";
-import ExternalUp from "./ExternalUp";
-import { useRouter } from "next/navigation";
 import CstLoading from "../share/CstLoading";
 import CstAlert from "../share/CstAlert";
 import { LOGIN_COMPANY } from "@/app/etc/constant";
-
-interface MailCodeExpiredAtResponse {
-  email: string;
-  expiredAt: number;
-}
+import ExternalUp from "./ExternalUp";
+import { signIn } from "next-auth/react";
 
 export default function AuthPage({
   mode,
@@ -24,7 +19,6 @@ export default function AuthPage({
   api,
   firIcon,
   secIcon,
-  request,
 }: {
   readonly mode: string;
   readonly comment: string;
@@ -35,7 +29,6 @@ export default function AuthPage({
   readonly api: string;
   readonly firIcon: string;
   readonly secIcon: string;
-  readonly request: string;
 }) {
   const [formFirInput, setformFirInput] = useState("");
   const [formSecInput, setformSecInput] = useState("");
@@ -53,17 +46,14 @@ export default function AuthPage({
   const LucideIcon1 = (icons as any)[firIcon];
   const LucideIcon2 = (icons as any)[secIcon];
 
-  const errorCodeHandler = (code: number) => {
-
-    let message;
-
-    if(code === 401){
-      message = '이메일 인증이 되지 않은 계정입니다. 메일을 확인해주세요' 
-    }else if(code === 403)
-    setAlertConfig(props => ({
-      ...props, isOpen: true, 
-    }))
-  }
+  const resPopHandler = (t: "success" | "error" | "info", message?: string) => {
+    setAlertConfig((props) => ({
+      ...props,
+      type: t,
+      isOpen: true,
+      message: message || "관리자에게 문의해주세요.",
+    }));
+  };
 
   const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
@@ -72,20 +62,47 @@ export default function AuthPage({
     await fetch(LOGIN_COMPANY, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        email : formFirInput,
-        password: formSecInput
-      })
-    }).then(res => {
-      if(res.status === 401){
-        setAlertConfig(props => ({
-          ...props, 
-          isOpen:true, 
-          message: "비활성화 된 계정입니다."}))
-      }
+        email: formFirInput,
+        password: formSecInput,
+      }),
     })
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then((errorData) => {
+            const errorDetail =
+              errorData?.body?.detail || errorData?.detail || "서버 에러 발생";
+            throw new Error(errorDetail);
+          });
+        }
+        const authHeader = res.headers.get("Authorization");
+        if (authHeader?.startsWith("Bearer ")) {
+          const token = authHeader.substring(7);
+
+          const result = signIn("credentials", {
+            userId: formFirInput,
+            accessToken: token,
+            redirect: true,
+            callbackUrl: "/",
+          });
+        }
+
+        return res.json();
+      })
+      .then((data) => {
+        resPopHandler("success", data.message);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        resPopHandler("error", error.message);
+      })
+      .finally(() => {
+        setformFirInput("");
+        setformSecInput("");
+        setLoading(false);
+      });
   };
 
   return (
@@ -106,7 +123,7 @@ export default function AuthPage({
                 {comment}
               </h1>
               <div className="text-sm mt-2 font-medium">
-                {mode === "login" && <SelectOption mode={mode} />}
+                <SelectOption mode={mode} />
               </div>
             </div>
             <form onSubmit={handleSubmit} className="space-y-5">

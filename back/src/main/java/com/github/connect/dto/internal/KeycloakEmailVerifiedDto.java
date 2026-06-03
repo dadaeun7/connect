@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access=AccessLevel.PROTECTED)
-public class KeycloakAccessTokenDto {
-
-    @JsonProperty("access_token")
-    private String accessToken;
+public class KeycloakEmailVerifiedDto {
+    
+    @JsonProperty("emailVerified")
+    private Boolean emailVerified;
 }

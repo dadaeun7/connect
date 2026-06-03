@@ -1,10 +1,11 @@
 package com.github.connect.service;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -12,6 +13,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.github.connect.constants.EntityFieldStandardType;
 import com.github.connect.dto.internal.KeycloakAccessTokenDto;
+import com.github.connect.dto.internal.KeycloakEmailVerifiedDto;
 import com.github.connect.dto.request.CompanyUserGetAuthReq;
 import com.github.connect.entity.Users;
 import com.github.connect.exception.custom.KeycloakConnectException;
@@ -28,8 +30,8 @@ public class CompanyUserGetAuthService {
     private final UsersRepository usersRepository;
     private final WebClient keycloakClient;
 
-    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
-    private String issuerUri;
+    @Value("${spring.security.oauth2.resourceserver.base-url}")
+    private String baseUrl;
 
     @Value("${spring.keycloak.client-id}")
     private String clientId;
@@ -40,29 +42,72 @@ public class CompanyUserGetAuthService {
     @Value("${spring.keycloak.password}")
     private String password;
 
-    public Mono<String> authRequest(CompanyUserGetAuthReq req) {
+    public Mono<Map<String, String>> authRequest(CompanyUserGetAuthReq req) {
 
         return usersRepository.findByEmail(req.getEmail())
-                    .flatMap(user -> checkUserIsActive(req.getEmail()).then(Mono.just(user)))
-                    .flatMap(user -> getAccessToken(req.getEmail(), req.getPassword()))
+                    .flatMap(user -> authRequestCheck(req.getEmail(), req.getPassword()))
                     .switchIfEmpty(Mono.defer(() -> 
-                        getAccessTokenKeycloak()
-                            .flatMap(accessToken -> getUserUUID(accessToken, req.getEmail(), req.getPassword()))
-                            .flatMap(uuid -> createUserInDB(req.getEmail(), uuid))
-                            .flatMap(newUser -> Mono.empty())
+                        createUser(req.getEmail(), req.getPassword())
                     ));
     }
 
-    private Mono<Void> checkUserIsActive(String email){
-        return usersRepository.findIsActiveByEmail(email)
-        .flatMap(state -> {
-            if(state.equals(EntityFieldStandardType.USER_PENDING)){
-                return Mono.error(new UserNotActiveException("사용자 계정이 활성화되지 않았습니다. 관리자에게 문의하세요."));
-            } else if(state.equals(EntityFieldStandardType.USER_SUSPENDED)){
-                return Mono.error(new UserNotActiveException("사용자 계정이 정지되었습니다. 관리자에게 문의하세요."));
-            }
-            return Mono.empty();
-        });
+    private Mono<Map<String, String>> authRequestCheck(String email, String password){
+        return getAccessTokenKeycloak()
+        .flatMap(accessToken -> getUserUUID(accessToken, email, password)
+            .flatMap(uuid -> checkUserIsActive(uuid, accessToken)
+                .flatMap(isActive -> {
+                    if(Boolean.TRUE.equals(isActive)){
+                        return usersRepository.updateIsActiveByEmail(email, EntityFieldStandardType.USER_ACTIVE)
+                        .flatMap(getaccToken -> getAccessToken(email, password)
+                            .flatMap(token -> Mono.just(Map.of("accessToken", token)))
+                        );
+                    }else{
+                        return Mono.error(new UserNotActiveException("이메일 인증전 상태입니다. 메일을 확인해주세요."));
+                    }
+                })
+        ));
+    }
+
+    private Mono<Map<String, String>> createUser(String email, String password){
+        return getAccessTokenKeycloak()
+        .flatMap(accessToken -> createUserUUID(accessToken, email, password)
+            .flatMap(uuid -> createUserInDB(email, uuid)
+                .then(sendVerifyEmail(uuid, accessToken)
+                    .then(Mono.just((Map.of("message", "등록 완료. 이메일 확인 필요"))))
+        )));
+    }
+
+    private Mono<Boolean> checkUserIsActive(String uuid, String accessToken){
+
+        return keycloakClient.get()
+        .uri(baseUrl + "/admin/realms/"+clientId+"/users/"+uuid)
+        .header("Authorization", "Bearer " + accessToken)
+        .header("Content-Type", "application/json")
+        .retrieve()
+        .onStatus(HttpStatusCode::isError, response -> 
+                Mono.error(new KeycloakConnectException("사용자 정보를 가져오지 못했습니다. " + response.toString())))
+        .bodyToMono(KeycloakEmailVerifiedDto.class)
+        .map(KeycloakEmailVerifiedDto::getEmailVerified);
+    }
+
+
+    private Mono<String> getUserUUID(String accessToken, String email, String password){
+        return keycloakClient.get()
+            .uri(baseUrl + "/admin/realms/" + clientId + "/users?email=" + email)
+            .header("Authorization", "Bearer " + accessToken)
+            .retrieve()
+            .onStatus(HttpStatusCode::isError, response -> 
+                    Mono.error(new KeycloakConnectException("인증 서버에서 유저 UUID 조회 실패")))
+            // Keycloak은 검색 결과를 List 형태로 반환함
+            .bodyToMono(new ParameterizedTypeReference<List<Map<String, Object>>>() {})
+            .flatMap(users -> {
+                if (users.isEmpty()) {
+                    return Mono.error(new UserNotActiveException("Keycloak에 존재하지 않는 유저입니다."));
+                }
+                // 첫 번째로 검색된 유저의 id(UUID) 반환
+                String uuid = (String) users.get(0).get("id");
+                return Mono.just(uuid);
+            });
     }
 
     private Mono<Void> createUserInDB(String email, String uuid){
@@ -76,34 +121,35 @@ public class CompanyUserGetAuthService {
 
     }
 
-    public Mono<Void> successAuth(String email){
-        return usersRepository.findIsActiveByEmail(email)
-            .flatMap(state -> {
-                if (state.equals(EntityFieldStandardType.USER_PENDING)) {
-                    return usersRepository.updateIsActiveByEmail(email, EntityFieldStandardType.USER_ACTIVE);
-                }
-                return Mono.empty();
-            });
+    private Mono<Void> sendVerifyEmail(String uuid, String accessToken){
+        return keycloakClient.put()
+        .uri(baseUrl + "/admin/realms/"+clientId+"/users/"+uuid+"/send-verify-email")
+        .header("Authorization", "Bearer " + accessToken)
+        .header("Content-Type", "application/json")
+        .retrieve()
+        .toBodilessEntity()
+        .then();
     }
 
     private Mono<String> getAccessToken(String email, String password){
         return keycloakClient.post()
-        .uri(issuerUri+"/realms/"+clientId+"/protocol/openid-connect/token")
+        .uri(baseUrl+"/realms/"+clientId+"/protocol/openid-connect/token")
         .header("Content-Type", "application/x-www-form-urlencoded")
         .body(BodyInserters.fromFormData("client_id", clientId)
             .with("username", email)
             .with("password", password)
             .with("grant_type", "password"))
-            .retrieve()
-            .onStatus(HttpStatusCode::isError, response -> Mono.error(new KeycloakConnectException("로그인 인증 서버에 문제가 발생했습니다. 관리자에게 문의하세요. " + response.toString())))
-            .bodyToMono(KeycloakAccessTokenDto.class)
-            .map(KeycloakAccessTokenDto::getAccessToken);
+        .retrieve()
+        .onStatus(HttpStatusCode::isError, response -> 
+            Mono.error(new KeycloakConnectException("[gat] 로그인 인증 서버에 문제가 발생했습니다. 관리자에게 문의하세요.")))
+        .bodyToMono(KeycloakAccessTokenDto.class)
+        .map(KeycloakAccessTokenDto::getAccessToken);
     }
 
-    private Mono<String> getUserUUID(String accessToken, String email, String password){
+    private Mono<String> createUserUUID(String accessToken, String email, String password){
 
         return keycloakClient.post()
-        .uri(issuerUri + "/admin/realms/"+clientId+"/users")
+        .uri(baseUrl + "/admin/realms/"+clientId+"/users")
         .header("Authorization", "Bearer " + accessToken)
         .header("Content-Type", "application/json")
         .body(BodyInserters.fromValue(Map.of(
@@ -111,11 +157,11 @@ public class CompanyUserGetAuthService {
             "email", email,
             "enabled", true,
             "emailVerified", false,
-            "credentials", Map.of(
+            "credentials", List.of(Map.of(
                 "type", "password",
                 "value", password,
                 "temporary", false
-            )
+            ))
         )))
         .retrieve()
         .toBodilessEntity()
@@ -135,14 +181,14 @@ public class CompanyUserGetAuthService {
     {
 
         return keycloakClient.post()
-        .uri(issuerUri+"/realms/master/protocol/openid-connect/token")
+        .uri(baseUrl+"/realms/master/protocol/openid-connect/token")
         .header("Content-Type", "application/x-www-form-urlencoded")
-        .body(BodyInserters.fromFormData("client_id", clientId)
+        .body(BodyInserters.fromFormData("client_id", "admin-cli")
             .with("username", username)
             .with("password", password)
             .with("grant_type", "password"))
         .retrieve()
-        .onStatus(HttpStatusCode::isError, response -> Mono.error(new KeycloakConnectException("로그인 인증 서버에 문제가 발생했습니다. 관리자에게 문의하세요. " + response.toString())))
+        .onStatus(HttpStatusCode::isError, response -> Mono.error(new KeycloakConnectException("[gatk] 로그인 인증 서버에 문제가 발생했습니다. 관리자에게 문의하세요.")))
         .bodyToMono(KeycloakAccessTokenDto.class)
         .map(KeycloakAccessTokenDto::getAccessToken);
     }

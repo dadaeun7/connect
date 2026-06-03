@@ -26,7 +26,6 @@ export default async function Page({
     api,
     firIcon,
     secIcon,
-    request,
   ] = Menu[mode];
 
   return (
@@ -42,7 +41,6 @@ export default async function Page({
         api={api}
         firIcon={firIcon}
         secIcon={secIcon}
-        request={request}
       />
     </Suspense>
   );

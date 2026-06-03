@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.net.SocketTimeoutException;
 
 @RestControllerAdvice
-public class GlobalExceptionHandler extends Throwable{
+public class GlobalExceptionHandler{
 
     @ExceptionHandler(EmailSendException.class)
     public ResponseEntity<DefaultErrorResponse> handleMessagingException(EmailSendException ex){
