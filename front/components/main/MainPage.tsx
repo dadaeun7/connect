@@ -7,31 +7,26 @@ import {
   ArrowRight,
 } from "lucide-react";
 import Link from "next/link";
+import LoginStateToggle from "./LoginStateToggle";
 
 export default function MainPage() {
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] selection:bg-[var(--primary)]/20 selection:text-[var(--primary)] overflow-x-hidden">
       {/* 글로벌 탑 상향 네비게이션 */}
-      <nav className="flex justify-between items-center px-10 py-5 border-b border-[var(--border)] bg-[var(--card)] sticky top-0 z-50">
-        <div className="text-xl font-black tracking-tighter uppercase cursor-pointer">
-          <img src="/logo.png" className="w-8" />
+      <nav className="grid grid-cols-[1fr_auto_1fr] items-center px-10 py-5 border-b border-[var(--border)] bg-[var(--card)] sticky top-0 z-50">
+      <div className="flex justify-start">
+          <div className="text-xl font-black tracking-tighter uppercase cursor-pointer">
+            <img src="/logo.png" className="w-8" />
+          </div>
         </div>
-        <div className="flex gap-15 text-[12px] font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
-          <a href="#" className="hover:text-[var(--primary)] transition-colors">
-            작업 흐름
-          </a>
-          <a href="#" className="hover:text-[var(--primary)] transition-colors">
-            통합 목록
-          </a>
-          <a href="#" className="hover:text-[var(--primary)] transition-colors">
-            요금제
-          </a>
+        <div className="flex gap-20 text-[12px] font-bold uppercase tracking-wider text-[var(--muted-foreground)] whitespace-nowrap">
+            <a href="#" className="hover:text-[var(--primary)] transition-colors">작업 흐름</a>
+            <a href="#" className="hover:text-[var(--primary)] transition-colors">통합 목록</a>
+            <a href="#" className="hover:text-[var(--primary)] transition-colors">요금제</a>
         </div>
-        <Link href="/auth/login">
-          <button className="px-5 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider border border-[var(--border)] bg-[var(--muted)] hover:bg-[var(--primary)] hover:text-[var(--primary-foreground)] transition-colors">
-            로그인
-          </button>
-        </Link>
+        <div className="flex justify-end">
+            <LoginStateToggle />
+        </div>
       </nav>
 
       {/* 히어로 중앙 정보 피드 */}

@@ -8,6 +8,7 @@ import CstAlert from "../share/CstAlert";
 import { LOGIN_COMPANY } from "@/app/etc/constant";
 import ExternalUp from "./ExternalUp";
 import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function AuthPage({
   mode,
@@ -43,6 +44,8 @@ export default function AuthPage({
     },
   });
 
+  const router = useRouter();
+
   const LucideIcon1 = (icons as any)[firIcon];
   const LucideIcon2 = (icons as any)[secIcon];
 
@@ -59,7 +62,8 @@ export default function AuthPage({
     e.preventDefault();
     setLoading(true);
 
-    await fetch(LOGIN_COMPANY, {
+    try{
+      const result = await fetch(LOGIN_COMPANY, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -68,43 +72,57 @@ export default function AuthPage({
         email: formFirInput,
         password: formSecInput,
       }),
-    })
-      .then((res) => {
-        if (!res.ok) {
-          return res.json().then((errorData) => {
-            const errorDetail =
-              errorData?.body?.detail || errorData?.detail || "서버 에러 발생";
-            throw new Error(errorDetail);
-          });
-        }
-        const authHeader = res.headers.get("Authorization");
-        if (authHeader?.startsWith("Bearer ")) {
-          const token = authHeader.substring(7);
+    });
 
-          const result = signIn("credentials", {
-            userId: formFirInput,
-            accessToken: token,
-            redirect: true,
-            callbackUrl: "/",
-          });
+    if(!result.ok){
+      const errData = await result.json();
+      const errDetail = errData?.body?.detail || errData?.detail || "서버에 에러가 발생했습니다.";
+      throw new Error(errDetail);
+    }
+
+    const jsonBody = await result.json();
+
+    if(jsonBody.registration){
+      resPopHandler('success', jsonBody.registration);
+      return;
+    }
+
+    if(jsonBody.loginIn){
+
+      const authHeader = result.headers.get("Authorization");
+
+      if(authHeader?.startsWith("Bearer ")){
+        const token = authHeader.substring(7);
+
+        const res:any= await signIn("credentials",{
+          userId: formFirInput,
+          accessToken: token,
+          redirect: false,
+        })
+
+        if(res.error){
+          throw new Error("인증 세션 생성에 실패했습니다.");
         }
 
-        return res.json();
-      })
-      .then((data) => {
-        resPopHandler("success", data.message);
-      })
-      .catch((error) => {
+        resPopHandler("success", "로그인 성공했습니다.");
+        router.push("/");
+        return;
+      }
+
+      throw new Error("인증 토큰을 전달받지 못했습니다.")
+    }
+
+    throw new Error("올바르지 않은 접근이거나 유효하지 않은 응답 형태입니다.");
+
+    }catch(error:any) {
         console.error("Error:", error);
         resPopHandler("error", error.message);
-      })
-      .finally(() => {
+    }finally{
         setformFirInput("");
         setformSecInput("");
         setLoading(false);
-      });
-  };
-
+    }
+  }
   return (
     <>
       <CstAlert
@@ -181,4 +199,4 @@ export default function AuthPage({
       </>
     </>
   );
-}
+  }

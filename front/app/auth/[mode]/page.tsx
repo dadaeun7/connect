@@ -31,7 +31,6 @@ export default async function Page({
   return (
     <Suspense fallback={<Loading />}>
       <AuthPage
-        key={mode}
         mode={mode}
         comment={comment}
         firstInput={firstInput}

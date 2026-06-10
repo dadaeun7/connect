@@ -127,6 +127,7 @@ services:
             - KEYCLOAK_CLIENT_ID=${KEYCLOAK_CLIENT_ID}
             - KEYCLOAK_USERNAME=${KEYCLOAK_USERNAME}
             - KEYCLOAK_PASSWORD=${KEYCLOAK_PASSWORD}
+            - KEYCLOAK_SECRET=${KEYCLOAK_SECRET}
         depends_on:
             backend-db:
                 condition: service_healthy

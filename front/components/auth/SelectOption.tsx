@@ -16,7 +16,7 @@ export default function SelectOption({ mode }: { readonly mode: string }) {
       link: "/auth/signup",
     },
     signup: {
-      comment: "계정이 있으신가요?",
+      comment: "이메일 인증을 완료하셨나요?",
       btnMsg: "로그인",
       link: "/auth/login",
     },

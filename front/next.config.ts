@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { BASE, REFRESH_TOKEN } from "./app/etc/constant";
 
 const backend = "http://localhost:8080";
 
@@ -15,9 +16,9 @@ const nextConfig: NextConfig = {
         destination: backend + "/auth/:path*",
       },
       {
-        source: "/api/auth/:path",
-        destination: backend + "/api/:path*",
-      },
+        source: "/u/retoken",
+        destination: backend + "/retoken"
+      }
     ];
   },
 };

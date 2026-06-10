@@ -15,6 +15,9 @@ public class ApiConstants {
     public static final String SIGN_UP_VERIFY = LOGIN_AUTH_BASE + "/verify";
     public static final String SIGN_UP_REGISTER = LOGIN_AUTH_BASE + "/register";
 
+    public static final String REFRESH_TOKEN = "/retoken";
+
+
     public static final String API_BASE = "/api";
     public static final String CONNECT_GITHUB = API_BASE + "/github";
     public static final String CONNECT_FIGMA = API_BASE + "/figma";

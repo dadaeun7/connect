@@ -13,9 +13,6 @@ export default function Layout({
       <Link href="/">
         <div className="absolute left-8 top-8 flex items-center gap-2.5 text-[var(--muted-foreground)] hover:text-[var(--primary)] transition-colors group cursor-pointer">
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-          <span className="text-xs font-bold uppercase tracking-wider">
-            메인화면으로 가기
-          </span>
         </div>
       </Link>
 

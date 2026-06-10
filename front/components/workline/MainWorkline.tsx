@@ -18,7 +18,7 @@ export default function MainDashboard() {
         <div className="space-y-2">
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-bold tracking-tight text-[var(--foreground)] uppercase">
-              Leads
+              작업라인
             </h1>
             <span className="text-xs font-bold bg-[var(--card)] text-[var(--muted-foreground)] px-2.5 py-1 rounded-md border border-[var(--border)] shadow-[0_1px_2px_rgba(0,0,0,0.02)] font-mono">
               248
@@ -43,7 +43,7 @@ export default function MainDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         {[
           {
-            label: "New Leads",
+            label: "대시보드1",
             value: "42",
             trend: "12%",
             up: true,
@@ -51,7 +51,7 @@ export default function MainDashboard() {
               "border-[var(--primary)]/20 bg-[var(--primary)]/5 text-[var(--primary)]",
           },
           {
-            label: "Qualified Leads",
+            label: "대시보드2",
             value: "18",
             trend: "4.2%",
             up: true,
@@ -59,7 +59,7 @@ export default function MainDashboard() {
               "border-[var(--primary)]/20 bg-[var(--primary)]/5 text-[var(--primary)]",
           },
           {
-            label: "Avg Response Time",
+            label: "대시보드3",
             value: "1.8h",
             trend: "15%",
             up: true,
@@ -67,7 +67,7 @@ export default function MainDashboard() {
               "border-[var(--primary)]/20 bg-[var(--primary)]/5 text-[var(--primary)]",
           },
           {
-            label: "Hot Leads",
+            label: "대시보드4",
             value: "9",
             trend: "2%",
             up: false,
@@ -100,19 +100,19 @@ export default function MainDashboard() {
       </div>
 
       {/* 콘트롤 툴바: 요소들의 컴포넌트 높이를 h-11(44px) 이상으로 확장하여 터치 타깃 확보 */}
-      <div className="flex items-center justify-between border-b border-[var(--border)] pb-4 mb-8">
+      <div className="flex items-center justify-between border-b border-[var(--border)] pb-[4.8px] mb-8">
         <div className="flex items-center gap-6 text-xs font-bold text-[var(--muted-foreground)]">
           <span className="text-[var(--primary)] border-b-2 border-[var(--primary)] pb-[17px] -mb-[18px] cursor-pointer font-black tracking-wider">
-            All
+            전체
           </span>
           <span className="hover:text-[var(--foreground)] cursor-pointer transition-colors tracking-wider">
-            Favourite
+            긴급
           </span>
           <span className="hover:text-[var(--foreground)] cursor-pointer transition-colors tracking-wider">
-            New
+            새작업
           </span>
           <span className="hover:text-[var(--foreground)] cursor-pointer transition-colors tracking-wider">
-            Assigned to me
+            완료
           </span>
         </div>
 

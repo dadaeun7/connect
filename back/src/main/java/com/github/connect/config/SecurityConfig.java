@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.web.reactive.EnableWebFlux
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity.CsrfSpec;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.authentication.RedirectServerAuthenticationSuccessHandler;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,6 +24,7 @@ public class SecurityConfig {
         http
         // keycloak는 CSRF 공격에 취약하지 않으므로 CSRF 보호를 비활성화
             .csrf(CsrfSpec::disable)
+            .oauth2Login(oauth -> oauth.authenticationSuccessHandler(new RedirectServerAuthenticationSuccessHandler("/")))
             .authorizeExchange(auth -> auth
                     .pathMatchers( "/auth/**", "/").permitAll()
                     .pathMatchers("/project/**").authenticated())

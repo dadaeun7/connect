@@ -5,6 +5,7 @@ import com.github.connect.dto.internal.UserAuthenticationDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
@@ -30,6 +31,7 @@ class RedisConfig {
     }
 
     @Bean
+    @Primary
     public ReactiveRedisTemplate<String,String> cstStringRedisTemplate(LettuceConnectionFactory redisConnectionFactory){
         RedisSerializer<String> serializer = new StringRedisSerializer();
         
@@ -46,6 +48,7 @@ class RedisConfig {
     }
 
     @Bean
+    @Primary
     public ReactiveRedisTemplate<String, Object> objRedisTemplate(LettuceConnectionFactory redisConnectionFactory){
 
         /* JackSon 다형성에 대해 보안을 위해 타입 검증과 직렬화 클래스 범위 한정하여 PolymorphicTypeValidator 세팅 */
