@@ -36,7 +36,8 @@ export default function GeneralTab() {
             사용자 프로젝트 초대
           </h2>
           <p className="text-sm text-[var(--muted-foreground)] font-medium">
-            협업 프로젝트 공간에 동참할 사용자의 이메일을 통해 초대합니다.
+            협업 프로젝트 공간에 같이 작업할 사용자의 이메일로 초대하고, 초대
+            수락된 리스트 입니다.
           </p>
         </div>
 
@@ -44,15 +45,14 @@ export default function GeneralTab() {
           <div className="relative flex-1">
             <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--muted-foreground)]/60" />
             <input
-              className="w-full bg-[var(--muted)] border border-[var(--border)] rounded-lg pl-11 pr-4 py-3 text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--primary)] transition-colors"
+              className="w-full bg-[var(--muted)] border border-[var(--border)] rounded-lg pl-11 pr-4 py-3 text-sm text-[var(--foreground)]/50 focus:outline-none focus:border-[var(--primary)]/70 transition-colors"
               placeholder="invite_user_context@gmail.com"
             />
           </div>
           <div className="relative min-w-[140px]">
             <select className="w-full bg-[var(--muted)] border border-[var(--border)] rounded-lg px-4 py-3 text-sm text-[var(--foreground)] focus:outline-none appearance-none font-bold">
-              <option>Editor 권한</option>
-              <option>Admin 마스터</option>
-              <option>Viewer 참관</option>
+              <option>Editor</option>
+              <option>Viewer</option>
             </select>
             <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--muted-foreground)]/40 pointer-events-none" />
           </div>
@@ -65,23 +65,23 @@ export default function GeneralTab() {
           <table className="w-full text-left border-collapse text-sm">
             <thead>
               <tr className="bg-[var(--muted)]/50 border-b border-[var(--border)] text-[11px] font-black uppercase text-[var(--muted-foreground)] tracking-wider">
-                <th className="p-4 pl-4">Account User Mail</th>
-                <th className="p-4">Role Group</th>
-                <th className="p-4 text-right pr-4">Identity Description</th>
+                <th className="p-4 pl-4">이메일</th>
+                <th className="p-4">권한</th>
+                <th className="p-4 text-right pr-22">설명</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--border)]/50 font-medium text-[var(--muted-foreground)] bg-[var(--card)]">
               <tr className="hover:bg-[var(--muted)]/20 transition-colors">
                 <td className="p-4 pl-4 font-bold text-[var(--foreground)] text-sm">
-                  박다은 (나)
+                  test@gmail.com (나)
                 </td>
                 <td className="p-4">
-                  <span className="text-[var(--primary)] bg-[var(--primary)]/10 text-[10px] font-black border border-[var(--primary)]/20 px-2 py-0.5 rounded">
-                    ADMIN MASTER
+                  <span className="text-[var(--primary)]/50 bg-[var(--primary)]/10 text-[10px] font-black px-2 py-1 rounded">
+                    관리자
                   </span>
                 </td>
                 <td className="p-4 text-right pr-4 text-[var(--muted-foreground)]/80 font-bold">
-                  Workspace Owner
+                  프로젝트 소유자
                 </td>
               </tr>
             </tbody>
@@ -91,11 +91,12 @@ export default function GeneralTab() {
 
       <section className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-6 shadow-sm">
         <div className="mb-4">
-          <h2 className="text-sm font-bold text-[var(--foreground)]">
+          <h2 className="text-s font-bold text-[var(--foreground)]">
             초대 메일 발송 이력
           </h2>
-          <p className="text-xs text-[var(--muted-foreground)] font-medium">
-            송신 완료된 초대 명단의 실시간 인증 대기 상태 타임라인 내역입니다.
+          <p className="text-sm text-[var(--muted-foreground)] font-medium">
+            초대 사용자들의 대기 상태를 확인 합니다. 가입 후 수락하면 초대
+            목록으로 넘어갑니다.
           </p>
         </div>
 
@@ -111,14 +112,11 @@ export default function GeneralTab() {
                   <p className="font-bold text-[var(--foreground)] text-sm">
                     collaborator_dev_node_{i}@daum.net
                   </p>
-                  <p className="text-[11px] text-[var(--muted-foreground)] font-semibold mt-0.5">
-                    Invitation Dispatched
-                  </p>
                 </div>
               </div>
               <div className="text-right flex items-center gap-4">
                 <span className="text-[10px] font-black px-2 py-0.5 bg-[var(--muted)] border border-[var(--border)] rounded text-[var(--muted-foreground)]/70">
-                  Pending
+                  대기중
                 </span>
                 <span className="font-mono text-xs text-[var(--muted-foreground)]/40 font-bold">
                   2026.04.29

@@ -13,12 +13,23 @@ import reactor.core.publisher.Mono;
 @Table(name = "Users")
 public interface UsersRepository extends ReactiveCrudRepository<Users, Long>{
     
-    @Query("SELECT u.isActive FROM Users u WHERE u.email = :email")
+    @Query("SELECT u.isActive FROM \"Users\" u WHERE u.email = :email")
     Mono<String> findIsActiveByEmail(String email);
 
     Mono<Users> findByEmail(String email);
 
+    @Query("SELECT u.id FROM \"Users\" u WHERE u.email = :email")
+    Mono<Long> findByUserId(String email);
+
     @Modifying
     @Query("UPDATE \"Users\" SET is_active = :isActive WHERE email = :email")
     Mono<Integer> updateIsActiveByEmail(String email, String isActive);
+
+    @Modifying
+    @Query("DELETE FROM \"Users\" WHERE email LIKE '%@test.com'")
+    Mono<Void> deleteTestUsers();
+
+    @Modifying
+    @Query("SELECT u.email FROM \"Users\" u WHERE u.id = :userId")
+    Mono<String> findByUserEmail(Long userId);
 }

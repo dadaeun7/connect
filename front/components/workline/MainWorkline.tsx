@@ -1,19 +1,21 @@
 "use client";
 
-import { Search, SlidersHorizontal, ArrowUpDown } from "lucide-react";
+import { Search, SlidersHorizontal, ArrowUpDown, X } from "lucide-react";
 import MilestoneCard from "./MilestoneCard";
 import AddMilestone from "./AddMilstone";
 import { useState } from "react";
 
 export default function MainDashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("전체");
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
+  const menu = ["전체", "긴급", "새작업", "완료"];
   return (
     <div className="flex-1 bg-[var(--background)] min-h-screen p-8 text-[var(--foreground)] selection:bg-[var(--primary)]/10 selection:text-[var(--primary)]">
-      {/* 상단 헤더 섹션: 충분한 하단 여백(mb-8) 확보 */}
+      {/* 상단 헤더 섹션 */}
       <div className="flex justify-between items-start mb-8">
         <div className="space-y-2">
           <div className="flex items-center gap-3">
@@ -27,121 +29,94 @@ export default function MainDashboard() {
         </div>
       </div>
 
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
-          <div
-            className="absolute inset-0 bg-black/40 backdrop-blur-xs"
-            onClick={closeModal}
-          />
-          <div className="relative z-10 w-full max-w-2xl">
-            <AddMilestone />
-          </div>
-        </div>
-      )}
+      {/* 우측 슬라이드 인 사이드바 (구조 및 클래스 전면 수정) */}
+      <div
+        className={`fixed inset-0 z-50 transition-all duration-300 ${
+          isModalOpen ? "visible" : "invisible pointer-events-none"
+        }`}
+      >
+        {/* 배경 딤드 처리 (클릭 시 무조건 닫힘) */}
+        <div
+          className={`absolute inset-0 bg-black/40 backdrop-blur-xs transition-opacity duration-300 cursor-pointer ${
+            isModalOpen ? "opacity-100" : "opacity-0"
+          }`}
+          onClick={closeModal}
+        />
 
-      {/* 요약 메트릭 그리드: 머티리얼 가이드에 맞춰 gap-6(24px) 적용 및 카드 내부 패딩(p-6) 확대 */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        {[
-          {
-            label: "대시보드1",
-            value: "42",
-            trend: "12%",
-            up: true,
-            style:
-              "border-[var(--primary)]/20 bg-[var(--primary)]/5 text-[var(--primary)]",
-          },
-          {
-            label: "대시보드2",
-            value: "18",
-            trend: "4.2%",
-            up: true,
-            style:
-              "border-[var(--primary)]/20 bg-[var(--primary)]/5 text-[var(--primary)]",
-          },
-          {
-            label: "대시보드3",
-            value: "1.8h",
-            trend: "15%",
-            up: true,
-            style:
-              "border-[var(--primary)]/20 bg-[var(--primary)]/5 text-[var(--primary)]",
-          },
-          {
-            label: "대시보드4",
-            value: "9",
-            trend: "2%",
-            up: false,
-            style: "border-destructive/20 bg-destructive/5 text-destructive",
-          },
-        ].map((stat, i) => (
-          <div
-            key={i}
-            className="bg-[var(--card)] rounded-xl p-6 flex flex-col justify-between min-h-[120px] relative overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.02)] group"
-          >
-            <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[var(--primary)] opacity-0 dark:group-hover:opacity-100 transition-opacity" />
-
-            <div className="space-y-2">
-              <span className="text-[11px] text-[var(--muted-foreground)] font-bold uppercase tracking-wider block">
-                {stat.label}
-              </span>
-              <div className="flex items-baseline justify-between">
-                <span className="text-2xl font-bold text-[var(--foreground)] font-mono">
-                  {stat.value}
-                </span>
-                <span
-                  className={`text-[11px] font-bold font-mono border px-2 py-0.5 rounded ${stat.style}`}
-                >
-                  {stat.trend}
-                </span>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* 콘트롤 툴바: 요소들의 컴포넌트 높이를 h-11(44px) 이상으로 확장하여 터치 타깃 확보 */}
-      <div className="flex items-center justify-between border-b border-[var(--border)] pb-[4.8px] mb-8">
-        <div className="flex items-center gap-6 text-xs font-bold text-[var(--muted-foreground)]">
-          <span className="text-[var(--primary)] border-b-2 border-[var(--primary)] pb-[17px] -mb-[18px] cursor-pointer font-black tracking-wider">
-            전체
-          </span>
-          <span className="hover:text-[var(--foreground)] cursor-pointer transition-colors tracking-wider">
-            긴급
-          </span>
-          <span className="hover:text-[var(--foreground)] cursor-pointer transition-colors tracking-wider">
-            새작업
-          </span>
-          <span className="hover:text-[var(--foreground)] cursor-pointer transition-colors tracking-wider">
-            완료
-          </span>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 bg-[var(--card)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-xs">
-            <Search size={14} className="text-[var(--muted-foreground)]" />
-            <input
-              type="text"
-              placeholder="Search tasks..."
-              className="bg-transparent text-[var(--foreground)] placeholder:text-[var(--muted-foreground)]/40 focus:outline-none w-36 text-xs font-medium"
-            />
-          </div>
-          <button className="flex items-center gap-1.5 border border-[var(--border)] bg-[var(--card)] text-[var(--muted-foreground)] px-3.5 py-2.5 rounded-lg text-xs font-bold hover:text-[var(--foreground)] transition-colors">
-            <SlidersHorizontal size={13} /> Filter
-          </button>
-          <button className="flex items-center gap-1.5 border border-[var(--border)] bg-[var(--card)] text-[var(--muted-foreground)] px-3.5 py-2.5 rounded-lg text-xs font-bold hover:text-[var(--foreground)] transition-colors">
-            <ArrowUpDown size={13} /> Sort
-          </button>
-          <div className="w-[1px] h-4 bg-[var(--border)] mx-1" />
+        {/* 사이드바 본체 */}
+        <div
+          className={`absolute top-0 right-0 h-full w-full max-w-xl bg-[var(--background)] border-l border-[var(--border)] shadow-2xl transition-transform duration-300 ease-in-out ${
+            isModalOpen ? "translate-x-0" : "translate-x-full"
+          }`}
+        >
+          {/* 상단 닫기 버튼 배치 */}
           <button
-            className="bg-[var(--primary)] text-[var(--primary-foreground)] font-black px-4 py-2.5 rounded-lg text-xs hover:opacity-90 transition-opacity shadow-sm"
-            onClick={openModal}
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              closeModal();
+            }}
+            className="absolute top-5 right-5 z-10 p-2 hover:bg-[var(--muted)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] rounded-lg transition-colors cursor-pointer"
           >
-            + Add Lead
+            <X size={18} />
           </button>
+
+          <div className="h-full overflow-y-auto p-6">
+            <AddMilestone onClose={closeModal} />
+          </div>
         </div>
       </div>
 
-      {/* 리스트 간격 조정: 컴포넌트 카드 배치 간격을 `space-y-6`으로 대폭 확장 */}
+      {/* 콘트롤 툴바 */}
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex gap-8 border-b border-[var(--border)] px-1 w-full">
+          {menu.map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`pb-3 text-sm font-bold tracking-wider transition-all relative uppercase ${
+                activeTab === tab
+                  ? "text-[var(--primary)] font-black"
+                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+              }`}
+            >
+              {tab}
+              {activeTab === tab && (
+                <div className="absolute bottom-[-1px] left-0 w-full h-[2px] bg-[var(--primary)]" />
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="flex items-center gap-3 justify-end mb-3">
+        {/* 1. 부모 div에 transition-all과 focus-within:w-64(원하는 확장 너비)를 추가합니다. */}
+        <div className="flex items-center gap-2 bg-[var(--card)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-xs w-48 transition-all duration-300 ease-in-out focus-within:w-120 focus-within:border-[var(--muted-foreground)]">
+          <Search
+            size={14}
+            className="text-[var(--muted-foreground)] shrink-0"
+          />
+          {/* 2. input창의 고정 너비(w-36)를 지우고 w-full로 변경하여 부모가 늘어날 때 같이 늘어나도록 합니다. */}
+          <input
+            type="text"
+            placeholder="Search tasks..."
+            className="bg-transparent text-[var(--foreground)] placeholder:text-[var(--muted-foreground)]/40 focus:outline-none w-full text-sm font-medium"
+          />
+        </div>
+        <button className="flex items-center gap-1.5 border border-[var(--border)] bg-[var(--card)] text-[var(--muted-foreground)] px-3.5 py-2.5 rounded-lg text-sm font-bold hover:text-[var(--foreground)] transition-colors">
+          <SlidersHorizontal size={13} /> Filter
+        </button>
+        <button className="flex items-center gap-1.5 border border-[var(--border)] bg-[var(--card)] text-[var(--muted-foreground)] px-3.5 py-2.5 rounded-lg text-sm font-bold hover:text-[var(--foreground)] transition-colors">
+          <ArrowUpDown size={13} /> Sort
+        </button>
+        <div className="w-[1px] h-4 bg-[var(--border)] mx-1" />
+        <button
+          className="bg-[var(--primary)] text-[var(--primary-foreground)] font-black px-4 py-2.5 rounded-lg text-sm hover:opacity-90 transition-opacity shadow-sm cursor-pointer"
+          onClick={openModal}
+        >
+          + Add Milestone
+        </button>
+      </div>
+
       <div className="space-y-6">
         <MilestoneCard />
       </div>

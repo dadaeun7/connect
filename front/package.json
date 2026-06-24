@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@floating-ui/react": "^0.27.19",
     "@notionhq/client": "5.19.0",
     "@octokit/rest": "22.0.1",
     "@slack/web-api": "7.15.1",
@@ -16,6 +17,7 @@
     "@tanstack/react-query": "5.99.2",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
+    "dayjs": "^1.11.21",
     "firebase": "12.12.1",
     "jose": "^6.2.3",
     "js-cookie": "^3.0.8",
@@ -46,5 +48,17 @@
     "postcss": "^8.5.10",
     "fast-uri": "^3.1.2",
     "axios": "^1.16.0"
+  },
+  "allowScripts": {
+    "firebase@12.12.1": true,
+    "msw@2.13.4": true,
+    "protobufjs@7.6.0": true,
+    "sharp@0.34.5": true,
+    "unrs-resolver@1.11.1": true,
+    "@babel/core@7.29.0": true,
+    "form-data@4.0.5": true,
+    "hono@4.12.23": true,
+    "js-yaml@4.1.1": true,
+    "vite@8.0.13": true
   }
 }

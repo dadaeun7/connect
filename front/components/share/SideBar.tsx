@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Layers,
   Calendar,
@@ -11,49 +11,121 @@ import {
   User,
   CreditCard,
   ChevronLeft,
+  ChevronRight,
+  SquarePlus,
+  ArrowRight,
+  Plus,
+  ChevronDown,
 } from "lucide-react";
 import ThemeBtn from "./ThemeBtn";
+import GithubIcon from "./svg_icon/GithubIcon";
+import FigmaIcon from "./svg_icon/FigmaIcon";
+import NotionIcon from "./svg_icon/NotionIcon";
+import SlackIcon from "./svg_icon/SlackIcon";
+import { useProjectStore } from "@/app/store/useProjectStore";
+import { Tooltip } from "./ToolTip";
+import { useRouter } from "next/navigation";
+
+const SERVICE_DOTS = [
+  { icon: <GithubIcon />, label: "GH" },
+  { icon: <FigmaIcon />, label: "FI" },
+  { icon: <NotionIcon />, label: "NO" },
+  { icon: <SlackIcon />, label: "SL" },
+];
 
 export default function Sidebar() {
+  const router = useRouter();
   const pathname = usePathname();
-  const [isExpanded, setIsExpanded] = useState(true); // 💡 누락되었던 핵심 확장/축소 상태 복구
-  const [projects] = useState(["프로젝트 A", "프로젝트 B"]);
+  const [isExpanded, setIsExpanded] = useState(true);
+  const projects = useProjectStore((state) => state.projects);
+  const setProjects = useProjectStore((state) => state.setProjects);
+  const [currentProject, setCurrentProject] = useState(projects[0]);
   const [showProjects, setShowProjects] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
+  const [newProjectName, setNewProjectName] = useState("");
+  const [showMenu, setShowMenu] = useState(currentProject?.myRole === "ADMIN");
+
+  const handleCreateProject = async () => {
+    try {
+      const result = await fetch("/project/save", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: newProjectName,
+        }),
+      });
+
+      if (!result.ok) {
+        alert("프로젝트 생성에 실패했습니다.");
+        return;
+      }
+
+      const newProjectData = await result.json();
+
+      setProjects([newProjectData, ...projects]);
+      setCurrentProject(newProjectData);
+      setNewProjectName("");
+      setIsAdding(false);
+    } catch (err) {
+      console.error("네트워크 에러 또는 파싱 에러: " + err);
+      alert("서버 통신 중 오류가 발생했습니다. 관리자에게 문의하세요.");
+    }
+  };
+
+  useEffect(() => {
+    setShowMenu(currentProject?.myRole === "ADMIN");
+    router.push(`/project/${currentProject.id}/workline`);
+  }, [currentProject]);
 
   const menuSections = [
     {
       title: "협업 관리",
+      show: true,
       items: [
         {
           name: "작업라인",
-          path: "/project/workline",
-          icon: <Layers size={15} />,
+          path: `/project/${currentProject.id}/workline`,
+          icon: <Layers size={16} />,
+          show: true,
         },
         {
           name: "타임라인",
-          path: "/project/timeline",
-          icon: <Calendar size={15} />,
+          path: `/project/${currentProject.id}/timeline`,
+          icon: <Calendar size={16} />,
+          show: true,
         },
         {
-          name: "새이슈",
-          path: "/project/new-issue",
-          icon: <PlusSquare size={15} />,
+          name: "새 이슈",
+          path: `/project/${currentProject.id}/new-issue`,
+          icon: <PlusSquare size={16} />,
+          show: true,
         },
         {
           name: "프로젝트 설정",
-          path: "/project/project-setting",
-          icon: <Settings size={15} />,
+          path: `/project/${currentProject.id}/project-setting`,
+          icon: <Settings size={16} />,
+          show: showMenu,
         },
       ],
     },
     {
-      title: "계정 관리",
+      title: "계정",
+      show: showMenu,
       items: [
-        { name: "내 정보", path: "/project/my-info", icon: <User size={15} /> },
+        {
+          name: "내 정보",
+          path: `/project/${currentProject.id}/my-info`,
+          icon: <User size={16} />,
+          show: showMenu,
+        },
         {
           name: "결제",
-          path: "/project/payment",
-          icon: <CreditCard size={15} />,
+          path: `/project/${currentProject.id}/payment`,
+          icon: <CreditCard size={16} />,
+          show: showMenu,
         },
       ],
     },
@@ -61,88 +133,189 @@ export default function Sidebar() {
 
   return (
     <aside
-      // 💡 isExpanded 상태에 따라 가로 폭이 w-60(240px)과 w-16(64px)으로 유연하게 스위칭되도록 교정
       className={`min-h-screen border-r border-[var(--sidebar-border)] bg-[var(--sidebar)] text-[var(--sidebar-foreground)] flex flex-col shrink-0 transition-all duration-300 ${
-        isExpanded ? "w-60" : "w-16"
+        isExpanded ? "w-[220px]" : "w-[58px]"
       }`}
     >
-      {/* 테마 스위처 바: 사이드바가 활성화되어 열려있을 때만 우측 정렬 매핑 */}
-      {isExpanded && (
-        <div className="flex ml-5 justify-between items-center w-full mt-2 ">
-          <Link href={"/"}>
-            <img
-              src="/logo.png"
-              alt="logo"
-              className="w-7 h-7 object-contain"
-            />
-          </Link>
-          <ThemeBtn />
-        </div>
-      )}
+      {/* 로고 + 테마 */}
+      <div
+        className={`flex items-center border-b border-[var(--sidebar-border)] px-5 ${isExpanded ? "justify-between" : "justify-center"}`}
+      >
+        <Link href="/" className="shrink-0">
+          <img
+            src="/logo.png"
+            alt="logo"
+            className={isExpanded ? "w-7 h-7 mr-5" : "w-7 h-7 my-2"}
+          />
+        </Link>
+        {isExpanded && <ThemeBtn />}
+      </div>
 
-      {/* 프로젝트 셀렉터 탭 */}
-      <div className="p-3 mt-2 border-b border-[var(--sidebar-border)]/60">
-        <div
-          onClick={() => setShowProjects(!showProjects)}
-          className={`flex items-center bg-[var(--muted)]/80 border border-[var(--sidebar-border)] rounded-xl py-2.5 cursor-pointer hover:border-[var(--primary)]/40 transition-colors ${
-            isExpanded
-              ? "px-3 justify-between"
-              : "justify-center px-0 w-10 h-10 mx-auto"
-          }`}
-        >
-          <div className="w-6 h-6 bg-[var(--sidebar-primary)] text-[var(--sidebar-primary-foreground)] text-[10px] font-black rounded flex items-center justify-center shrink-0">
-            {projects[0][0]}
-          </div>
-          {isExpanded && (
-            <>
-              <span className="text-sm font-bold text-[var(--foreground)] truncate flex-1 ml-3">
-                {projects[0]}
-              </span>
-              <span className="text-[10px] text-[var(--sidebar-foreground)]/50 font-mono">
-                ▼
-              </span>
-            </>
+      {/* 프로젝트 셀렉터 */}
+      <div className="px-3 py-2.5 border-b border-[var(--sidebar-border)]/50">
+        {/**프로젝트 추가 */}
+        <div className="relative w-full">
+          {/* 토글 트리거 버튼 */}
+          <button
+            onClick={() => setShowProjects(!showProjects)}
+            className={`w-full flex items-center bg-[var(--sidebar-accent)] border border-[var(--sidebar-border)] rounded-xl py-3 cursor-pointer hover:border-[var(--sidebar-primary)]/30 transition-all ${
+              isExpanded ? "px-3 justify-between gap-2" : "justify-center px-0"
+            }`}
+          >
+            <div
+              className="w-6 h-6 rounded-lg text-[10px] font-black flex items-center justify-center shrink-0"
+              style={{
+                background: "var(--sidebar-primary)",
+                color: "var(--sidebar-primary-foreground)",
+              }}
+            >
+              {currentProject.name[0]}
+            </div>
+            {isExpanded && (
+              <>
+                <span className="text-[14px] font-bold text-[var(--foreground)] truncate flex-1 text-left">
+                  {currentProject.name}
+                </span>
+                {/* 토글 상태에 따라 화살표 회전 애니메이션 추가 */}
+                <span
+                  className={`text-[8px] text-[var(--sidebar-foreground)]/40 font-mono shrink-0 transition-transform duration-200 ${showProjects ? "rotate-180" : ""}`}
+                >
+                  <ChevronDown size={16} />
+                </span>
+              </>
+            )}
+          </button>
+
+          {/* 토글 드롭다운 목록 */}
+          {showProjects && (
+            <div className="absolute left-0 right-0 mt-1 bg-[var(--sidebar-accent)] border border-[var(--sidebar-border)] rounded-xl overflow-hidden z-50 shadow-lg">
+              <div className="flex flex-col max-h-60 overflow-y-auto p-1">
+                {projects
+                  .filter((p) => p.id !== currentProject.id)
+                  .map((p) => (
+                    <button
+                      key={p.id}
+                      onClick={() => {
+                        const targetProject = p;
+                        const remaingProjects = projects.filter(
+                          (item) => item.id !== p.id,
+                        );
+                        const reordered = [targetProject, ...remaingProjects];
+
+                        setProjects(reordered);
+                        setCurrentProject(p);
+                        setShowProjects(false);
+                      }}
+                      className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left text-[14px] hover:bg-[var(--sidebar-primary)]/10 text-[var(--foreground)] transition-colors ${
+                        p.id === currentProject.id
+                          ? "bg-[var(--sidebar-primary)]/5 font-semibold"
+                          : ""
+                      }`}
+                    >
+                      {/* 리스트 내 프로젝트 이니셜 아이콘 */}
+                      <div
+                        className="w-5 h-5 rounded-md text-[9px] font-black flex items-center justify-center shrink-0"
+                        style={{
+                          background: "var(--sidebar-primary)",
+                          color: "var(--sidebar-primary-foreground)",
+                        }}
+                      >
+                        {p.name[0]}
+                      </div>
+                      {isExpanded && (
+                        <span className="truncate flex-1">{p.name}</span>
+                      )}
+                    </button>
+                  ))}
+                {/**프로젝트 추가 */}
+                {isAdding ? (
+                  <div className="flex items-center gap-2 rounded-xl px-3 py-2 mt-1">
+                    <input
+                      type="text"
+                      value={newProjectName}
+                      onChange={(e) => setNewProjectName(e.target.value)}
+                      placeholder="프로젝트 이름 입력"
+                      className="bg-transparent text-[14px] text-[var(--foreground)] outline-none flex-1 w-full"
+                      autoFocus
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleCreateProject();
+                        if (e.key === "Escape") setIsAdding(false);
+                      }}
+                    />
+                    <Tooltip content="프로젝트 추가" placement="top">
+                      <button
+                        onClick={handleCreateProject}
+                        className="text-s text-[var(--secondary-foreground)] font-bold cursor-pointer mt-2"
+                      >
+                        <Plus size={14} />
+                      </button>
+                    </Tooltip>
+                    <Tooltip content="나가기" placement="top">
+                      <button
+                        onClick={() => setIsAdding(false)}
+                        className="text-s text-[var(--secondary-foreground)] cursor-pointer mt-2"
+                      >
+                        <ArrowRight size={14} />
+                      </button>
+                    </Tooltip>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setIsAdding(true)}
+                    className="w-full flex items-center gap-2 rounded-xl px-3 py-1 mt-1 hover:bg-[var(--sidebar-primary)]/10 transition-all"
+                  >
+                    <span className="text-s text-[var(--sidebar-foreground)]/60">
+                      + 프로젝트 추가
+                    </span>
+                  </button>
+                )}
+                {/** */}
+              </div>
+            </div>
           )}
         </div>
       </div>
 
-      {/* 메인 트리 네비게이션 메뉴 리스트 */}
-      <div className="flex-1 py-4 mt-2 space-y-10 overflow-y-auto overflow-x-hidden discrete-scrollbar">
+      {/* 메뉴 */}
+      <div className="flex-1 py-4 space-y-10 overflow-y-auto overflow-x-hidden">
         {menuSections.map((section, idx) => (
-          <div key={idx} className="px-3">
+          <div
+            key={idx}
+            className={`px-3 ${section.show ? "block" : "hidden"}`}
+          >
             {isExpanded && (
-              <div className="text-[13px] font-bold text-[var(--sidebar-foreground)]/40 mb-3 px-2 tracking-wider uppercase">
+              <div className="text-[13px] font-black text-[var(--sidebar-foreground)]/30 mb-4 px-2 tracking-widest uppercase">
                 {section.title}
               </div>
             )}
-            <div className="space-y-1">
+            <div className="space-y-2">
               {section.items.map((item) => {
                 const isActive = pathname === item.path;
                 return (
                   <Link
                     href={item.path}
                     key={item.name}
-                    className={`flex items-center py-2.5 rounded-xl text-sm font-semibold group transition-all ${
+                    className={`flex items-center rounded-xl text-[13px] font-semibold group transition-all duration-150 ${
                       isExpanded
-                        ? "px-3 gap-3.5"
-                        : "justify-center px-0 w-10 h-10 mx-auto"
+                        ? "px-3 py-2.5 gap-3"
+                        : "justify-center p-3 mx-auto w-10"
                     } ${
                       isActive
-                        ? "bg-[var(--sidebar-accent)] text-[var(--sidebar-accent-foreground)] font-black shadow-sm"
-                        : "text-[var(--sidebar-foreground)]/70 hover:bg-[var(--sidebar-accent)]/40"
-                    }`}
+                        ? "bg-[var(--sidebar-accent)] text-[var(--sidebar-accent-foreground)] font-black"
+                        : "text-[var(--sidebar-foreground)]/60 hover:bg-[var(--sidebar-accent)]/50 hover:text-[var(--sidebar-foreground)]"
+                    } ${item.show ? "block" : "hidden"}`}
                   >
-                    <div
-                      className={
+                    <span
+                      className={`shrink-0 transition-colors ${
                         isActive
                           ? "text-[var(--sidebar-primary)]"
-                          : "text-[var(--sidebar-foreground)]/40 group-hover:text-[var(--sidebar-foreground)] transition-colors"
-                      }
+                          : "text-[var(--sidebar-foreground)]/35 group-hover:text-[var(--sidebar-foreground)]/70"
+                      }`}
                     >
                       {item.icon}
-                    </div>
+                    </span>
                     {isExpanded && (
-                      <span className="tracking-wide text-sm transition-opacity duration-200">
+                      <span className="tracking-wide truncate">
                         {item.name}
                       </span>
                     )}
@@ -154,17 +327,17 @@ export default function Sidebar() {
         ))}
       </div>
 
-      {/* 하단 통합 제어 영역 (테마 토글러 내장 + 오리지널 화살표 이미지 접기 단추) */}
-      <div className="mt-auto flex flex-col w-full border-t border-[var(--sidebar-border)]/80 bg-[var(--sidebar)]">
-        {/* 오리지널 하단 확장/축소 화살표 이미지 버튼 완전 결합 */}
-        <div
-          className={`h-16 flex items-center cursor-pointer hover:bg-[var(--sidebar-accent)]/40 transition-all ${
+      {/* 접기/펼치기 */}
+      <div className="border-t border-[var(--sidebar-border)]/60 bg-[var(--sidebar)]">
+        <button
+          className={`h-12 w-full flex items-center text-[var(--sidebar-foreground)]/30 hover:text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)]/40 transition-all ${
             isExpanded ? "px-5 justify-end" : "justify-center"
           }`}
           onClick={() => setIsExpanded(!isExpanded)}
+          title={isExpanded ? "사이드바 닫기" : "사이드바 열기"}
         >
-          <ChevronLeft size={15} />
-        </div>
+          {isExpanded ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}
+        </button>
       </div>
     </aside>
   );

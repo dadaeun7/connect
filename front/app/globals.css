@@ -1,4 +1,4 @@
-/*Lucide Icons https://lucide.dev/icons/funnel*/
+/* Lucide Icons https://lucide.dev/icons/ */
 
 @import "tailwindcss";
 @import "tw-animate-css";
@@ -9,103 +9,261 @@
 @import url("https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap");
 
 :root {
-  --background: oklch(
-    0.975 0.004 30
-  ); /* #F4F5F6 - 눈이 편안한 부드러운 미색 배경 */
-  --foreground: oklch(0.21 0.01 30); /* #1C1E21 - 가독성 높은 딥 차콜 텍스트 */
+  /* ─── Base ─────────────────────────────── */
+  --background: #f7f8fa;
+  --foreground: #111318;
 
-  --card: oklch(1 0 0); /* #FFFFFF - 배경과 완벽하게 분리되는 순백색 카드 */
-  --card-foreground: oklch(0.21 0.01 30);
+  --card: #ffffff;
+  --card-foreground: #111318;
 
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.21 0.01 30);
+  --popover: #ffffff;
+  --popover-foreground: #111318;
 
-  --primary: oklch(
-    0.65 0.22 35
-  ); /* #FF6A00 - 레퍼런스의 메인 시그니처 오렌지 포인트 */
-  --primary-foreground: oklch(1 0 0); /* #FFFFFF */
+  /* ─── Brand primary (neutral charcoal) ── */
+  --primary: #18181b;
+  --primary-foreground: #ffffff;
 
-  --secondary: oklch(
-    0.95 0.005 30
-  ); /* #EEF0F2 - 입력 필드, 비활성화 요소 배경 */
-  --secondary-foreground: oklch(0.4 0.01 30);
+  /* ─── Muted / Secondary ─────────────────── */
+  --secondary: #f0f1f3;
+  --secondary-foreground: #5a5e6e;
+  --muted: #f0f1f3;
+  --muted-foreground: #8a8fa8;
 
-  --muted: oklch(0.95 0.005 30); /* #EEF0F2 */
-  --muted-foreground: oklch(
-    0.55 0.01 30
-  ); /* #7A828A - 테이블 헤더, 메타 텍스트용 부드러운 회색 */
+  --accent: #edeef5;
+  --accent-foreground: #111318;
 
-  --accent: oklch(0.97 0.01 35); /* 호버 시 부드러운 오렌지빛 감도는 배경 */
-  --accent-foreground: oklch(0.65 0.22 35);
+  --destructive: #e5484d;
+  --border: #e4e5eb;
+  --input: #e4e5eb;
+  --ring: #18181b;
 
-  --destructive: oklch(0.6 0.18 25);
-  --border: oklch(
-    0.91 0.005 30
-  ); /* #E2E4E6 - 레퍼런스 특유의 얇고 은은한 경계선 */
-  --input: oklch(0.91 0.005 30);
-  --ring: oklch(0.65 0.22 35);
+  --radius: 0.625rem;
 
-  --radius: 0.5rem; /* 과하지 않고 세련된 둥글기 값 */
+  /* ─── Sidebar ───────────────────────────── */
+  --sidebar: #f2f3f7;
+  --sidebar-foreground: #3a3d4a;
+  --sidebar-primary: #18181b;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e8e9f0;
+  --sidebar-accent-foreground: #111318;
+  --sidebar-border: #e2e3ea;
+  --sidebar-ring: #18181b;
 
-  /* 레퍼런스 왼쪽 사이드바 (배경보다 살짝 더 투명하고 깨끗한 룩) */
-  --sidebar: oklch(0.985 0.002 30); /* #F8F9FA */
-  --sidebar-foreground: oklch(0.3 0.01 30);
-  --sidebar-primary: oklch(0.65 0.22 35);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.95 0.005 30);
-  --sidebar-accent-foreground: oklch(0.21 0.01 30);
-  --sidebar-border: oklch(0.93 0.005 30);
-  --sidebar-ring: oklch(0.65 0.22 35);
+  /* ─── Service point colors ────────────────
+     GitHub  : #24292F (dark) / #F6F8FA (light bg)
+     Figma   : #A259FF
+     Notion  : #37352F
+     Slack   : #611F69
+  ─────────────────────────────────────────── */
+
+  --github: #2ea44f; /* 깃허브 오픈소스/커밋 상징 초록색 */
+  --github-bg: #f4f9f5; /* 눈이 편안한 아주 연한 그린 틴트 */
+  --github-border: #cce8d5; /* 부드러운 초록빛 경계선 */
+  --github-text: #0a2414; /* 가독성을 높인 딥 그린 */
+
+  --figma: #f24e1e; /* 피그마 로고의 아이코닉한 오렌지 레드 */
+  --figma-bg: #ece3f8; /* 화사하고 트렌디한 살구빛 도는 배경 */
+  --figma-border: #af69ff; /* 은은한 웜톤 경계선 */
+  --figma-text: #5f0590; /* 명도가 확보된 딥 오렌지 브라운 */
+
+  --notion: #37352f; /* 노션 특유의 따뜻한 먹색 */
+  --notion-bg: #f7f7e4; /* 차분한 크림 오프화이트 */
+  --notion-border: #cfc5b0; /* 실제 노션 스타일의 라이트 그레이 */
+  --notion-text: #50492c; /* 선명한 가독성의 웜 블랙 */
+
+  --slack: #1a83c5; /* 슬랙 고유의 아이덴티티인 딥 오베르진(가지색) */
+  --slack-bg: #e5f0fa; /* 슬랙 클라이언트 특유의 차분한 웜 그레이/베이지 계열 */
+  --slack-border: #2968a8; /* 톤다운된 보더 */
+  --slack-text: #0d3e94; /* 가독성이 검증된 아주 짙은 청자색 */
+
+  /* ─── Task palette (refined, non-garish) ─ */
+  --task-blue: #3b82f6;
+  --task-blue-bg: #eff6ff;
+  --task-teal: #0d9488;
+  --task-teal-bg: #f0fdfa;
+  --task-amber: #d97706;
+  --task-amber-bg: #fffbeb;
+  --task-rose: #e11d48;
+  --task-rose-bg: #fff1f2;
+  --task-rose-border: #f8d4d6;
+  --task-violet: #7c3aed;
+  --task-violet-bg: #f5f3ff;
+  --task-sky: #0284c7;
+  --task-sky-bg: #f0f9ff;
+
+  /* ─── Status palette (refined, non-garish) ─ */
+  --status-inprogress: #2563eb;
+  --status-done: #10b981;
+  --status-blocked: #ef4444;
+  --status-review: #f59e0b;
+  --status-todo: #64748b;
+
+  /* ─── milestone palette  ─ */
+  --mile-point: #747474;
+  --mile-border: #bababa;
 }
 
 .dark {
-  /* [다크 모드] 첫 번째 이미지 (CITADAO 스타일) */
-  --background: oklch(0.13 0.01 240); /* 심해 느낌의 깊고 어두운 네이비 블랙 */
-  --foreground: oklch(0.98 0 0); /* 또렷한 화이트 텍스트 */
+  /* ─── Base ─────────────────────────────── */
+  --background: #0d0e12;
+  --foreground: #f0f1f5;
 
-  --card: oklch(0.17 0.01 240); /* 배경보다 한 단계 밝은 카드 레이어 */
-  --card-foreground: oklch(0.98 0 0);
+  --card: #13151c;
+  --card-foreground: #f0f1f5;
 
-  --popover: oklch(0.17 0.01 240);
-  --popover-foreground: oklch(0.98 0 0);
+  --popover: #181a23;
+  --popover-foreground: #f0f1f5;
 
-  --primary: oklch(0.84 0.21 140); /* 우측 상단 자산 카드의 네온 그린 */
-  --primary-foreground: oklch(0.1 0.01 240);
+  /* ─── Brand primary (neon off-white → subtle glow) */
+  --primary: #e8e9f5;
+  --primary-foreground: #0d0e12;
 
-  --secondary: oklch(0.22 0.01 240);
-  --secondary-foreground: oklch(0.9 0 0);
+  /* ─── Muted / Secondary ─────────────────── */
+  --secondary: #1c1e28;
+  --secondary-foreground: #8a8fa8;
+  --muted: #181a24;
+  --muted-foreground: #5c6080;
 
-  --muted: oklch(0.22 0.01 240);
-  --muted-foreground: oklch(0.55 0.01 240); /* 흐린 라벨, 단위 표현용 그레이 */
+  --accent: #1e2130;
+  --accent-foreground: #f0f1f5;
 
-  --accent: oklch(0.25 0.02 240); /* 메뉴 호버 시 하이라이트 */
-  --accent-foreground: oklch(0.98 0 0);
+  --destructive: #ff4d4f;
+  --border: rgba(255, 255, 255, 0.07);
+  --input: rgba(255, 255, 255, 0.08);
+  --ring: #e8e9f5;
 
-  --destructive: oklch(0.55 0.18 25);
-  --border: oklch(1 0 0 / 7%); /* 첫 번째 이미지 특유의 은은한 라인 */
-  --input: oklch(1 0 0 / 10%);
-  --ring: oklch(0.84 0.21 140);
+  --radius: 0.625rem;
 
-  /* 사이드바 전용 (다크모드 왼쪽 메뉴 톤) */
-  --sidebar: oklch(0.15 0.01 240);
-  --sidebar-foreground: oklch(0.8 0 0);
-  --sidebar-primary: oklch(0.84 0.21 140);
-  --sidebar-primary-foreground: oklch(0.1 0.01 240);
-  --sidebar-accent: oklch(0.2 0.01 240);
-  --sidebar-accent-foreground: oklch(0.98 0 0);
-  --sidebar-border: oklch(1 0 0 / 6%);
-  --sidebar-ring: oklch(0.84 0.21 140);
+  /* ─── Sidebar ───────────────────────────── */
+  --sidebar: #0f1018;
+  --sidebar-foreground: #9a9db5;
+  --sidebar-primary: #e8e9f5;
+  --sidebar-primary-foreground: #0d0e12;
+  --sidebar-accent: #1c1e2a;
+  --sidebar-accent-foreground: #f0f1f5;
+  --sidebar-border: rgba(255, 255, 255, 0.06);
+  --sidebar-ring: #e8e9f5;
+
+  /* ─── Service point colors (dark mode) ─── */
+  --github: #c9d1d9;
+  --github-bg: rgba(56, 139, 253, 0.08);
+  --github-border: rgba(56, 139, 253, 0.2);
+  --github-text: #79c0ff;
+
+  --figma: #a259ff;
+  --figma-bg: rgba(162, 89, 255, 0.1);
+  --figma-border: rgba(162, 89, 255, 0.25);
+  --figma-text: #c084fc;
+
+  --notion: #e3e2dd;
+  --notion-bg: rgba(255, 255, 255, 0.05);
+  --notion-border: rgba(255, 255, 255, 0.12);
+  --notion-text: #e3e2dd;
+
+  --slack: #e8d5ff;
+  --slack-bg: rgba(97, 31, 105, 0.2);
+  --slack-border: rgba(232, 213, 255, 0.2);
+  --slack-text: #e8d5ff;
+
+  /* ─── Task palette (dark mode) ─────────── */
+  --task-blue: #60a5fa;
+  --task-blue-bg: rgba(59, 130, 246, 0.12);
+  --task-teal: #2dd4bf;
+  --task-teal-bg: rgba(13, 148, 136, 0.12);
+  --task-amber: #fbbf24;
+  --task-amber-bg: rgba(217, 119, 6, 0.12);
+  --task-rose: #fb7185;
+  --task-rose-bg: rgba(225, 29, 72, 0.12);
+  --task-violet: #a78bfa;
+  --task-violet-bg: rgba(124, 58, 237, 0.12);
+  --task-sky: #38bdf8;
+  --task-sky-bg: rgba(2, 132, 199, 0.12);
 }
 
 @theme {
-  --font-sans: "Google Sans", "Gothic A1", sans-serif;
-  --font-mono: "Google Sans", "Gothic A1", sans-serif;
+  --font-sans: "Pretendard", "Google Sans", "Gothic A1", sans-serif;
+  --font-mono: "Pretendard", monospace;
 }
 
+/* ─── Scrollbar ───────────────────────── */
 .custom-scrollbar::-webkit-scrollbar {
+  height: 4px;
   width: 4px;
 }
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
+  background-color: var(--border);
+  border-radius: 99px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: var(--muted-foreground);
+}
+
+/* ─── Keyframes ───────────────────────── */
+@keyframes float-up {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+@keyframes flow-line {
+  0% {
+    stroke-dashoffset: 200;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes card-appear {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-float-up {
+  animation: float-up 0.4s ease both;
+}
+.animate-card-appear {
+  animation: card-appear 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.animate-slide-left {
+  animation: slide-in-left 0.35s ease both;
 }

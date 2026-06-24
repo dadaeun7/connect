@@ -5,6 +5,7 @@ import com.github.connect.exception.custom.UserNotActiveException;
 import com.github.connect.exception.custom.UserNotVerifyException;
 import com.github.connect.exception.custom.EmailSendException;
 import com.github.connect.exception.custom.KeycloakConnectException;
+import com.github.connect.exception.custom.UserExpirationException;
 
 import jakarta.mail.AuthenticationFailedException;
 import jakarta.mail.MessagingException;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.net.SocketTimeoutException;
+import java.sql.SQLException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler{
@@ -55,6 +57,15 @@ public class GlobalExceptionHandler{
         return createDefaultErrorResponse(e.getMessage(), 500);
     }
 
+    @ExceptionHandler(UserExpirationException.class)
+    public ResponseEntity<DefaultErrorResponse> handleUserExpiredException(UserExpirationException e){
+        return createDefaultErrorResponse(e.getMessage(), 401);
+    }
+
+    @ExceptionHandler(SQLException.class)
+    public ResponseEntity<DefaultErrorResponse> handleSQLException(SQLException e){
+        return createDefaultErrorResponse(e.getMessage(),500);
+    }
     private ResponseEntity<DefaultErrorResponse> createDefaultErrorResponse(String message, int statusCode){
         DefaultErrorResponse response = new DefaultErrorResponse(message, statusCode);
         return new ResponseEntity<>(response, response.getStatusCode());

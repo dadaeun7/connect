@@ -1,22 +1,16 @@
-import { PROJECT_WORKLINE } from "@/app/etc/constant";
-import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { useState } from "react";
 
-export default function LoginStateToggle() {
+interface ToggleProps {
+  isLoggedIn: boolean;
+}
 
-  const { data: session, status } = useSession();
-  
+export default function LoginStateToggle({ isLoggedIn }: ToggleProps) {
   let href = "/auth/login";
   let title = "로그인";
 
-  if(status === "loading"){
-    href= "/";
-    title="...";
-  }else if (session) {
-    href=PROJECT_WORKLINE;
-    title="콘솔로 이동";
-//    title=String(session.user.email);
+  if (isLoggedIn) {
+    href = "/project";
+    title = "콘솔로 이동";
   }
 
   return (

@@ -13,5 +13,11 @@ class ClientConfig {
         .baseUrl(baseUrl)
         .build();
     }
+
+    @Bean
+    public WebClient defauClient(){
+        return WebClient.builder()
+        .build();
+    }
 }
 

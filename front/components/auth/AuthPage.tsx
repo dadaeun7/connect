@@ -5,9 +5,8 @@ import SelectOption from "./SelectOption";
 import { icons } from "lucide-react";
 import CstLoading from "../share/CstLoading";
 import CstAlert from "../share/CstAlert";
-import { LOGIN_COMPANY } from "@/app/etc/constant";
+import { LOGIN_COMPANY } from "@/lib/constant";
 import ExternalUp from "./ExternalUp";
-import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 export default function AuthPage({
@@ -34,6 +33,10 @@ export default function AuthPage({
   const [formFirInput, setformFirInput] = useState("");
   const [formSecInput, setformSecInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loadingProps, setLoadingProps] = useState({
+    icon: "connect",
+    describe: "연결중입니다...",
+  });
 
   const [alertConfig, setAlertConfig] = useState({
     isOpen: false,
@@ -60,69 +63,72 @@ export default function AuthPage({
 
   const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
+
+    if (mode === "signup") {
+      setLoadingProps((props) => ({
+        ...props,
+        icon: "mail",
+        describe: "가입 메일 발송중입니다...",
+      }));
+    }
+
     setLoading(true);
 
-    try{
+    try {
       const result = await fetch(LOGIN_COMPANY, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: formFirInput,
-        password: formSecInput,
-      }),
-    });
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: formFirInput,
+          password: formSecInput,
+        }),
+      });
 
-    if(!result.ok){
-      const errData = await result.json();
-      const errDetail = errData?.body?.detail || errData?.detail || "서버에 에러가 발생했습니다.";
-      throw new Error(errDetail);
-    }
+      if (!result.ok) {
+        const errData = await result.json();
+        const errDetail =
+          errData?.body?.detail ||
+          errData?.detail ||
+          "서버에 에러가 발생했습니다.";
+        throw new Error(errDetail);
+      }
 
-    const jsonBody = await result.json();
+      const jsonBody = await result.json();
 
-    if(jsonBody.registration){
-      resPopHandler('success', jsonBody.registration);
-      return;
-    }
+      if (jsonBody.registration) {
+        resPopHandler("success", jsonBody.registration);
+        return;
+      }
 
-    if(jsonBody.loginIn){
-
-      const authHeader = result.headers.get("Authorization");
-
-      if(authHeader?.startsWith("Bearer ")){
-        const token = authHeader.substring(7);
-
-        const res:any= await signIn("credentials",{
-          userId: formFirInput,
-          accessToken: token,
-          redirect: false,
-        })
-
-        if(res.error){
-          throw new Error("인증 세션 생성에 실패했습니다.");
-        }
-
+      if (jsonBody.loginIn) {
         resPopHandler("success", "로그인 성공했습니다.");
         router.push("/");
         return;
       }
 
-      throw new Error("인증 토큰을 전달받지 못했습니다.")
-    }
+      if (jsonBody.message) {
+        setAlertConfig((props) => ({
+          ...props,
+          type: "error",
+          isOpen: true,
+          message: jsonBody.message,
+        }));
+      }
 
-    throw new Error("올바르지 않은 접근이거나 유효하지 않은 응답 형태입니다.");
-
-    }catch(error:any) {
-        console.error("Error:", error);
-        resPopHandler("error", error.message);
-    }finally{
-        setformFirInput("");
-        setformSecInput("");
-        setLoading(false);
+      throw new Error(
+        "올바르지 않은 접근이거나 유효하지 않은 응답 형태입니다.",
+      );
+    } catch (error: any) {
+      console.error("Error:", error);
+      resPopHandler("error", error.message);
+    } finally {
+      setformFirInput("");
+      setformSecInput("");
+      setLoading(false);
     }
-  }
+  };
   return (
     <>
       <CstAlert
@@ -133,7 +139,10 @@ export default function AuthPage({
       />
       <>
         {loading ? (
-          <CstLoading imageName="mail" description="메일 발송중입니다.." />
+          <CstLoading
+            imageName={loadingProps.icon}
+            description={loadingProps.describe}
+          />
         ) : (
           <>
             <div className="text-center mb-8">
@@ -192,11 +201,11 @@ export default function AuthPage({
               </button>
 
               {/* 소셜 가입 연동 옵션 인클루드 */}
-              {external && <ExternalUp />}
+              {external && <ExternalUp setLoading={setLoading} />}
             </form>
           </>
         )}
       </>
     </>
   );
-  }
+}

@@ -26,7 +26,7 @@ export default function InfoPage() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
-            className={`pb-3 text-xs font-bold uppercase tracking-wider transition-all relative ${
+            className={`pb-3 text-sm font-bold uppercase tracking-wider transition-all relative ${
               activeTab === tab.id
                 ? "text-[var(--primary)] font-black"
                 : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"

@@ -18,8 +18,12 @@ repositories {
 }
 
 dependencies {
+	implementation("org.springframework.boot:spring-boot-starter-cache")
+	implementation("com.github.ben-manes.caffeine:caffeine")
+	implementation("com.auth0:java-jwt:4.4.0")
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
 	implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
+	implementation("org.springframework.boot:spring-boot-data-r2dbc-test:4.0.1")
 	implementation("org.postgresql:r2dbc-postgresql")
 	implementation("org.springframework.boot:spring-boot-starter-data-redis-reactive")
 	implementation("org.springframework.boot:spring-boot-starter-kafka")
@@ -43,9 +47,8 @@ dependencies {
 	testImplementation("org.testcontainers:testcontainers:2.0.5")
 	testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
 	testImplementation("org.testcontainers:testcontainers-junit-jupiter:2.0.5")
+
 	// test db
-	testImplementation("com.h2database:h2")
-	testRuntimeOnly("com.h2database:h2")
 	testCompileOnly("org.projectlombok:lombok")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 	testAnnotationProcessor("org.projectlombok:lombok")

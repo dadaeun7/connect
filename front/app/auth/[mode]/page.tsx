@@ -17,6 +17,8 @@ export default async function Page({
     notFound();
   }
 
+  console.log("mode: " + mode);
+
   const [
     comment,
     firstInput,

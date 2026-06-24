@@ -11,7 +11,7 @@ export default function IssueTap({ menu }: { menu: string[] }) {
         <button
           key={tab}
           onClick={() => setActiveTab(tab)}
-          className={`pb-3 text-xs font-bold tracking-wider transition-all relative uppercase ${
+          className={`pb-3 text-sm font-bold tracking-wider transition-all relative uppercase ${
             activeTab === tab
               ? "text-[var(--primary)] font-black"
               : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"

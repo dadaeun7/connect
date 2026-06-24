@@ -3,11 +3,11 @@ package com.github.connect.repository;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.stereotype.Repository;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
 @Repository
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class StringRedisRepository {
 
     private final ReactiveRedisTemplate<String, String> reactiveRedisTemplate;
@@ -18,6 +18,10 @@ public class StringRedisRepository {
 
     public Mono<String> redisGetValue(String type, String key){
         return reactiveRedisTemplate.opsForValue().get(type+key);
+    }
+
+    public Mono<String> redisGetValue(String key){
+        return reactiveRedisTemplate.opsForValue().get(key);
     }
 
 }

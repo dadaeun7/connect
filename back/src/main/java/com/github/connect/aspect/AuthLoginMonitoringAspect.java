@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 @Component
 public class AuthLoginMonitoringAspect {
 
-    @Pointcut("execution(* com.github.connect.service.CompanyUserGetAuthService..*(..))")
+    @Pointcut("execution(* com.github.connect.service.user.*(..))")
     public void authLoginMonitoring(){}
 
     @Around("authLoginMonitoring()")

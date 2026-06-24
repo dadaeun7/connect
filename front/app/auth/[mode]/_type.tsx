@@ -1,4 +1,4 @@
-import { LOGIN_COMPANY } from "@/app/etc/constant";
+import { LOGIN_COMPANY } from "@/lib/constant";
 
 export type AuthMode = "login" | "signup";
 
