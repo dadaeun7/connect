@@ -49,8 +49,8 @@ public class AppConnectRouter {
                 String state = req.queryParam("state").orElseThrow(()-> new IllegalArgumentException("redis key가 유실 되었습니다."));
 
                 return service.getToken(state, code)
-                .flatMap(tokenDto -> service.saveAppConnectInfo(tokenDto, state))
-                .flatMap(saveEntity -> ServerResponse.temporaryRedirect(URI.create(ApiConstants.FRONT+"/project/workline")).build());
+                .flatMap(tokenDto -> service.saveAppConnectInfo(tokenDto, state)
+                    .flatMap(saveEntity -> ServerResponse.temporaryRedirect(URI.create(ApiConstants.FRONT+"/project")).build()));
             });
 
         return prepareRoute.and(callbackRoute);

@@ -1,5 +1,7 @@
 package com.github.connect.repository;
 
+import java.time.Duration;
+
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -15,7 +17,7 @@ public class AppUUidRedisRepository {
     private final ReactiveRedisTemplate<String, Object> redisTemplate;
     
     public Mono<Boolean> redisSaveKey(String key, AppConnecInfoDto dto){
-        return redisTemplate.opsForValue().set(key, dto);
+        return redisTemplate.opsForValue().set(key, dto, Duration.ofMinutes(10));
     }
 
     public Mono<AppConnecInfoDto> getDtoValue(String key){

@@ -1,8 +1,6 @@
-"use client";
-
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import React, { useState } from "react";
 import {
   Layers,
   Calendar,
@@ -12,38 +10,28 @@ import {
   CreditCard,
   ChevronLeft,
   ChevronRight,
-  SquarePlus,
   ArrowRight,
   Plus,
   ChevronDown,
 } from "lucide-react";
 import ThemeBtn from "./ThemeBtn";
-import GithubIcon from "./svg_icon/GithubIcon";
-import FigmaIcon from "./svg_icon/FigmaIcon";
-import NotionIcon from "./svg_icon/NotionIcon";
-import SlackIcon from "./svg_icon/SlackIcon";
 import { useProjectStore } from "@/app/store/useProjectStore";
 import { Tooltip } from "./ToolTip";
-import { useRouter } from "next/navigation";
 
-const SERVICE_DOTS = [
-  { icon: <GithubIcon />, label: "GH" },
-  { icon: <FigmaIcon />, label: "FI" },
-  { icon: <NotionIcon />, label: "NO" },
-  { icon: <SlackIcon />, label: "SL" },
-];
-
-export default function Sidebar() {
+export default function Sidebar({ showMenu }: { showMenu: boolean }) {
   const router = useRouter();
   const pathname = usePathname();
   const [isExpanded, setIsExpanded] = useState(true);
+
   const projects = useProjectStore((state) => state.projects);
   const setProjects = useProjectStore((state) => state.setProjects);
-  const [currentProject, setCurrentProject] = useState(projects[0]);
+  const currentProject = useProjectStore((state) => state.currentProject);
+  const setCurrentProject = useProjectStore(
+    (state) => state.setCurrentProjectById,
+  );
   const [showProjects, setShowProjects] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [newProjectName, setNewProjectName] = useState("");
-  const [showMenu, setShowMenu] = useState(currentProject?.myRole === "ADMIN");
 
   const handleCreateProject = async () => {
     try {
@@ -66,7 +54,7 @@ export default function Sidebar() {
       const newProjectData = await result.json();
 
       setProjects([newProjectData, ...projects]);
-      setCurrentProject(newProjectData);
+      setCurrentProject(newProjectData?.id);
       setNewProjectName("");
       setIsAdding(false);
     } catch (err) {
@@ -75,65 +63,63 @@ export default function Sidebar() {
     }
   };
 
-  useEffect(() => {
-    setShowMenu(currentProject?.myRole === "ADMIN");
-    router.push(`/project/${currentProject.id}/workline`);
-  }, [currentProject]);
-
-  const menuSections = [
-    {
-      title: "협업 관리",
-      show: true,
-      items: [
-        {
-          name: "작업라인",
-          path: `/project/${currentProject.id}/workline`,
-          icon: <Layers size={16} />,
-          show: true,
-        },
-        {
-          name: "타임라인",
-          path: `/project/${currentProject.id}/timeline`,
-          icon: <Calendar size={16} />,
-          show: true,
-        },
-        {
-          name: "새 이슈",
-          path: `/project/${currentProject.id}/new-issue`,
-          icon: <PlusSquare size={16} />,
-          show: true,
-        },
-        {
-          name: "프로젝트 설정",
-          path: `/project/${currentProject.id}/project-setting`,
-          icon: <Settings size={16} />,
-          show: showMenu,
-        },
-      ],
-    },
-    {
-      title: "계정",
-      show: showMenu,
-      items: [
-        {
-          name: "내 정보",
-          path: `/project/${currentProject.id}/my-info`,
-          icon: <User size={16} />,
-          show: showMenu,
-        },
-        {
-          name: "결제",
-          path: `/project/${currentProject.id}/payment`,
-          icon: <CreditCard size={16} />,
-          show: showMenu,
-        },
-      ],
-    },
-  ];
+  const menuSections = React.useMemo(
+    () => [
+      {
+        title: "협업 관리",
+        show: true,
+        items: [
+          {
+            name: "작업라인",
+            path: `/project/${currentProject?.id}/workline`,
+            icon: <Layers size={16} />,
+            show: true,
+          },
+          {
+            name: "타임라인",
+            path: `/project/${currentProject?.id}/timeline`,
+            icon: <Calendar size={16} />,
+            show: true,
+          },
+          {
+            name: "새 이슈",
+            path: `/project/${currentProject?.id}/new-issue`,
+            icon: <PlusSquare size={16} />,
+            show: true,
+          },
+          {
+            name: "프로젝트 설정",
+            path: `/project/${currentProject?.id}/project-setting`,
+            icon: <Settings size={16} />,
+            show: showMenu,
+          },
+        ],
+      },
+      {
+        title: "계정",
+        show: showMenu,
+        items: [
+          {
+            name: "내 정보",
+            path: `/project/${currentProject?.id}/my-info`,
+            icon: <User size={16} />,
+            show: showMenu,
+          },
+          {
+            name: "결제",
+            path: `/project/${currentProject?.id}/payment`,
+            icon: <CreditCard size={16} />,
+            show: showMenu,
+          },
+        ],
+      },
+    ],
+    [currentProject?.id, showMenu],
+  );
 
   return (
     <aside
-      className={`min-h-screen border-r border-[var(--sidebar-border)] bg-[var(--sidebar)] text-[var(--sidebar-foreground)] flex flex-col shrink-0 transition-all duration-300 ${
+      className={`scrollbar-gutter-stable min-h-screen border-r border-[var(--sidebar-border)] bg-[var(--sidebar)] text-[var(--sidebar-foreground)] flex flex-col shrink-0 transition-all duration-300 ${
         isExpanded ? "w-[220px]" : "w-[58px]"
       }`}
     >
@@ -169,12 +155,12 @@ export default function Sidebar() {
                 color: "var(--sidebar-primary-foreground)",
               }}
             >
-              {currentProject.name[0]}
+              {currentProject?.name ? currentProject.name[0] : ""}
             </div>
             {isExpanded && (
               <>
                 <span className="text-[14px] font-bold text-[var(--foreground)] truncate flex-1 text-left">
-                  {currentProject.name}
+                  {currentProject?.name}
                 </span>
                 {/* 토글 상태에 따라 화살표 회전 애니메이션 추가 */}
                 <span
@@ -191,23 +177,17 @@ export default function Sidebar() {
             <div className="absolute left-0 right-0 mt-1 bg-[var(--sidebar-accent)] border border-[var(--sidebar-border)] rounded-xl overflow-hidden z-50 shadow-lg">
               <div className="flex flex-col max-h-60 overflow-y-auto p-1">
                 {projects
-                  .filter((p) => p.id !== currentProject.id)
+                  .filter((p) => p.id !== currentProject?.id)
                   .map((p) => (
                     <button
                       key={p.id}
                       onClick={() => {
-                        const targetProject = p;
-                        const remaingProjects = projects.filter(
-                          (item) => item.id !== p.id,
-                        );
-                        const reordered = [targetProject, ...remaingProjects];
-
-                        setProjects(reordered);
-                        setCurrentProject(p);
+                        setCurrentProject(p.id);
                         setShowProjects(false);
+                        router.push(`/project/${p.id}/workline`);
                       }}
                       className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left text-[14px] hover:bg-[var(--sidebar-primary)]/10 text-[var(--foreground)] transition-colors ${
-                        p.id === currentProject.id
+                        p.id === currentProject?.id
                           ? "bg-[var(--sidebar-primary)]/5 font-semibold"
                           : ""
                       }`}

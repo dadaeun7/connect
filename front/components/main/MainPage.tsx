@@ -9,6 +9,7 @@ import GithubIcon from "../share/svg_icon/GithubIcon";
 import NotionIcon from "../share/svg_icon/NotionIcon";
 import FigmaIcon from "../share/svg_icon/FigmaIcon";
 import SlackIcon from "../share/svg_icon/SlackIcon";
+import ServiceDashboard from "./ServiceDashboard";
 
 // ─── 서비스 연결 플로우 인터랙티브 컴포넌트 ────────────────────────────────────
 const SERVICE_NODES = [
@@ -53,94 +54,6 @@ const SERVICE_NODES = [
     events: ["Message sent", "Channel alert", "Webhook triggered"],
   },
 ];
-
-function ServiceFlowDiagram() {
-  const [flowStep, setFlowStep] = useState(0);
-
-  // 💡 컴포넌트 함수 자체를 상태에 담을 때는 React.ComponentType 타입을 사용하는 것이 가장 안전합니다.
-  const [liveEvents, setLiveEvents] = useState<
-    {
-      id: number;
-      serviceIc: React.ComponentType;
-      text: string;
-      color: string;
-    }[]
-  >([]);
-  const counterRef = useRef(0);
-
-  // 자동 플로우 애니메이션
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setFlowStep((s) => (s + 1) % 4);
-    }, 1800);
-    return () => clearInterval(interval);
-  }, []);
-
-  // 라이브 이벤트 스트림
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const svc =
-        SERVICE_NODES[Math.floor(Math.random() * SERVICE_NODES.length)];
-      const text = svc.events[Math.floor(Math.random() * svc.events.length)];
-      const id = counterRef.current++;
-      setLiveEvents((prev) => [
-        { id, serviceIc: svc.eventIcon, text, color: svc.color },
-        ...prev.slice(0, 4),
-      ]);
-    }, 2200);
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <div className="w-full max-w-4xl mx-auto mt-5 mb-20">
-      {/* 라이브 이벤트 스트림 */}
-      <div className="mt-8 border border-[var(--border)] rounded-2xl bg-[var(--card)] overflow-hidden">
-        <div className="flex items-center gap-2 px-5 py-3 border-b border-[var(--border)] bg-[var(--muted)]/30">
-          <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-          <span className="text-xs font-black uppercase tracking-widest text-[var(--muted-foreground)]">
-            Task
-          </span>
-          <span className="ml-auto text-[10px] font-mono text-[var(--muted-foreground)]/50">
-            Events
-          </span>
-        </div>
-        <div className="divide-y divide-[var(--border)]">
-          {liveEvents.length === 0 ? (
-            <div className="px-5 py-4 text-xs text-[var(--muted-foreground)] font-medium">
-              이벤트 수신 대기 중...
-            </div>
-          ) : (
-            liveEvents.map((ev, i) => {
-              // 💡 변수명을 대문자로 선언하여 React가 확실하게 컴포넌트 타입으로 인지하도록 처리합니다.
-              const EventIconComponent = ev.serviceIc;
-
-              return (
-                <div
-                  key={ev.id}
-                  className="flex items-center gap-3 px-5 py-3 transition-all duration-500"
-                  style={{
-                    opacity: 1 - i * 0.18,
-                    animation: i === 0 ? "float-up 0.35s ease both" : undefined,
-                  }}
-                >
-                  <div className="flex-shrink-0 flex items-center justify-center w-5 h-5">
-                    {EventIconComponent ? <EventIconComponent /> : null}
-                  </div>
-                  <span className="text-sm font-medium text-[var(--foreground)]/80">
-                    {ev.text}
-                  </span>
-                  <span className="ml-auto text-[10px] font-mono text-[var(--muted-foreground)]/40">
-                    {dateFormat()}
-                  </span>
-                </div>
-              );
-            })
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 const dateFormat = () => {
   const now = new Date();
@@ -233,31 +146,33 @@ export default function MainPage({ isLoggedIn }: MainPageProps) {
       </nav>
       <main className="flex-1">
         {/* Hero */}
-        <section className="relative pt-15 pb-8 px-8 flex flex-col items-center text-center max-w-5xl mx-auto">
+        <section className="relative pt-10 pb-8 px-8 flex flex-col items-center text-center max-w-5xl mx-auto">
+          <ServiceDashboard activeIndex={index} />
           {/* 각 서비스 애니메이션 설명 */}
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl flex flex-wrap items-center gap-x-2">
-            {/* 바뀔 단어가 들어갈 컨테이너 */}
-            <span className="relative inline-flex h-[1.2em] overflow-hidden items-center min-w-[170px]">
-              <AnimatePresence mode="wait">
-                <motion.span
-                  key={index}
-                  // 아래에서 위로 올라오는 회전/이동 효과
-                  initial={{ opacity: 0, y: 20, rotateX: -30 }}
-                  animate={{ opacity: 1, y: 0, rotateX: 0 }}
-                  exit={{ opacity: 0, y: -20, rotateX: 30 }}
-                  transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                  className="absolute left-0 font-extrabold origin-center-left"
-                >
-                  {items[index]}
-                </motion.span>
-              </AnimatePresence>
+          <div className="flex flex-col items-center">
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl flex flex-wrap items-center gap-x-2">
+              {/* 바뀔 단어가 들어갈 컨테이너 */}
+              <span className="relative inline-flex h-[1.2em] overflow-hidden items-center min-w-[170px]">
+                <AnimatePresence mode="wait">
+                  <motion.span
+                    key={index}
+                    // 아래에서 위로 올라오는 회전/이동 효과
+                    initial={{ opacity: 0, y: 20, rotateX: -30 }}
+                    animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                    exit={{ opacity: 0, y: -20, rotateX: 30 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                    className="absolute left-0 font-extrabold origin-center-left"
+                  >
+                    {items[index]}
+                  </motion.span>
+                </AnimatePresence>
+              </span>
+            </h1>
+            {/* 고정 텍스트 */}
+            <span className="text-2xl text-slate-700 mt-3">
+              하나의 작업으로 통합하고 관리해보세요.
             </span>
-          </h1>
-          {/* 고정 텍스트 */}
-          <span className="text-2xl text-slate-700 mt-3">
-            하나의 작업으로 통합하고 관리해보세요.
-          </span>
-
+          </div>
           {/*데이터 연결하기 및 github 가기 */}
           <div className="flex gap-3 mt-8">
             <button
@@ -317,8 +232,6 @@ export default function MainPage({ isLoggedIn }: MainPageProps) {
             </div>
           ))}
         </section>
-        {/* 인터랙티브 플로우 다이어그램 */}
-        <ServiceFlowDiagram />
       </main>
       {/* Footer */}
       <footer className="fixed bottom-0 left-0 right-0 w-full px-10 py-8 border-t border-[var(--border)] bg-[var(--card)]/90 backdrop-blur-md z-40">

@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import ProjectLoading from "./[projectId]/loading";
 import { ProjectSimpleDto, useProjectStore } from "../store/useProjectStore";
 import { useRouter } from "next/navigation";
+import Sidebar from "@/components/share/SideBar";
 
 export default function SuperProjectLayout({
   children,
@@ -13,6 +14,12 @@ export default function SuperProjectLayout({
   const setProjects = useProjectStore((state) => state.setProjects);
   const isLoading = useProjectStore((state) => state.isLoading);
   const setIsLoading = useProjectStore((state) => state.setIsLoading);
+  const currentProject = useProjectStore((state) => state.currentProject);
+  const setCurrentProject = useProjectStore(
+    (state) => state.setCurrentProjectById,
+  );
+
+  const [showMenu, setShowMenu] = useState(currentProject?.myRole === "ADMIN");
 
   const router = useRouter();
 
@@ -34,24 +41,34 @@ export default function SuperProjectLayout({
         });
       })
       .then((data: ProjectSimpleDto[]) => {
-        console.log("수신된 프로젝트 리스트:", data);
         setProjects(data);
         setIsLoading(false);
 
-        if (data && data.length > 0 && data[0].id) {
+        if (!currentProject && data.length > 0) {
+          setCurrentProject(data[0].id);
           router.push(`/project/${data[0].id}/workline`);
+        }
+
+        if (currentProject) {
+          router.push(`/project/${currentProject.id}/workline`);
         }
       })
       .catch((err) => {
         console.error("프로젝트 로드 에러:", err);
         setProjects([]);
       });
-  }, [setProjects, setIsLoading]);
+
+    setShowMenu(currentProject?.myRole === "ADMIN");
+  }, [setProjects, setIsLoading, currentProject]);
 
   // 💡 데이터를 받아오기 전까지는 사이드바+본문 통합 스켈레톤을 노출하여 방어
-  if (isLoading) {
-    return <ProjectLoading />;
-  }
 
-  return <>{children}</>;
+  return (
+    <section className="flex h-screen overflow-hidden">
+      <Sidebar showMenu={showMenu} />
+      <main className="custom-scrollbar flex-1 h-full overflow-y-auto">
+        {isLoading ? <ProjectLoading /> : children}
+      </main>
+    </section>
+  );
 }

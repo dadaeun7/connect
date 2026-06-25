@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useProjectStore } from "../store/useProjectStore";
 import CreatePage from "@/components/create/CreateProject";
+import ProjectLoading from "./[projectId]/loading";
 
 export default function ProjectMainPage() {
   const router = useRouter();
@@ -31,7 +31,7 @@ export default function ProjectMainPage() {
 
   // 3. 백엔드에서 프로젝트 리스트를 아직 받아오는 중이라면 아무것도 하지 않고 대기 (스켈레톤 방어)
   if (isLoading) {
-    return null;
+    return <ProjectLoading />;
   }
 
   // 4. 💡 [핵심] 프로젝트가 0개인 상태로 로딩이 끝났다면, 주소를 이동시키지 말고

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import AppIntegrationSet from "@/components/project_setting/AppIntegrationSet";
 import {
-  BACKEND,
   FIGMA_REDIRECT_URL,
   GITHUB_REDIRECT_URL,
   NOTION_REDIRECT_URL,
@@ -25,6 +24,7 @@ interface RedirectConfig {
   icon: React.ReactNode;
   scopes: Scopes[];
   permission: string;
+  extraParams: Object;
 }
 
 const APPCONNECT: Record<string, RedirectConfig> = {
@@ -42,7 +42,8 @@ const APPCONNECT: Record<string, RedirectConfig> = {
         desc: "선택한 브랜치의 최근 커밋 상세 내용을 작업라인에 표시합니다.",
       },
     ],
-    permission: ["repo", "read:user"].join(","),
+    permission: ["repo", "read:user"].join(" "),
+    extraParams: {},
   },
   Figma: {
     auth: "https://www.figma.com/oauth",
@@ -58,7 +59,10 @@ const APPCONNECT: Record<string, RedirectConfig> = {
         desc: "디자인 수정 이력과 팀원들이 남긴 코멘트를 실시간으로 동기화합니다.",
       },
     ],
-    permission: ["file_read"].join(" "),
+    permission: ["file_read"].join(","),
+    extraParams: {
+      response_type: "code",
+    },
   },
   Notion: {
     auth: "https://api.notion.com/v1/oauth/authorize",
@@ -75,6 +79,10 @@ const APPCONNECT: Record<string, RedirectConfig> = {
       },
     ],
     permission: "",
+    extraParams: {
+      response_type: "code",
+      owner: "user",
+    },
   },
   Slack: {
     auth: "https://slack.com/oauth/v2/authorize",
@@ -90,7 +98,8 @@ const APPCONNECT: Record<string, RedirectConfig> = {
         desc: "선택한 채널의 실시간 대화 피드 및 메시지 이력을 페이징하여 읽어옵니다.",
       },
     ],
-    permission: ["channels:read", "channels:history"].join(" "),
+    permission: ["channels:read", "channels:history"].join(","),
+    extraParams: {},
   },
 };
 
@@ -146,27 +155,26 @@ export default function IntegrationTab() {
       const data = await response.json();
       const state = data.state;
 
-      /** notion
-        매개변수	설명	필수 ✅
-        client_id	연결 설정에서 찾을 수 있는 연결 식별자입니다.	✅
-        redirect_uri	사용자가 접근 권한을 부여한 후 돌아가야 할 URL입니다.	✅
-        response_type	항상 사용하세요 code.	✅
-        owner	항상 사용하세요 user.	✅
-        state	사용자가 상호 작용이나 작업을 진행 중인 경우, 이 매개변수를 사용하여 사용자가 돌아온 후 상태를 복원할 수 있습니다. 또한 CSRF 공격을 방지하는 데에도 사용할 수 있습니다.
-      */
+      const param = new URLSearchParams();
 
-      let reqUrl =
-        `${APPCONNECT[activeTab].auth}` +
-        `?client_id=${clientId}` +
-        `&redirect_uri=${APPCONNECT[activeTab].url}` +
-        // 백엔드에서 Client Secret 매핑을 위해 state 같이 전달
-        `&state=${encodeURIComponent(state)}`;
+      param.append("client_id", clientId);
+      param.append("redirect_uri", APPCONNECT[activeTab].url);
+      param.append("state", encodeURIComponent(state));
 
       if (APPCONNECT[activeTab].permission) {
-        reqUrl += `&scope=${encodeURIComponent(APPCONNECT[activeTab].permission)}`;
+        param.append("scope", APPCONNECT[activeTab].permission);
       }
 
-      window.location.href = reqUrl;
+      Object.entries(APPCONNECT[activeTab].extraParams).forEach(
+        ([key, value]) => {
+          param.append(key, value);
+        },
+      );
+
+      const finalAuthRequestUrl = `${APPCONNECT[activeTab].auth}?${param.toString()}`;
+      console.log("앱 연동 요청 url: " + finalAuthRequestUrl);
+
+      window.location.href = finalAuthRequestUrl;
     } catch (err) {
       console.log(activeTab + "인증 중 에러 발생: " + err);
     }

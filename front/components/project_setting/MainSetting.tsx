@@ -23,7 +23,7 @@ export default function SettingPage() {
 
       <div className="flex gap-8 border-b border-[var(--border)] mb-8 px-1">
         {[
-          { id: "general", label: "기본 프로젝트 개요" },
+          { id: "general", label: "프로젝트 설정" },
           { id: "integration", label: "플랫폼 통합 세팅 (API)" },
         ].map((tab) => (
           <button

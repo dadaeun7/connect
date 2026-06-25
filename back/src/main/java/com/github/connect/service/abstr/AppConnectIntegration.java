@@ -1,13 +1,16 @@
 package com.github.connect.service.abstr;
 
+import java.util.Base64;
 import java.util.Map;
 import java.util.UUID;
 
+import org.springframework.http.MediaType;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.server.ServerRequest;
 
+import com.github.connect.constants.ApiConstants;
 import com.github.connect.dto.internal.AppConnecInfoDto;
 import com.github.connect.dto.internal.AppConnectTokenDto;
 import com.github.connect.dto.internal.AppTokenCacheDto;
@@ -34,7 +37,8 @@ public abstract class AppConnectIntegration{
 
 // 💡 자식 클래스(구현체)들이 구현하여 고유 값을 제공하도록 추상 메서드로 정의합니다.
     protected abstract String getType();
-    protected abstract String getGetTokenUri();
+    protected abstract String getGetCodeUri();
+    protected abstract String getAccessTokenUri();
     protected abstract String getGetUserIdUri();
 
     // 서비스 식별용 키 (컨트롤러 팩토리 라우팅용)
@@ -43,34 +47,45 @@ public abstract class AppConnectIntegration{
     public Mono<AppConnectTokenDto> getToken(String state, String code){
 
         return appUUidRedisRepository.getDtoValue(state)
-        .flatMap(dto -> 
-            defauClient.post()
-            .uri(this.getGetTokenUri())
+        .switchIfEmpty(Mono.error(new IllegalArgumentException("만료되었거나, 존재하지 않는 state 입니다.")))
+        .flatMap(dto -> {
+            
+            String credentials = dto.getClientId()+":"+dto.getSecretKey();
+            String encodedCredentials = Base64.getEncoder().encodeToString(credentials.getBytes());
+
+            return defauClient.post()
+            .uri(this.getAccessTokenUri())
             .header("Accept", "application/json")
+            .header("Authorization", "Basic " + encodedCredentials)
+            .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(Map.of(
-                "client_id", dto.getClientId(),
-                "client_secret", dto.getSecretKey(),
-                "code", code
+                "grant_type", "authorization_code",
+                "code", code,
+                "redirect_uri", ApiConstants.BACK+ ApiConstants.APP_CONNECT + "/" + getProviderName()
             ))
             .retrieve()
-            .bodyToMono(AppConnectTokenDto.class));
+            .bodyToMono(AppConnectTokenDto.class);
+        });
     }
 
     public Mono<AppConnect> saveAppConnectInfo(AppConnectTokenDto tokenDto, String state){
 
         return getUserIdFromProvider(tokenDto)
-        .flatMap(userId -> {
-            return appUUidRedisRepository.getDtoValue(state)
+        .flatMap(userId -> 
+            appUUidRedisRepository.getDtoValue(state)
             .flatMap(dto -> {    
                 String encodeAccessToken = aseUtil.encrypt(tokenDto.getAccessToken());
                 String encodeRefreshToken = aseUtil.encrypt(tokenDto.getRefreshToken());
                 String encodeSecretKey = aseUtil.encrypt(dto.getSecretKey());
+                
                 return saveRedisAppToken(dto.getUserId(), dto.getClientId(),encodeAccessToken, encodeRefreshToken)
-                .flatMap(enused -> {
-                    return saveAppConnect(dto.getUserId(),dto.getClientId(), encodeSecretKey, encodeRefreshToken, userId);
-                });
-            });
-        });
+                .doOnSuccess(v -> System.out.println("====== 1. app connect redis 저장 완료 ======"))
+                .then(Mono.defer(()->
+                    saveAppConnect(dto.getUserId(),dto.getClientId(), encodeSecretKey, encodeRefreshToken, userId)
+                    .doOnSuccess(saved -> System.out.println("====== DB 저장 성공: " + saved.getId() + " ======"))
+                    .doOnError(err -> System.err.println("====== DB 저장 중 에러 발생: " + err.getMessage() + " ======"))));
+            })
+        );
     }
 
     protected Mono<String> getUserIdFromProvider(AppConnectTokenDto tokenDto){
@@ -101,7 +116,7 @@ public abstract class AppConnectIntegration{
         connect.setUserId(userId);
         connect.setRefreshToken(refreshToken);
         connect.setType(this.getType());
-        return appConnectRepository.save(connect);
+        return appConnectRepository.save(connect).log("AppConnectSaveStream");
     }
     
     // protected Mono<AppConnectTokenDto> getAccessToken(String refreshToken){
@@ -115,10 +130,10 @@ public abstract class AppConnectIntegration{
             return token.getToken().getClaimAsString("email");
         })
         .switchIfEmpty(Mono.error(new IllegalStateException("인증 정보(JWT 토큰)를 찾을 수 없습니다.")))
-        .flatMap(userEmail->{
-            return req.bodyToMono(Map.class)
-            .flatMap(body-> {
-                return userCacheManager.findCacheUserId(userEmail)
+        .flatMap(userEmail->
+            req.bodyToMono(Map.class)
+            .flatMap(body-> 
+                userCacheManager.findCacheUserId(userEmail)
                 .switchIfEmpty(Mono.error(new IllegalStateException("존재하지 않는 유저 이메일입니다: " + userEmail)))
                 .flatMap(userId->{
                     String clientId = String.valueOf(body.get("clientId"));
@@ -137,9 +152,9 @@ public abstract class AppConnectIntegration{
                             if(!check) Mono.error(new RedisException("redis 저장 과정에서 에러 발생"));
                             return Mono.just(stateUuid);
                         });
-                });
-            });
-        });
+                })
+            )
+        );
     }
 
 }

@@ -1,51 +1,7 @@
 export default function ProjectLoading() {
   return (
     <div className="flex h-screen w-full overflow-hidden bg-white animate-pulse">
-      {/* 1. 왼쪽 사이드바 스켈레톤 (실제 대시보드 구조 모사) */}
-      <aside className="w-64 h-full border-r border-gray-200 bg-gray-50/50 p-4 flex flex-col justify-between">
-        <div className="space-y-6">
-          {/* 상단 로고 & 다크모드 스위치 자리 */}
-          <div className="flex justify-between items-center">
-            <div className="h-6 w-6 bg-gray-200 rounded"></div>
-            <div className="h-6 w-16 bg-gray-200 rounded-full"></div>
-          </div>
-
-          {/* 프로젝트 셀렉터 덮개 */}
-          <div className="h-10 w-full bg-gray-200 rounded-lg"></div>
-
-          {/* 프로젝트 추가 버튼 */}
-          <div className="h-5 w-24 bg-gray-200 rounded ml-2"></div>
-
-          {/* 협업 관리 메뉴 섹션 */}
-          <div className="space-y-3 pt-4">
-            <div className="h-3 w-16 bg-gray-200 rounded ml-2"></div>{" "}
-            {/* '협업 관리' 텍스트 */}
-            <div className="h-9 w-full bg-gray-300 rounded-lg"></div>{" "}
-            {/* 작업라인 (활성화 상태 흉내로 조금 더 진하게) */}
-            <div className="h-9 w-full bg-gray-200 rounded-lg"></div>{" "}
-            {/* 타임라인 */}
-            <div className="h-9 w-full bg-gray-200 rounded-lg"></div>{" "}
-            {/* 새 이슈 */}
-            {/* Role 별로 노출 여부가 갈리는 '프로젝트 설정' 메뉴 뼈대 */}
-            <div className="h-9 w-full bg-gray-100 rounded-lg border border-dashed border-gray-200"></div>
-          </div>
-
-          {/* 계정 메뉴 섹션 */}
-          <div className="space-y-3 pt-4">
-            <div className="h-3 w-12 bg-gray-200 rounded ml-2"></div>{" "}
-            {/* '계정' 텍스트 */}
-            <div className="h-9 w-full bg-gray-200 rounded-lg"></div>{" "}
-            {/* 내 정보 */}
-            <div className="h-9 w-full bg-gray-200 rounded-lg"></div>{" "}
-            {/* 결제 */}
-          </div>
-        </div>
-
-        {/* 최하위 프로필 원형 아이콘 */}
-        <div className="h-8 w-8 bg-gray-200 rounded-full"></div>
-      </aside>
-
-      {/* 2. 우측 메인 콘텐츠 스켈레톤 (보내주신 작업라인 화면 일치) */}
+      {/*  우측 메인 콘텐츠 스켈레톤 (보내주신 작업라인 화면 일치) */}
       <main className="flex-1 h-full p-8 space-y-6 overflow-y-auto bg-white">
         {/* 상단 타이틀 영역 (작업라인 248) */}
         <div className="flex justify-between items-center">

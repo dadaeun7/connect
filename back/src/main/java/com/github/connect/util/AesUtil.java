@@ -5,7 +5,7 @@ import java.security.SecureRandom;
 import java.util.Base64;
 
 import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -14,12 +14,25 @@ import org.springframework.stereotype.Component;
 @Component
 public class AesUtil {
     
-    private final String secretKey;
+    private final SecretKeySpec secretKey;
+    private static final String ALGORITHM = "AES/GCM/NoPadding";
+    private static final int GCM_IV_LENGTH = 12;  
+    private static final int GCM_TAG_LENGTH = 128; 
+    
     private final SecureRandom secureRandom = new SecureRandom();
-    private static final String ALGORIGHM = "AES/GCM/PKCS5Padding";
 
     public AesUtil(@Value("${spring.ase.secret-key}") String secretKey){
-        this.secretKey = secretKey;
+
+        if(secretKey == null || secretKey.isEmpty()){
+            throw new IllegalArgumentException("Encryption key config '${spring.ase.secret-key}' is missing.");
+        }
+
+        byte[] decodedKey = Base64.getDecoder().decode(secretKey);
+
+        if(decodedKey.length != 32){
+            throw new IllegalArgumentException("AES-256 key must be exactly 32 bytes after Base64 decoding. Current: " + decodedKey.length);
+        }
+        this.secretKey = new SecretKeySpec(decodedKey, "AES");
     }
 
     public String encrypt(String platinText){
@@ -27,13 +40,12 @@ public class AesUtil {
         if(platinText == null) return null;
 
         try{
-            byte[] iv = new byte[16];
+            byte[] iv = new byte[GCM_IV_LENGTH];
             secureRandom.nextBytes(iv);
-            IvParameterSpec ivSpec = new IvParameterSpec(iv);
 
-            SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8), "AES");
-            Cipher cipher = Cipher.getInstance(ALGORIGHM);
-            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivSpec);
+            Cipher cipher = Cipher.getInstance(ALGORITHM);
+            GCMParameterSpec gcmSpec = new GCMParameterSpec(GCM_TAG_LENGTH, iv);
+            cipher.init(Cipher.ENCRYPT_MODE, this.secretKey, gcmSpec);
 
             byte[] encryptedBytes = cipher.doFinal(platinText.getBytes(StandardCharsets.UTF_8));
 
@@ -56,20 +68,18 @@ public class AesUtil {
 
         try{
             byte[] combined = Base64.getDecoder().decode(cipherText);
+            
+            byte[] iv = new byte[GCM_IV_LENGTH];
+            byte[] encryptedBytes = new byte[combined.length - GCM_IV_LENGTH];
+            
+            // 복호화 시에도 기존 arraycopy 구조 그대로 사용
+            System.arraycopy(combined, 0, iv, 0, GCM_IV_LENGTH);
+            System.arraycopy(combined, GCM_IV_LENGTH, encryptedBytes, 0, encryptedBytes.length);
 
-            byte[] iv = new byte[16];
-            System.arraycopy(combined, 0, iv, 0, iv.length);
-            IvParameterSpec ivSpec = new IvParameterSpec(iv);
-
-            // 2. 뒤의 나머지 바이트(실제 암호문) 추출
-            int encryptedSize = combined.length - iv.length;
-            byte[] encryptedBytes = new byte[encryptedSize];
-            System.arraycopy(combined, iv.length, encryptedBytes, 0, encryptedSize);
-
-            SecretKeySpec keySpec = new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8), "AES");
-            Cipher cipher = Cipher.getInstance(ALGORIGHM);
-            cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
-
+            Cipher cipher = Cipher.getInstance(ALGORITHM);
+            GCMParameterSpec gcmSpec = new GCMParameterSpec(GCM_TAG_LENGTH, iv);
+            cipher.init(Cipher.DECRYPT_MODE, this.secretKey, gcmSpec);
+            
             byte[] decryptedBytes = cipher.doFinal(encryptedBytes);
             return new String(decryptedBytes, StandardCharsets.UTF_8);
         }catch(Exception e){

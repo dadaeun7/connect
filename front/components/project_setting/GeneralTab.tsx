@@ -1,12 +1,15 @@
+import { useProjectStore } from "@/app/store/useProjectStore";
 import { ChevronDown, Mail } from "lucide-react";
 
 export default function GeneralTab() {
+  const currentProject = useProjectStore((state) => state.currentProject);
+
   return (
     <div className="space-y-8">
       <section className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-6 shadow-sm">
         <div className="mb-4">
           <h2 className="text-s font-bold text-[var(--foreground)]">
-            워크스페이스 기본 정보 관리
+            프로젝트 기본 정보
           </h2>
           <p className="text-sm text-[var(--muted-foreground)] font-medium">
             현재 프로젝트의 이름을 지정합니다.
@@ -19,11 +22,11 @@ export default function GeneralTab() {
             </label>
             <input
               className="w-full bg-[var(--muted)] border border-[var(--border)] rounded-lg px-4 py-3 text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--primary)] font-semibold transition-colors"
-              defaultValue="차후 정보를 받아서 동기화할 예정"
+              defaultValue={currentProject?.name}
             />
           </div>
           <div className="flex justify-end">
-            <button className="bg-[var(--secondary)] border border-[var(--border)] text-[var(--secondary-foreground)] font-bold px-5 py-2.5 rounded-lg text-xs hover:bg-[var(--muted)] transition-colors">
+            <button className="cursor-pointer bg-[var(--secondary)] border border-[var(--border)] text-[var(--secondary-foreground)] font-bold px-5 py-2.5 rounded-lg text-xs hover:bg-[var(--primary)] hover:text-[var(--primary-foreground)] transition-colors">
               프로젝트 이름 저장
             </button>
           </div>
@@ -33,11 +36,10 @@ export default function GeneralTab() {
       <section className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-6 shadow-sm">
         <div className="mb-4">
           <h2 className="text-s font-bold text-[var(--foreground)]">
-            사용자 프로젝트 초대
+            프로젝트 초대 목록
           </h2>
           <p className="text-sm text-[var(--muted-foreground)] font-medium">
-            협업 프로젝트 공간에 같이 작업할 사용자의 이메일로 초대하고, 초대
-            수락된 리스트 입니다.
+            협업 프로젝트 공간에 같이 작업할 사용자의 이메일로 초대합니다.
           </p>
         </div>
 

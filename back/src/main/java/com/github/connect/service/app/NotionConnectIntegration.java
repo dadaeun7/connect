@@ -1,5 +1,4 @@
 package com.github.connect.service.app;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -29,8 +28,18 @@ public class NotionConnectIntegration extends AppConnectIntegration{
     }
 
     @Override
-    protected String getGetTokenUri() {
-        return "https://api.notion.com/v1/oauth/authorize";
+    protected String getAccessTokenUri() {
+        return "https://api.notion.com/v1/oauth/token";
+
+        // 관련 문서 https://developers.notion.com/guides/get-started/authorization#step-4-notion-responds-with-an-access_token--refresh_token-and-additional-information
+        
+        // POST /v1/oauth/token HTTP/1.1
+        // Authorization: Basic "$CLIENT_ID:$CLIENT_SECRET"
+        // Content-Type: application/json
+        // {"grant_type":"authorization_code",
+        // "code":"authorization으로 받은 코드", "
+        // redirect_uri":"https://example.com/auth/notion/callback"}
+
     }
 
     @Override
@@ -48,6 +57,11 @@ public class NotionConnectIntegration extends AppConnectIntegration{
         // tokenDto 내부 응답 바디 맵이나 필드에서 직접 추출 (예: workspace_id 또는 owner.user.id)
         String externalUserId = tokenDto.getAdditionalProperties().get("workspace_id").toString();
         return Mono.just(externalUserId);
+    }
+
+    @Override
+    protected String getGetCodeUri() {
+        return "https://api.notion.com/v1/oauth/authorize";
     }
 
 }
