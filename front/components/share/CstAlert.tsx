@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-interface CustomAlertProps {
+export interface CustomAlertProps {
   isOpen: boolean;
   message: string;
   type?: "success" | "error" | "info";

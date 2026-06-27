@@ -2,13 +2,22 @@
 
 import React, { useState } from "react";
 import MyInfoTab from "./MyInfoTab";
-import AffiliationTab from "./AffiliationTab";
+import IntegrationTab, { RedirectConfig } from "./app/AppConnectTab";
 
-export default function InfoPage() {
-  const [activeTab, setActiveTab] = useState<"info" | "affiliation">("info");
+export default function InfoPage({
+  appConnectHanlder,
+}: Readonly<{
+  appConnectHanlder: (
+    clientId: string,
+    clientSecret: string,
+    activeTab: string,
+    config: RedirectConfig,
+  ) => Promise<void>;
+}>) {
+  const [activeTab, setActiveTab] = useState<"info" | "integration">("info");
 
   return (
-    <div className="flex-1 bg-[var(--background)] min-h-screen p-8 text-[var(--foreground)] selection:bg-[var(--primary)]/20 selection:text-[var(--primary)]">
+    <div className="flex-1 bg-[var(--background)] min-h-screen p-8 text-[var(--foreground)] selection:bg-[var(--primary)]/20 selection:text-[var(--primary)] animate-in fade-in duration-300">
       <div className="mb-8">
         <h1 className="text-2xl font-bold tracking-tight mb-2 uppercase">
           내 정보
@@ -21,12 +30,12 @@ export default function InfoPage() {
       <div className="flex gap-8 border-b border-[var(--border)] mb-8 px-1">
         {[
           { id: "info", label: "일반" },
-          { id: "affiliation", label: "소속" },
+          { id: "affiliation", label: "OAuth 연동" },
         ].map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
-            className={`pb-3 text-sm font-bold uppercase tracking-wider transition-all relative ${
+            className={`pb-3 text-sm font-bold tracking-wider transition-all relative ${
               activeTab === tab.id
                 ? "text-[var(--primary)] font-black"
                 : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
@@ -40,8 +49,14 @@ export default function InfoPage() {
         ))}
       </div>
 
-      <div className="max-w-4xl mx-auto">
-        {activeTab === "info" ? <MyInfoTab /> : <AffiliationTab />}
+      <div
+        className={`${activeTab === "info" ? "max-w-3xl mx-auto" : "max-w-4xl mx-auto"}`}
+      >
+        {activeTab === "info" ? (
+          <MyInfoTab />
+        ) : (
+          <IntegrationTab appConnectHanlder={appConnectHanlder} />
+        )}
       </div>
     </div>
   );

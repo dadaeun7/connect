@@ -2,15 +2,15 @@
 
 import { useState } from "react";
 import GeneralTab from "./GeneralTab";
-import IntegrationTab from "./IntegrationTab";
+import AffiliationTab from "./AffiliationTab";
 
 export default function SettingPage() {
-  const [activeTab, setActiveTab] = useState<"general" | "integration">(
+  const [activeTab, setActiveTab] = useState<"general" | "affiliation">(
     "general",
   );
 
   return (
-    <div className="flex-1 bg-[var(--background)] min-h-screen p-8 text-[var(--foreground)] selection:bg-[var(--primary)]/20 selection:text-[var(--primary)]">
+    <div className="flex-1 bg-[var(--background)] min-h-screen p-8 text-[var(--foreground)] selection:bg-[var(--primary)]/20 selection:text-[var(--primary)] animate-in fade-in duration-300">
       <div className="mb-8">
         <h1 className="text-2xl font-bold tracking-tight mb-2 text-[var(--foreground)]">
           프로젝트 설정
@@ -23,8 +23,8 @@ export default function SettingPage() {
 
       <div className="flex gap-8 border-b border-[var(--border)] mb-8 px-1">
         {[
-          { id: "general", label: "프로젝트 설정" },
-          { id: "integration", label: "플랫폼 통합 세팅 (API)" },
+          { id: "general", label: "정보 · 앱 세부 권한" },
+          { id: "integration", label: "초대 · 히스토리" },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -43,12 +43,8 @@ export default function SettingPage() {
         ))}
       </div>
 
-      <div
-        className={
-          activeTab === "general" ? "max-w-4xl mx-auto" : "max-w-5xl mx-auto"
-        }
-      >
-        {activeTab === "general" ? <GeneralTab /> : <IntegrationTab />}
+      <div className="max-w-4xl mx-auto">
+        {activeTab === "general" ? <GeneralTab /> : <AffiliationTab />}
       </div>
     </div>
   );

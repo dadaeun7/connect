@@ -61,7 +61,7 @@ public class SlackConnectIntegration extends AppConnectIntegration{
             .uri(this.getAccessTokenUri())
             .header("Accept", "application/json")
             .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-            .bodyValue(BodyInserters.fromFormData(formData))
+            .body(BodyInserters.fromFormData(formData))
             .retrieve()
             .bodyToMono(AppConnectTokenDto.class);
         });

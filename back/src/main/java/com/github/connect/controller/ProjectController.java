@@ -2,6 +2,7 @@ package com.github.connect.controller;
 
 import java.util.List;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +16,7 @@ import com.github.connect.global.common.annotation.LoginUser;
 import com.github.connect.service.project.ProjectService;
 
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -30,6 +32,12 @@ public class ProjectController {
         .collectList()
         .map(ResponseEntity::ok);
     }
+
+//     @GetMapping(value =ApiConstants.PROJECT_LIST_UP, produces = MediaType.APPLICATION_JSON_VALUE)
+    // public Flux<ProjectListResponse> projectListUp(@LoginUser String email, String accessToken){
+
+    //     return projectService.getProjects(email);
+    // }
 
     @PostMapping(ApiConstants.PROJECT_SAVE)
     public Mono<ResponseEntity<ProjectListResponse>> projectSave(@LoginUser String email, String accessToken, @RequestBody ProjectSaveReq req){

@@ -79,11 +79,11 @@ public abstract class AppConnectIntegration{
                 String encodeSecretKey = aseUtil.encrypt(dto.getSecretKey());
                 
                 return saveRedisAppToken(dto.getUserId(), dto.getClientId(),encodeAccessToken, encodeRefreshToken)
-                .doOnSuccess(v -> System.out.println("====== 1. app connect redis 저장 완료 ======"))
+                .doOnSuccess(v -> System.out.println("====== App Connect Redis 저장 완료 ======"))
                 .then(Mono.defer(()->
                     saveAppConnect(dto.getUserId(),dto.getClientId(), encodeSecretKey, encodeRefreshToken, userId)
-                    .doOnSuccess(saved -> System.out.println("====== DB 저장 성공: " + saved.getId() + " ======"))
-                    .doOnError(err -> System.err.println("====== DB 저장 중 에러 발생: " + err.getMessage() + " ======"))));
+                    .doOnSuccess(saved -> System.out.println("====== APP OAuth2 정보 저장 성공: " + saved.getId() + " ======"))
+                    .doOnError(err -> System.err.println("====== APP OAuth2 정보 저장 중 에러 발생: " + err.getMessage() + " ======"))));
             })
         );
     }

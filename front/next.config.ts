@@ -27,8 +27,8 @@ const nextConfig: NextConfig = {
         destination: backend + "/project/save",
       },
       {
-        source: "/api/prepare/:path*",
-        destination: backend + "/api/oauth/prepare/:path*",
+        source: "/api/app/list",
+        destination: backend + "/app/list",
       },
     ];
   },

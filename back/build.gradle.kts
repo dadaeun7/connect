@@ -42,6 +42,9 @@ dependencies {
 	// test 
 	testImplementation("org.springframework.boot:spring-boot-starter-test:4.0.6")
 	testImplementation("com.github.gavlyukovskiy:p6spy-spring-boot-starter:2.0.1")
+	testImplementation ("org.openjdk.jmh:jmh-core:1.37")
+	testAnnotationProcessor("org.openjdk.jmh:jmh-generator-annprocess:1.37")
+	annotationProcessor("org.openjdk.jmh:jmh-generator-annprocess:1.37")
 
 	// test container
 	testImplementation("org.testcontainers:testcontainers:2.0.5")

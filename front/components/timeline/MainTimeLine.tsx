@@ -298,18 +298,18 @@ export default function IntegratedFluidTimeline() {
     : null;
 
   return (
-    <div className="flex-1 bg-[var(--background)] min-h-screen p-8 text-[var(--foreground)]">
+    <div className="flex-1 bg-[var(--background)] min-h-screen p-8 text-[var(--foreground)] animate-in fade-in duration-300">
       {/* 헤더 */}
-      <div className="flex justify-between items-start mb-6">
+      <div className="flex justify-between items-start mb-4">
         <div>
           <h2 className="text-2xl font-black tracking-tight font-mono">
             {MONTH_NAMES[viewDate.getMonth()]}&nbsp;
-            <span className="text-[var(--muted-foreground)] font-bold">
+            <span className="text-[var(--muted-foreground)] font-bold ml-2 text-xl">
               {viewDate.getFullYear()}
             </span>
           </h2>
           <p className="text-sm font-semibold text-[var(--muted-foreground)] tracking-wide mt-1">
-            워크스페이스 각 노드에서 동기화된 일정을 타임라인으로 제어합니다
+            모든 이슈를 타임라인 상태로 확인하고 관리합니다.
           </p>
         </div>
 
@@ -322,9 +322,9 @@ export default function IntegratedFluidTimeline() {
           </button>
           <button
             onClick={goToToday}
-            className="px-4 py-1.5 text-xs font-black uppercase tracking-widest text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors border-x border-[var(--border)]/60"
+            className="px-4 py-1.5 text-xs font-black uppercase tracking-widest text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
           >
-            Today
+            오늘
           </button>
           <button
             onClick={() => goMonth(1)}
@@ -442,7 +442,6 @@ export default function IntegratedFluidTimeline() {
           )}
         </div>
       </div>
-
       {/* 타임라인 본체 */}
       <div
         className="border border-[var(--border)] rounded-2xl bg-[var(--card)] shadow-sm overflow-hidden"
@@ -614,30 +613,6 @@ export default function IntegratedFluidTimeline() {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* 하단 범례 디자인 싱크 정렬 */}
-      <div className="mt-5 flex items-center gap-3 flex-wrap border-t border-[var(--border)] pt-4">
-        <span className="text-xs font-bold uppercase tracking-widest text-[var(--muted-foreground)] mr-1">
-          상태 구분
-        </span>
-        {Object.entries(STATUS_STYLES).map(([key, val]) => (
-          <span
-            key={key}
-            className="flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-md border"
-            style={{
-              color: val.color,
-              background: `color-mix(in srgb, ${val.color} 10%, transparent)`,
-              borderColor: `color-mix(in srgb, ${val.color} 25%, transparent)`,
-            }}
-          >
-            <span
-              className="w-1.5 h-1.5 rounded-full"
-              style={{ background: val.color }}
-            />
-            {key}
-          </span>
-        ))}
       </div>
     </div>
   );

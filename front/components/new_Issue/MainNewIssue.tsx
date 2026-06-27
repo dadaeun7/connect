@@ -9,6 +9,7 @@ export default function IssueListView() {
       title: "서비스명/등록된 내용",
       status: "검토전",
       date: "2026-04-30 10:30:21",
+      contents: [],
     },
     {
       id: 2,
@@ -23,9 +24,22 @@ export default function IssueListView() {
       status: "논의중",
       date: "2026-04-30 10:30:21",
       contents: [
-        "해당 이슈를 논의중으로 변경했습니다.",
-        "@테스트1 @테스트2 님 00 내용에 대한 확인 부탁드립니다.",
-        "@테스트3 본 이슈건은 다른 이슈건과 유사하여 이슈 병합해주시면 감사하겠습니다.",
+        {
+          user: "myTest",
+          message: "해당 이슈를 논의중으로 변경했습니다.",
+          writeAt: "2026-04-30",
+        },
+        {
+          user: "myTest1",
+          message: "@테스트2 님 00 내용에 대한 확인 부탁드립니다.",
+          writeAt: "2026-04-30",
+        },
+        {
+          user: "myTest2",
+          message:
+            "본 이슈건은 다른 이슈건과 유사하여 이슈 병합해주시면 감사하겠습니다.",
+          writeAt: "2026-04-30",
+        },
       ],
     },
   ];
@@ -33,7 +47,7 @@ export default function IssueListView() {
   const filteredIssues = ["전체", "검토전", "논의중", "완료"];
 
   return (
-    <div className="flex-1 bg-[var(--background)] min-h-screen p-8 text-[var(--foreground)] selection:bg-[var(--primary)]/20 selection:text-[var(--primary)]">
+    <div className="flex-1 bg-[var(--background)] min-h-screen p-8 text-[var(--foreground)] selection:bg-[var(--primary)]/20 selection:text-[var(--primary)] animate-in fade-in duration-300">
       <div className="mb-8">
         <h1 className="text-2xl font-bold tracking-tight mb-2 text-[var(--foreground)]">
           새이슈

@@ -1,17 +1,24 @@
-import { Search } from "lucide-react";
+import { Search, SlidersHorizontal } from "lucide-react";
 
 export default function IssueSearch() {
   return (
-    <div className="flex gap-3 mb-6">
-      <div className="relative flex-1">
+    <div className="flex justify-end gap-1 mb-3">
+      {/* 1. 부모 div에 transition-all과 focus-within:w-64(원하는 확장 너비)를 추가합니다. */}
+      <div className="flex items-center gap-2 bg-[var(--card)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-xs w-48 transition-all duration-300 ease-in-out focus-within:w-120 focus-within:border-[var(--muted-foreground)]">
+        <Search size={14} className="text-[var(--muted-foreground)] shrink-0" />
+        {/* 2. input창의 고정 너비(w-36)를 지우고 w-full로 변경하여 부모가 늘어날 때 같이 늘어나도록 합니다. */}
         <input
-          className="w-full bg-[var(--card)] border border-[var(--border)] rounded-xl py-3 pl-11 pr-4 text-sm text-[var(--foreground)] placeholder:text-[var(--muted-foreground)]/40 focus:outline-none focus:border-[var(--primary)] transition-colors font-medium"
-          placeholder="Search issues..."
+          type="text"
+          placeholder="Search tasks..."
+          className="bg-transparent text-[var(--foreground)] placeholder:text-[var(--muted-foreground)]/40 focus:outline-none w-full text-sm font-medium"
         />
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted-foreground)]/60" />
       </div>
-      <button className="bg-[var(--card)] border border-[var(--border)] px-5 py-2 rounded-xl text-xs font-bold text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)] transition-colors uppercase tracking-wider">
-        FILTER
+      <button
+        className="flex items-center gap-1
+      bg-[var(--card)] border border-[var(--border)] px-5 py-2 rounded-lg text-sm font-bold text-[var(--muted-foreground)] 
+      hover:text-[var(--foreground)] hover:bg-[var(--muted)] transition-colors tracking-wider"
+      >
+        <SlidersHorizontal size={13} /> <span>Fiter </span>
       </button>
     </div>
   );

@@ -1,15 +1,20 @@
 package com.github.connect.service.app;
 
 import java.util.Base64;
-import java.util.Map;
 
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.github.connect.constants.ApiConstants;
 import com.github.connect.constants.EntityFieldStandardType;
 import com.github.connect.dto.internal.AppConnectTokenDto;
+import com.github.connect.dto.internal.AppRefreshDto;
+import com.github.connect.dto.internal.AppRefreshToAccessTokenDto;
+import com.github.connect.dto.internal.AppTokenCacheDto;
 import com.github.connect.repository.AppConnectRepository;
 import com.github.connect.repository.AppTokenRedisRepository;
 import com.github.connect.repository.AppUUidRedisRepository;
@@ -60,25 +65,76 @@ public class FigmaConnectIntegration extends AppConnectIntegration{
             String credentials = dto.getClientId()+":"+dto.getSecretKey();
             String encodedCredentials = Base64.getEncoder().encodeToString(credentials.getBytes());
 
+            MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+            formData.add("grant_type", "authorization_code");
+            formData.add("code", code);
+            formData.add("redirect_uri", ApiConstants.BACK+ApiConstants.APP_CONNECT + "/" + getProviderName());
+            
             return defauClient.post()
             .uri(this.getAccessTokenUri())
             .header("Accept", "application/json")
             .header("Authorization", "Basic " + encodedCredentials)
             .contentType(MediaType.APPLICATION_FORM_URLENCODED) // 중요
-            .bodyValue(Map.of(
-                "grant_type", "authorization_code",
-                "code", code,
-                "redirect_uri", ApiConstants.BACK+ApiConstants.APP_CONNECT + "/" + getProviderName()
-            ))
+            .body(BodyInserters.fromFormData(formData))
             .retrieve()
             .bodyToMono(AppConnectTokenDto.class);
         });
     }
 
 
+    // 토큰을 갱신하려면 다음 헤더를 포함하여 POST요청을 보내십시오.https://api.figma.com/v1/oauth/refreshContent-Type: application/x-www-form-urlencoded
+    //  먼저 클라이언트 ID와 클라이언트 시크릿을 콜론(:)으로 구분하여 연결합니다.
+    // HTTP Basic Authentication그런  다음, 생성된 문자열을 Base64로 인코딩하여 Authorization 헤더에 포함시킵니다. 
+    // 헤더 형식은 다음과 같아야 합니다.client_idclient_secretclient_id:client_secret
+    
+    public Mono<String> getRefreshAccessToken(String email){
+        return userCacheManager.findCacheUserId(email)
+        .flatMap(id -> getAppClientInfo(id) // 여기 결과물 변수명을 clientInfo로 변경
+            .flatMap(clientInfo -> reqAccessToken(clientInfo)
+                .flatMap(accToken -> {
+                    AppTokenCacheDto tokenCacheDto = new AppTokenCacheDto();
+                    tokenCacheDto.setClientId(clientInfo.clientId());
+                    tokenCacheDto.setAccessToken(aseUtil.encrypt(accToken.getAccessToken()));
+                    tokenCacheDto.setRefreshToken(aseUtil.encrypt(clientInfo.refreshToken()));
+
+                    return appTokenRedisRepository.redisSetKey(id, this.getProviderName().toUpperCase(), tokenCacheDto)
+                        .map(check -> accToken.getAccessToken()); // return 키워드 제거
+                })
+            ));
+    }
+
+    private Mono<AppRefreshToAccessTokenDto> reqAccessToken(AppRefreshDto appInfo){
+
+        String credentials = appInfo.clientId() + appInfo.clientSecret();
+        String appCredentials = Base64.getEncoder().encodeToString(credentials.getBytes());
+
+
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("refresh_token", appInfo.refreshToken());
+
+        return defauClient.post()
+        .uri("https://api.figma.com/v1/oauth/refresh")
+        .header("Accept", "application/json")
+        .header("Authorization", "Basic " + appCredentials)
+        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+        .body(BodyInserters.fromFormData(formData))
+        .retrieve()
+        .bodyToMono(AppRefreshToAccessTokenDto.class);
+    }
+
+    private Mono<AppRefreshDto> getAppClientInfo(Long userId){
+        return appConnectRepository.getClientInfo(userId);
+    }
+
+    @Override
+    protected Mono<String> getUserIdFromProvider(AppConnectTokenDto tokenDto) {
+        String externalUserId = tokenDto.getAdditionalProperties().get("user_id_string").toString();
+        return Mono.just(externalUserId);
+    }
+
     @Override
     protected String getGetUserIdUri() {
-       return "https://api.figma.com/v1/me";
+        throw new UnsupportedOperationException("Unimplemented method 'getGetUserIdUri'");
     }
 
     @Override

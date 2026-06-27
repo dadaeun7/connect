@@ -1,11 +1,13 @@
 "use client";
 
 import { Search, SlidersHorizontal, ArrowUpDown, X } from "lucide-react";
-import MilestoneCard from "./MilestoneCard";
-import AddMilestone from "./AddMilstone";
 import { useState } from "react";
+import Issue from "./Issue";
+import AddIssue from "./add/AddIssue";
 
-export default function MainDashboard() {
+export default function MainDashboard({
+  getGithubRepo,
+}: Readonly<{ getGithubRepo: () => Promise<void> }>) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("전체");
 
@@ -14,7 +16,7 @@ export default function MainDashboard() {
 
   const menu = ["전체", "긴급", "새작업", "완료"];
   return (
-    <div className="flex-1 bg-[var(--background)] min-h-screen p-8 text-[var(--foreground)] selection:bg-[var(--primary)]/10 selection:text-[var(--primary)]">
+    <div className="@container flex-1 bg-[var(--background)] min-h-screen p-8 text-[var(--foreground)] selection:bg-[var(--primary)]/10 selection:text-[var(--primary)] animate-in fade-in duration-300">
       {/* 상단 헤더 섹션 */}
       <div className="flex justify-between items-start mb-8">
         <div className="space-y-2">
@@ -45,7 +47,7 @@ export default function MainDashboard() {
 
         {/* 사이드바 본체 */}
         <div
-          className={`absolute top-0 right-0 h-full w-full max-w-xl bg-[var(--background)] border-l border-[var(--border)] shadow-2xl transition-transform duration-300 ease-in-out ${
+          className={`absolute top-0 right-0 h-full w-full max-w-xl bg-[var(--card)] border-l border-[var(--border)] shadow-2xl transition-transform duration-300 ease-in-out ${
             isModalOpen ? "translate-x-0" : "translate-x-full"
           }`}
         >
@@ -62,7 +64,7 @@ export default function MainDashboard() {
           </button>
 
           <div className="h-full overflow-y-auto p-6">
-            <AddMilestone onClose={closeModal} />
+            <AddIssue onClose={closeModal} getGithubRepo={getGithubRepo} />
           </div>
         </div>
       </div>
@@ -88,7 +90,7 @@ export default function MainDashboard() {
           ))}
         </div>
       </div>
-      <div className="flex items-center gap-3 justify-end mb-3">
+      <div className="@container flex items-center gap-1 justify-end mb-3">
         {/* 1. 부모 div에 transition-all과 focus-within:w-64(원하는 확장 너비)를 추가합니다. */}
         <div className="flex items-center gap-2 bg-[var(--card)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-xs w-48 transition-all duration-300 ease-in-out focus-within:w-120 focus-within:border-[var(--muted-foreground)]">
           <Search
@@ -103,22 +105,24 @@ export default function MainDashboard() {
           />
         </div>
         <button className="flex items-center gap-1.5 border border-[var(--border)] bg-[var(--card)] text-[var(--muted-foreground)] px-3.5 py-2.5 rounded-lg text-sm font-bold hover:text-[var(--foreground)] transition-colors">
-          <SlidersHorizontal size={13} /> Filter
+          <SlidersHorizontal size={13} />{" "}
+          <span className="hidden @min-[700px]:inline">Filter</span>
         </button>
         <button className="flex items-center gap-1.5 border border-[var(--border)] bg-[var(--card)] text-[var(--muted-foreground)] px-3.5 py-2.5 rounded-lg text-sm font-bold hover:text-[var(--foreground)] transition-colors">
-          <ArrowUpDown size={13} /> Sort
+          <ArrowUpDown size={13} />{" "}
+          <span className="hidden @min-[700px]:inline">Sort</span>
         </button>
         <div className="w-[1px] h-4 bg-[var(--border)] mx-1" />
         <button
           className="bg-[var(--primary)] text-[var(--primary-foreground)] font-black px-4 py-2.5 rounded-lg text-sm hover:opacity-90 transition-opacity shadow-sm cursor-pointer"
           onClick={openModal}
         >
-          + Add Milestone
+          +Add <span className="hidden @min-[900px]:inline"> Issue</span>
         </button>
       </div>
 
       <div className="space-y-6">
-        <MilestoneCard />
+        <Issue />
       </div>
     </div>
   );

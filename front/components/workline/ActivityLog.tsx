@@ -21,91 +21,18 @@ const SERVICE_COLORS = {
 
 type ServiceKey = keyof typeof SERVICE_COLORS;
 
-const STATUS_COLORS = {
-  "In Progress": {
-    color: "var(--task-blue)",
-    bg: "var(--task-blue-bg)",
-  },
-  Done: {
-    color: "var(--task-teal)",
-    bg: "var(--task-teal-bg)",
-  },
-  Blocked: {
-    color: "var(--task-rose)",
-    bg: "var(--task-rose-bg)",
-  },
-  Review: {
-    color: "var(--task-amber)",
-    bg: "var(--task-amber-bg)",
-  },
-};
-
-type StatusKey = keyof typeof STATUS_COLORS;
-
-const PRIORITY_COLORS = {
-  High: { color: "var(--task-rose)", bg: "var(--task-rose-bg)" },
-  Medium: { color: "var(--task-amber)", bg: "var(--task-amber-bg)" },
-  Low: { color: "var(--task-teal)", bg: "var(--task-teal-bg)" },
-};
-
-type PriorityKey = keyof typeof PRIORITY_COLORS;
-
-export default function IssueRow({
+export default function ActivityLog({
   title,
   isTable = false,
-  service,
-  status = "In Progress",
-  priority = "Medium",
-}: {
+}: Readonly<{
   title: string;
   isTable?: boolean;
-  service?: ServiceKey;
-  status?: StatusKey;
-  priority?: PriorityKey;
-}) {
-  const svc = service ? SERVICE_COLORS[service] : null;
-  const statusStyle = STATUS_COLORS[status];
-  const priorityStyle = PRIORITY_COLORS[priority];
-
+}>) {
   return (
-    <div className="bg-[var(--card)] rounded-xl border border-[var(--border)]/70 overflow-hidden transition-all duration-200 hover:border-[var(--border)] shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
-      <div className="px-4 py-3 flex justify-between items-center">
-        <div className="flex gap-2 items-center shrink-0">
-          <div className="w-1.5 h-1.5 rounded-full shrink-0" />
-          <span className="text-[13.5px] font-semibold text-[var(--foreground)]/85 truncate">
-            {title}
-          </span>
-        </div>
-        <div className="flex gap-2 items-center shrink-0 ml-3">
-          <span
-            className="px-4 py-1 rounded-xl text-[12px] font-mono font-semibold"
-            style={{
-              color: statusStyle.color,
-              background: statusStyle.bg,
-              borderColor: statusStyle.color + "30",
-            }}
-          >
-            {status}
-          </span>
-          <span
-            className="px-4 py-1 rounded-xl text-[12px] font-mono font-semibold"
-            style={{
-              color: priorityStyle.color,
-              background: priorityStyle.bg,
-            }}
-          >
-            {priority}
-          </span>
-          <ChevronDown
-            size={13}
-            className="text-[var(--muted-foreground)]/30 ml-0.5"
-          />
-        </div>
-      </div>
-
+    <div>
       {isTable && (
         <div className="px-3 pb-3">
-          <div className="bg-[var(--muted)]/20 border border-[var(--border)]/40 rounded-lg overflow-hidden">
+          <div className="bg-[var(--muted)]/50 overflow-hidden">
             {[
               {
                 service: "github" as ServiceKey,
@@ -124,7 +51,7 @@ export default function IssueRow({
               return (
                 <div
                   key={i}
-                  className="flex items-center justify-between px-3.5 py-2.5 border-b border-[var(--border)]/30 last:border-0 hover:bg-[var(--card)] transition-colors"
+                  className="flex items-center justify-between px-3.5 py-2.5 border-b border-[var(--border)]/30 last:border-0 hover:bg-[var(--foreground)]/5 transition-colors"
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
                     <span className="text-[12px] font-black uppercase px-1.5 py-0.5 rounded shrink-0">

@@ -55,6 +55,15 @@ public class ProjectService {
         });
     }
 
+    public Flux<ProjectListResponse> getProjects(String email){
+        return userCacheManager.findCacheUserId(email)
+        .flatMapMany(projectRepository::findProjectsByUserId);
+    }
+
+
+    /**
+     * 테스트를 위해 만든 메소드로 실제 운영 환경에서 사용하지 않음
+     */
     private Mono<ProjectRole> saveProjectWithRole(Long projectId, Long userId){
         ProjectRole role = new ProjectRole();
         role.setProjectId(projectId);
@@ -64,11 +73,6 @@ public class ProjectService {
         role.setInvitedAt(OffsetDateTime.now());
         
         return projectRoleRepository.save(role);
-    }
-
-    public Flux<ProjectListResponse> getProjects(String email){
-        return userCacheManager.findCacheUserId(email)
-        .flatMapMany(projectRepository::findProjectsByUserId);
     }
 
     public Mono<Void> saveProjectWithUserEmail(String name, String email){

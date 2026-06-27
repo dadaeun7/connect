@@ -13,6 +13,7 @@ import {
   ArrowRight,
   Plus,
   ChevronDown,
+  AlignStartVertical,
 } from "lucide-react";
 import ThemeBtn from "./ThemeBtn";
 import { useProjectStore } from "@/app/store/useProjectStore";
@@ -23,12 +24,13 @@ export default function Sidebar({ showMenu }: { showMenu: boolean }) {
   const pathname = usePathname();
   const [isExpanded, setIsExpanded] = useState(true);
 
-  const projects = useProjectStore((state) => state.projects);
-  const setProjects = useProjectStore((state) => state.setProjects);
-  const currentProject = useProjectStore((state) => state.currentProject);
-  const setCurrentProject = useProjectStore(
-    (state) => state.setCurrentProjectById,
-  );
+  const {
+    projects,
+    setProjects,
+    currentProject,
+    setCurrentProjectById: setCurrentProject,
+  } = useProjectStore();
+
   const [showProjects, setShowProjects] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [newProjectName, setNewProjectName] = useState("");
@@ -78,7 +80,7 @@ export default function Sidebar({ showMenu }: { showMenu: boolean }) {
           {
             name: "타임라인",
             path: `/project/${currentProject?.id}/timeline`,
-            icon: <Calendar size={16} />,
+            icon: <AlignStartVertical size={16} />,
             show: true,
           },
           {
@@ -125,13 +127,13 @@ export default function Sidebar({ showMenu }: { showMenu: boolean }) {
     >
       {/* 로고 + 테마 */}
       <div
-        className={`flex items-center border-b border-[var(--sidebar-border)] px-5 ${isExpanded ? "justify-between" : "justify-center"}`}
+        className={`flex items-center border-b border-[var(--sidebar-border)] ${isExpanded ? "justify-between" : "justify-center"}`}
       >
-        <Link href="/" className="shrink-0">
+        <Link href="/" className="shrink-0 ">
           <img
             src="/logo.png"
             alt="logo"
-            className={isExpanded ? "w-7 h-7 mr-5" : "w-7 h-7 my-2"}
+            className={isExpanded ? "ml-5 w-7 h-7" : "w-7 h-7 my-2"}
           />
         </Link>
         {isExpanded && <ThemeBtn />}

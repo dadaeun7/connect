@@ -7,8 +7,7 @@ import ProjectLoading from "./[projectId]/loading";
 
 export default function ProjectMainPage() {
   const router = useRouter();
-  const projects = useProjectStore((state) => state.projects);
-  const isLoading = useProjectStore((state) => state.isLoading);
+  const { projects, isLoading } = useProjectStore();
 
   // 1. 프로젝트 생성 API 요청 핸들러
   const handleProjectCreate = async (name: string) => {

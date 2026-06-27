@@ -16,3 +16,28 @@ export type PriorityType = "high" | "medium" | "low";
 
 export const StatusList = ["inprogress", "done", "blocked", "review", "todo"];
 export const PriorityList = ["high", "medium", "low"];
+
+export const PRIORITY_COLORS = {
+  High: { color: "var(--task-rose)", bg: "var(--task-rose-bg)" },
+  Medium: { color: "var(--task-amber)", bg: "var(--task-amber-bg)" },
+  Low: { color: "var(--task-teal)", bg: "var(--task-teal-bg)" },
+};
+
+export const STATUS_COLORS = {
+  "In Progress": {
+    color: "var(--task-blue)",
+    bg: "var(--task-blue-bg)",
+  },
+  Done: {
+    color: "var(--task-teal)",
+    bg: "var(--task-teal-bg)",
+  },
+  Blocked: {
+    color: "var(--task-rose)",
+    bg: "var(--task-rose-bg)",
+  },
+  Review: {
+    color: "var(--task-amber)",
+    bg: "var(--task-amber-bg)",
+  },
+};

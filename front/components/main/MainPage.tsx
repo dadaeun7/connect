@@ -110,7 +110,7 @@ export default function MainPage({ isLoggedIn }: MainPageProps) {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] overflow-x-hidden flex-col">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] overflow-x-hidden flex-col animate-in fade-in duration-300">
       {/* Nav */}
       <nav className="grid grid-cols-[1fr_auto_1fr] items-center px-10 py-4 border-b border-[var(--border)] bg-[var(--card)]/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="flex justify-start">
@@ -234,7 +234,7 @@ export default function MainPage({ isLoggedIn }: MainPageProps) {
         </section>
       </main>
       {/* Footer */}
-      <footer className="fixed bottom-0 left-0 right-0 w-full px-10 py-8 border-t border-[var(--border)] bg-[var(--card)]/90 backdrop-blur-md z-40">
+      <footer className="fixed bottom-0 left-0 right-0 w-full px-10 py-5 border-t border-[var(--border)] bg-[var(--card)]/90 backdrop-blur-md z-40">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <img
             src="/logo.png"

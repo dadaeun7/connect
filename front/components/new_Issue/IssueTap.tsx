@@ -6,7 +6,7 @@ export default function IssueTap({ menu }: { menu: string[] }) {
   const [activeTab, setActiveTab] = useState("전체");
 
   return (
-    <div className="flex gap-8 border-b border-[var(--border)] mb-6 px-1">
+    <div className="flex gap-8 border-b border-[var(--border)] mb-3 px-1">
       {menu.map((tab) => (
         <button
           key={tab}

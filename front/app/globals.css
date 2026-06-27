@@ -10,7 +10,7 @@
 
 :root {
   /* ─── Base ─────────────────────────────── */
-  --background: #f7f8fa;
+  --background: #fafafa;
   --foreground: #111318;
 
   --card: #ffffff;
@@ -26,8 +26,8 @@
   /* ─── Muted / Secondary ─────────────────── */
   --secondary: #f0f1f3;
   --secondary-foreground: #5a5e6e;
-  --muted: #f0f1f3;
-  --muted-foreground: #8a8fa8;
+  --muted: #f1f1f1;
+  --muted-foreground: #9fa1ac;
 
   --accent: #edeef5;
   --accent-foreground: #111318;
@@ -40,14 +40,14 @@
   --radius: 0.625rem;
 
   /* ─── Sidebar ───────────────────────────── */
-  --sidebar: #f2f3f7;
-  --sidebar-foreground: #3a3d4a;
+  --sidebar: #ebebeb;
+  --sidebar-foreground: #3d3e44;
   --sidebar-primary: #18181b;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #e8e9f0;
-  --sidebar-accent-foreground: #111318;
-  --sidebar-border: #e2e3ea;
-  --sidebar-ring: #18181b;
+  --sidebar-accent: #f3f3f3;
+  --sidebar-accent-foreground: #181a1d;
+  --sidebar-border: #e7e7e9;
+  --sidebar-ring: #202020;
 
   /* ─── Service point colors ────────────────
      GitHub  : #24292F (dark) / #F6F8FA (light bg)
@@ -122,7 +122,7 @@
   --secondary: #1c1e28;
   --secondary-foreground: #8a8fa8;
   --muted: #181a24;
-  --muted-foreground: #5c6080;
+  --muted-foreground: #898a91;
 
   --accent: #1e2130;
   --accent-foreground: #f0f1f5;
@@ -136,9 +136,9 @@
 
   /* ─── Sidebar ───────────────────────────── */
   --sidebar: #0f1018;
-  --sidebar-foreground: #9a9db5;
+  --sidebar-foreground: #acaebb;
   --sidebar-primary: #e8e9f5;
-  --sidebar-primary-foreground: #0d0e12;
+  --sidebar-primary-foreground: #2c2d33;
   --sidebar-accent: #1c1e2a;
   --sidebar-accent-foreground: #f0f1f5;
   --sidebar-border: rgba(255, 255, 255, 0.06);
@@ -267,3 +267,5 @@
 .animate-slide-left {
   animation: slide-in-left 0.35s ease both;
 }
+
+@plugin "@tailwindcss/container-queries";
