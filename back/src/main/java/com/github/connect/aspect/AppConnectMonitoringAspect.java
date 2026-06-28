@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class AppConnectMonitoringAspect {
     
-    @Pointcut("execution(* com.github.connect.service.app.*(..))")
+    @Pointcut("execution(* com.github.connect.service.app..*(..))")
     public void appConnectMonitoring(){}
 
     @AfterThrowing(value = "appConnectMonitoring()", throwing = "e")
