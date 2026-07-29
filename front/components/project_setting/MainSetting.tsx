@@ -15,15 +15,14 @@ export default function SettingPage() {
         <h1 className="text-2xl font-bold tracking-tight mb-2 text-[var(--foreground)]">
           프로젝트 설정
         </h1>
-        <p className="text-sm text-[var(--muted-foreground)] font-medium leading-relaxed">
-          외부 플랫폼 API 동기화 파이프라인 정보 및 워크스페이스 권한 설정을
-          수정합니다.
+        <p className="text-s text-[var(--muted-foreground)] font-medium leading-relaxed">
+          프로젝트에 인원을 초대하고, 앱 세부권한에 대해 확인합니다.
         </p>
       </div>
 
       <div className="flex gap-8 border-b border-[var(--border)] mb-8 px-1">
         {[
-          { id: "general", label: "정보 · 앱 세부 권한" },
+          { id: "general", label: "앱 세부 권한" },
           { id: "integration", label: "초대 · 히스토리" },
         ].map((tab) => (
           <button

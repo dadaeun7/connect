@@ -4,7 +4,9 @@ ARG NODE_VERSION=24.14.0-slim
 FROM node:${NODE_VERSION} AS dependencies
 
 WORKDIR /app
-RUN npm ci --no-audit --no-fund --production
+
+COPY package*.json ./
+RUN npm ci --no-audit --no-fund
 
 # builder stage
 FROM node:${NODE_VERSION} AS builder

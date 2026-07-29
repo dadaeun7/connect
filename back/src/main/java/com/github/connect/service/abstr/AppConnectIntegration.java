@@ -118,9 +118,6 @@ public abstract class AppConnectIntegration{
         connect.setType(this.getType());
         return appConnectRepository.save(connect).log("AppConnectSaveStream");
     }
-    
-    // protected Mono<AppConnectTokenDto> getAccessToken(String refreshToken){
-    // }
 
     public Mono<String> prepareIntegration(ServerRequest req){
         
@@ -149,7 +146,9 @@ public abstract class AppConnectIntegration{
                     return appUUidRedisRepository
                         .redisSaveKey(stateUuid, appConnecInfoDto)
                         .flatMap(check -> {
-                            if(!check) Mono.error(new RedisException("redis 저장 과정에서 에러 발생"));
+                            if (!check) {
+                                return Mono.error(new RedisException("redis 저장 과정에서 에러 발생"));
+                            }
                             return Mono.just(stateUuid);
                         });
                 })

@@ -41,3 +41,63 @@ export const STATUS_COLORS = {
     bg: "var(--task-amber-bg)",
   },
 };
+
+export const STATUS_MAP: Record<
+  number,
+  { key: string; label: string; color: string; bg: string }
+> = {
+  1: {
+    key: "todo",
+    label: "Todo",
+    color: "var(--status-todo)",
+    bg: "var(--secondary)",
+  },
+  2: {
+    key: "inprogress",
+    label: "Progress",
+    color: "var(--task-blue)",
+    bg: "var(--task-blue-bg)",
+  },
+  3: {
+    key: "review",
+    label: "Review",
+    color: "var(--task-amber)",
+    bg: "var(--task-amber-bg)",
+  },
+  4: {
+    key: "done",
+    label: "Done",
+    color: "var(--task-teal)",
+    bg: "var(--task-teal-bg)",
+  },
+  5: {
+    key: "blocked",
+    label: "Blocked",
+    color: "var(--task-rose)",
+    bg: "var(--task-rose-bg)",
+  },
+};
+
+export const PRIORITY_MAP: Record<
+  number,
+  { key: string; label: string; color: string; bg: string }
+> = {
+  6: {
+    key: "high",
+    label: "High",
+    color: "var(--task-rose)",
+    bg: "var(--task-rose-bg)",
+  },
+  7: {
+    key: "medium",
+    label: "Medium",
+    color: "var(--task-amber)",
+    bg: "var(--task-amber-bg)",
+  },
+  8: {
+    key: "low",
+    label: "Low",
+    color: "var(--task-teal)",
+    bg: "var(--task-teal-bg)",
+  },
+};

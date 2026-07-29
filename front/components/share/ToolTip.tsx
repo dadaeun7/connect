@@ -4,6 +4,8 @@ import {
   useFloating,
   useHover,
   useInteractions,
+  flip,
+  shift,
 } from "@floating-ui/react";
 import { useState } from "react";
 
@@ -11,12 +13,16 @@ interface TooltipProps {
   children: React.ReactNode; // 툴팁 트리거 (예: 버튼)
   content: React.ReactNode; // 툴팁 본문 내용
   placement?: "top" | "right" | "bottom" | "left"; // 나타날 위치
+  className?: string; // 추가
+  style?: React.CSSProperties; // 추가
 }
 
 export function Tooltip({
   children,
   content,
   placement = "top",
+  className = "",
+  style = {},
 }: TooltipProps) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -26,7 +32,7 @@ export function Tooltip({
     onOpenChange: setIsOpen,
     placement: placement,
     // 오프셋 8px 적용
-    middleware: [offset(8)],
+    middleware: [offset(8), flip(), shift({ padding: 10 })],
   });
 
   const hover = useHover(context);
@@ -64,9 +70,10 @@ export function Tooltip({
               top: y ?? 0,
               left: x ?? 0,
               width: "max-content",
+              ...style,
             }}
             {...getFloatingProps()}
-            className={tooltipStyle}
+            className={`${tooltipStyle} ${className}`}
           >
             {content}
           </div>

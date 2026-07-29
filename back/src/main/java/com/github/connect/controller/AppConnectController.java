@@ -4,6 +4,8 @@ import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.connect.constants.ApiConstants;
@@ -25,5 +27,10 @@ public class AppConnectController {
         
         return appConnectInfoServcie.getAppList(email)
         .map(ResponseEntity::ok);
+    }
+
+    @PostMapping(ApiConstants.APP_DELETE)
+    public Mono<Void> deleteAppInfo(@RequestParam("appType")String type, @LoginUser String email){
+        return appConnectInfoServcie.deleteAppInfo(email, type);
     }
 }

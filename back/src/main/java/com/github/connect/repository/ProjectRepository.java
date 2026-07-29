@@ -20,7 +20,8 @@ public interface ProjectRepository extends ReactiveCrudRepository<Project, Long>
     @Query("SELECT p.id as id, p.name as name, pr.project_role as my_role " +
            "FROM \"Project\" p " +
            "JOIN \"Project_Role\" pr ON p.id = pr.project_id " +
-           "WHERE pr.user_id = :userId")
+           "WHERE pr.user_id = :userId " +
+           " AND pr.state = 'ACCEPTED'")
     Flux<ProjectListResponse> findProjectsByUserId(Long userId);
 
     // test ------------------------------------------------------------------------

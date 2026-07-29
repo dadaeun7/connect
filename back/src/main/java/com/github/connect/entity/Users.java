@@ -5,11 +5,13 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @Table(name = "Users")
+@NoArgsConstructor
 public class Users {
     
     @Id
@@ -33,4 +35,8 @@ public class Users {
     public enum RoleType{
         COMPANY, GITHUB, GMAIL
     } 
+
+    public Users(Long id){
+        this.id = id;
+    }
 }

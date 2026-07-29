@@ -85,9 +85,14 @@ public class SlackConnectIntegration extends AppConnectIntegration{
 
     @Override
     protected Mono<String> getUserIdFromProvider(AppConnectTokenDto tokenDto) {
-        Map<String, Object> authedUser = (Map<String, Object>) tokenDto.getAdditionalProperties().get("authed_user");
-        String slackUserId = authedUser.get("id").toString(); 
-        return Mono.just(slackUserId);
+        Map<String, Object> additionalProps = tokenDto.getAdditionalProperties();
+
+        // team 객체에서 team.id 추출
+        Map<String, Object> teamInfo = (Map<String, Object>) additionalProps.get("team");
+        String teamId = teamInfo.get("id").toString(); // 예: T012345678
+
+        // TODO: 유저 식별자 또는 이 팀 ID를 연동 저장소(Redis/DB)의 Key로 활용
+        return Mono.just(teamId);
     }
 
 }

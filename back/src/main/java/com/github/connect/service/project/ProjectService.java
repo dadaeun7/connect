@@ -1,10 +1,10 @@
 package com.github.connect.service.project;
 
+import java.time.Clock;
 import java.time.OffsetDateTime;
 
 import org.springframework.stereotype.Service;
 
-import com.github.connect.buffer.ProjectWriteBuffer;
 import com.github.connect.constants.EntityFieldStandardType;
 import com.github.connect.dto.response.ProjectListResponse;
 import com.github.connect.entity.Project;
@@ -25,17 +25,9 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     private final ProjectRoleRepository projectRoleRepository;
     private final UserCacheManager userCacheManager;
-    // private final ProjectWriteBuffer projectWriteBuffer;
+    private final Clock clock;
 
     public Mono<ProjectListResponse> saveProject(String name, String email){
-        // return userCacheManager.findCacheUserId(email)
-        // .doOnNext(id -> {
-        //     Project project = new Project();
-        //     project.setName(name);
-        //     project.setUserId(id);
-        //     projectWriteBuffer.push(project);
-        // })
-        // .then();
 
         return userCacheManager.findCacheUserId(email)
         .flatMap(userId ->{
@@ -60,26 +52,26 @@ public class ProjectService {
         .flatMapMany(projectRepository::findProjectsByUserId);
     }
 
-
-    /**
-     * 테스트를 위해 만든 메소드로 실제 운영 환경에서 사용하지 않음
-     */
     private Mono<ProjectRole> saveProjectWithRole(Long projectId, Long userId){
         ProjectRole role = new ProjectRole();
         role.setProjectId(projectId);
         role.setUserId(userId);
         role.setRole(EntityFieldStandardType.ROLE_AMDIN);
         role.setInvitedBy(userId);
-        role.setInvitedAt(OffsetDateTime.now());
+        role.setInvitedAt(OffsetDateTime.now(clock));
+        role.setState(EntityFieldStandardType.INVITE_ACCEPTED);
         
         return projectRoleRepository.save(role);
     }
 
-    public Mono<Void> saveProjectWithUserEmail(String name, String email){
-        return projectRepository.saveProjectWithUserEmail(name, email);
-    }
+    /**
+     * 테스트를 위해 만든 메소드로 실제 운영 환경에서 사용하지 않음
+     */
+    // public Mono<Void> saveProjectWithUserEmail(String name, String email){
+    //     return projectRepository.saveProjectWithUserEmail(name, email);
+    // }
 
-    public Flux<ProjectListResponse> getProjectsWithUserEmail(String email){
-        return projectRepository.findProjectsByUserEmail(email);
-    }
+    // public Flux<ProjectListResponse> getProjectsWithUserEmail(String email){
+    //     return projectRepository.findProjectsByUserEmail(email);
+    // }
 }

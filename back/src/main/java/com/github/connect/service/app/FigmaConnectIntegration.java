@@ -95,7 +95,7 @@ public class FigmaConnectIntegration extends AppConnectIntegration{
                     AppTokenCacheDto tokenCacheDto = new AppTokenCacheDto();
                     tokenCacheDto.setClientId(clientInfo.clientId());
                     tokenCacheDto.setAccessToken(aseUtil.encrypt(accToken.getAccessToken()));
-                    tokenCacheDto.setRefreshToken(aseUtil.encrypt(clientInfo.refreshToken()));
+                    tokenCacheDto.setRefreshToken(clientInfo.refreshToken());
 
                     return appTokenRedisRepository.redisSetKey(id, this.getProviderName().toUpperCase(), tokenCacheDto)
                         .map(check -> accToken.getAccessToken()); // return 키워드 제거
@@ -103,14 +103,31 @@ public class FigmaConnectIntegration extends AppConnectIntegration{
             ));
     }
 
+
+    public Mono<String> getRefreshAccessTokenByUserId(Long userId){
+        return getAppClientInfo(userId) // 여기 결과물 변수명을 clientInfo로 변경
+            .flatMap(clientInfo -> reqAccessToken(clientInfo)
+                .flatMap(accToken -> {
+                    AppTokenCacheDto tokenCacheDto = new AppTokenCacheDto();
+                    tokenCacheDto.setClientId(clientInfo.clientId());
+                    tokenCacheDto.setAccessToken(aseUtil.encrypt(accToken.getAccessToken()));
+                    tokenCacheDto.setRefreshToken(clientInfo.refreshToken());
+
+                    return appTokenRedisRepository.redisSetKey(userId, this.getProviderName().toUpperCase(), tokenCacheDto)
+                        .map(check -> accToken.getAccessToken()); // return 키워드 제거
+                })
+            );
+    }
+
     private Mono<AppRefreshToAccessTokenDto> reqAccessToken(AppRefreshDto appInfo){
 
-        String credentials = appInfo.clientId() + appInfo.clientSecret();
+        String credentials = appInfo.clientId() + ":" + aseUtil.decrypt(appInfo.clientSecret());
         String appCredentials = Base64.getEncoder().encodeToString(credentials.getBytes());
 
 
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        formData.add("refresh_token", appInfo.refreshToken());
+        formData.add("refresh_token", aseUtil.decrypt(appInfo.refreshToken()));
+        formData.add("grant_type", "refresh_token");
 
         return defauClient.post()
         .uri("https://api.figma.com/v1/oauth/refresh")
@@ -123,7 +140,7 @@ public class FigmaConnectIntegration extends AppConnectIntegration{
     }
 
     private Mono<AppRefreshDto> getAppClientInfo(Long userId){
-        return appConnectRepository.getClientInfo(userId);
+        return appConnectRepository.getClientInfo(userId, EntityFieldStandardType.APP_FIGMA);
     }
 
     @Override

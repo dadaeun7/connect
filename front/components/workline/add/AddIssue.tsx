@@ -1,157 +1,247 @@
 "use client";
-
 import React, { useEffect, useState } from "react";
-import { useProjectStore } from "@/app/store/useProjectStore";
-import { PriorityList, StatusList } from "../type";
-import StatusPrioritySelector from "./StatusPrioritySelector";
-import ModernInputField from "./ModernInputFiled";
-import AppPlatformIntegration from "./AppPlatformIntegration";
-
-const ModernPanel = ({
-  children,
-  title,
-}: {
-  children: React.ReactNode;
-  title: string;
-}) => (
-  <div className="w-full">
-    <div className="mb-6 border-b border-[var(--border)] pb-4 pr-8">
-      <h2 className="text-xl font-bold text-[var(--foreground)] tracking-tight mb-1">
-        {title}
-      </h2>
-      <p className="text-sm text-[var(--muted-foreground)]">
-        프로젝트에서 관리할 작업 상황을 이슈로 등록하고 외부 플랫폼과
-        연동합니다.
-      </p>
-    </div>
-    {children}
-  </div>
-);
+import { ProjectSimpleDto, useProjectStore } from "@/app/store/useProjectStore";
+import StatusPrioritySelector from "../sidebar/common/StatusPrioritySelector";
+import ModernInputField from "../sidebar/common/ModernInputFiled";
+import AppPlatformIntegration from "../sidebar/common/AppPlatformIntegration";
+import {
+  FigmaState,
+  GithubBranch,
+  GithubRepo,
+  NotionList,
+} from "@/app/project/[projectId]/workline/page";
+import CstAlert from "@/components/share/CstAlert";
+import { Tooltip } from "@/components/share/ToolTip";
 
 export default function AddIssue({
   onClose,
   getGithubRepo,
-}: Readonly<{ onClose: () => void; getGithubRepo: () => Promise<void> }>) {
-  const { projects, currentProject } = useProjectStore();
-
-  // 1. 핵심 메타데이터 상태 관리
+  getGitBrach,
+  getFigmaState,
+  getNotionList,
+}: any) {
+  const { projects } = useProjectStore();
+  const [selectedProject, setSelectedProject] =
+    useState<ProjectSimpleDto | null>(null);
   const [issueName, setIssueName] = useState("");
   const [dueDate, setDueDate] = useState("");
-  const [selectedProject, setSelectedProject] = useState(
-    currentProject || null,
-  );
-  const [currentStatus, setCurrentStatus] = useState(StatusList[0]); // inprogress 등
-  const [currentPriority, setCurrentPriority] = useState(PriorityList[1]); // medium 등
-
-  // 2. 외부 연동 플랫폼 주소/ID 상태 관리 (GitHub, Figma, Notion)
-  const [githubRepo, setGithubRepo] = useState("");
-  const [githubBranch, setGithubBranch] = useState("");
-  const [figmaFileUrl, setFigmaFileUrl] = useState("");
-  const [notionPageId, setNotionPageId] = useState("");
-  const [notionDbId, setNotionDbId] = useState("");
+  const [currentStatusId, setCurrentStatusId] = useState(1);
+  const [currentPriorityId, setCurrentPriorityId] = useState(6);
+  const [loading, setLoading] = useState(false);
+  const [githubRepo, setGithubRepo] = useState<GithubRepo[]>([]);
+  const [githubBranch, setGithubBranch] = useState<GithubBranch[]>([]);
+  const [curNotionDb, setCurNotionDb] = useState<NotionList | null>(null);
+  const [curGitRepo, setCurGitRepo] = useState<GithubRepo | null>(null);
+  const [curGitBranch, setCurGitBranch] = useState<GithubBranch | null>(null);
+  const [figmaState, setFigmaState] = useState<FigmaState>();
+  const [selectedRepo, setSelectedRepo] = useState<string>("");
+  const [figmaFileUrl, setFigmaFileUrl] = useState<string>("");
+  const [notionDbs, setNotionDbs] = useState<NotionList[]>([]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const data = await getGithubRepo();
-      // 이제 브라우저 콘솔에 정상적으로 찍힙니다.
-      console.log("클라이언트 데이터 수신:", JSON.stringify(data, null, 2));
+    const initFetch = async () => {
+      try {
+        const [repo, result] = await Promise.all([
+          getGithubRepo(),
+          getNotionList(),
+        ]);
+
+        if (repo && Array.isArray(repo)) {
+          setGithubRepo(repo);
+        }
+
+        if (result && Array.isArray(result)) {
+          setNotionDbs(result.filter((r) => r.type === "database"));
+        }
+      } catch (error) {
+        console.error("데이터 초기화 실패:", error);
+      }
     };
+    initFetch();
+  }, []);
 
-    fetchData();
-  }, [onClose]);
+  useEffect(() => {
+    const fetchBranches = async () => {
+      if (curGitRepo === null) {
+        setGithubBranch([]);
+        setCurGitBranch(null);
+        return;
+      }
+      setLoading(true);
+      try {
+        const branches = await getGitBrach(curGitRepo.full_name);
+        setGithubBranch(branches || []);
+        if (!curGitBranch && branches && branches.length > 0) {
+          setCurGitBranch(branches[0]);
+        }
+      } catch (e) {
+        console.error("브랜치 로드 실패", e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBranches();
+  }, [curGitRepo]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const [alertConfig, setAlertConfig] = useState({
+    isOpen: false,
+    message: "인증 시간이 만료되었습니다.",
+    type: "error" as "success" | "error" | "info",
+    onClose: () => {
+      setAlertConfig((props) => ({ ...props, isOpen: false }));
+    },
+  });
 
-    // 최종 DB 전송용 데이터 레이아웃 구조 세팅 완료
+  const handleSubmit = async () => {
+    if (figmaFileUrl && figmaFileUrl.trim() !== "" && !figmaState?.success) {
+      setAlertConfig((prop) => ({
+        ...prop,
+        isOpen: true,
+        message: "피그마 유효성을 체크해주세요",
+        type: "error",
+      }));
+      return;
+    }
+    if (!issueName) {
+      setAlertConfig((prop) => ({
+        ...prop,
+        isOpen: true,
+        message: "프로젝트 이름을 입력해주세요",
+        type: "error",
+      }));
+      return;
+    }
+
+    if (selectedProject?.id == null) {
+      setAlertConfig((prop) => ({
+        ...prop,
+        isOpen: true,
+        message: "매핑할 프로젝트를 선택해주세요.",
+        type: "error",
+      }));
+      return;
+    }
+
     const payload = {
       title: issueName,
-      project_id: selectedProject?.id,
-      status_code: currentStatus,
-      priority_code: currentPriority,
-      due_date: dueDate,
-      github_repo: githubRepo,
-      github_branch: githubBranch,
-      figma_file_key: figmaFileUrl, // 백엔드 서브밋 전 혹은 후 정규식 가공 권장
-      notion_page_id: notionPageId,
-      notion_db_id: notionDbId,
+      projectId: Number(selectedProject?.id),
+      statusCode: currentStatusId,
+      priorityCode: currentPriorityId,
+      dueDate: dueDate ? `${dueDate}T18:00:00Z` : null,
+      githubRepoId: curGitRepo?.id ? Number(curGitRepo.id) : null,
+      githubRepoName: curGitRepo?.full_name || null,
+      githubBranch: curGitBranch?.name || null,
+      figmaFileKey:
+        figmaState?.url?.match(/\/file\/([a-zA-Z0-9]+)/)?.[1] || null,
+      figmaFileName: figmaState?.name || null,
+      notionDbId: curNotionDb?.id || null,
+      notionDbTitle: curNotionDb?.title || null,
     };
+    console.log("currentStatusId: ", currentStatusId);
+    console.log("currentPriorityId: ", currentPriorityId);
 
-    console.log("이슈 생성 요청 데이터:", payload);
-    alert("이슈가 정상적으로 등록되었습니다.");
-    onClose();
+    try {
+      const response = await fetch("/issue/create", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!response.ok) throw new Error("이슈 저장에 실패했습니다.");
+      onClose();
+      location.reload();
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
-    <ModernPanel title="이슈 등록">
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* 이슈명 입력 기본 정보 */}
+    <form className="space-y-9">
+      <span className="font-black text-lg">이슈 추가</span>
+      <span className="ml-2 text-sm">새로운 이슈를 등록합니다.</span>
+      <CstAlert
+        isOpen={alertConfig.isOpen}
+        message={alertConfig.message}
+        type={alertConfig.type}
+        onClose={alertConfig.onClose}
+      />
+      <div className="mt-8 space-y-9">
         <ModernInputField
           label="이슈명"
           id="issueName"
-          placeholder="예: 코어 웹훅 동기화 고도화 엔진 빌드"
           value={issueName}
           onChange={(e) => setIssueName(e.target.value)}
         />
-
-        {/* 컬러칩이 유기적으로 반영된 상태 및 우선순위 선택 세그먼트 */}
         <StatusPrioritySelector
-          currentStatus={currentStatus}
-          setCurrentStatus={setCurrentStatus}
-          currentPriority={currentPriority}
-          setCurrentPriority={setCurrentPriority}
+          currentStatusId={currentStatusId}
+          setCurrentStatusId={setCurrentStatusId}
+          currentPriorityId={currentPriorityId}
+          setCurrentPriorityId={setCurrentPriorityId}
         />
-
-        {/* 기본 마감일 및 프로젝트 지정 매핑 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <ModernInputField
-            label="마감 날짜"
-            id="dueDate"
             type="date"
+            label="마감일"
+            id="dueDate"
             value={dueDate}
             onChange={(e) => setDueDate(e.target.value)}
           />
-          <ModernInputField
-            label="프로젝트 공간"
-            id="project"
-            type="text"
-            placeholder={selectedProject?.name || "프로젝트를 선택하세요"}
-            projects={projects}
-            onSelectProject={(proj) => setSelectedProject(proj)}
-          />
+          <Tooltip
+            content="매핑할 프로젝트를 선택하세요."
+            placement="top"
+            style={{
+              marginLeft: "-2.3rem",
+              marginTop: "2rem",
+            }}
+          >
+            <ModernInputField
+              type="text"
+              label="프로젝트"
+              id="project"
+              placeholder={
+                selectedProject ? selectedProject.name : "선택하세요"
+              }
+              projects={projects}
+              onSelectProject={(p) => setSelectedProject(p)}
+            />
+          </Tooltip>
         </div>
-
-        {/* 요구사항이 반영된 GitHub, Figma, Notion 외부 리소스 적재 섹션 */}
         <AppPlatformIntegration
           githubRepo={githubRepo}
-          setGithubRepo={setGithubRepo}
           githubBranch={githubBranch}
-          setGithubBranch={setGithubBranch}
+          selectedRepo={selectedRepo}
+          setSelectedRepo={setSelectedRepo}
+          loading={loading}
           figmaFileUrl={figmaFileUrl}
+          figmaState={figmaState}
+          setFigmaState={setFigmaState}
           setFigmaFileUrl={setFigmaFileUrl}
-          notionPageId={notionPageId}
-          setNotionPageId={setNotionPageId}
-          notionDbId={notionDbId}
-          setNotionDbId={setNotionDbId}
+          notionDbs={notionDbs}
+          curGitRepo={curGitRepo}
+          curGitBranch={curGitBranch}
+          setCurGitRepo={setCurGitRepo}
+          setCurGitBranch={setCurGitBranch}
+          curNotionDb={curNotionDb}
+          setCurNotionDb={setCurNotionDb}
+          getFigmaState={getFigmaState}
         />
-
-        {/* 액션 하단 제어 바 */}
-        <div className="flex justify-end gap-3 border-t border-[var(--border)] pt-5 mt-4">
+        <div className="flex items-center justify-end gap-3 pt-3 ">
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2.5 text-sm font-bold text-[var(--muted-foreground)] bg-[var(--card)] border border-[var(--border)] hover:bg-[var(--muted)] rounded-lg transition-colors cursor-pointer"
+            className="px-4 py-2 text-m font-bold text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
           >
             취소
           </button>
           <button
-            type="submit"
-            className="px-5 py-2.5 text-sm font-black text-[var(--primary-foreground)] bg-[var(--primary)] rounded-lg shadow-sm hover:opacity-90 transition-opacity cursor-pointer"
+            type="button"
+            onClick={handleSubmit}
+            className="px-4 py-2 bg-[var(--primary)] text-[var(--primary-foreground)] text-m font-bold rounded-lg hover:opacity-90 transition-opacity"
           >
             저장하기
           </button>
         </div>
-      </form>
-    </ModernPanel>
+      </div>
+    </form>
   );
 }

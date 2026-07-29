@@ -24,4 +24,8 @@ public class StringRedisRepository {
         return reactiveRedisTemplate.opsForValue().get(key);
     }
 
+    public Mono<Void> redisDeleteValue(String type, String key){
+        return reactiveRedisTemplate.delete(type+key).then();
+    }
+
 }

@@ -13,3 +13,6 @@
 ignoreCopy.ps1
 *.zip
 connect-backup1.json
+
+.env
+backBuild.ps1

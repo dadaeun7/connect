@@ -12,6 +12,7 @@ import SlackIcon from "../../share/svg_icon/SlackIcon";
 import CstAlert from "../../share/CstAlert";
 import { useAppStore } from "@/app/store/useAppStore";
 import AppIntegrationSet from "./AppAuthDescription";
+import { useConfirmation } from "@/components/share/ConfirmationContext";
 
 interface Scopes {
   title: string;
@@ -39,10 +40,14 @@ const APPCONNECT: Record<string, RedirectConfig> = {
       },
       {
         title: "커밋 이력 읽기",
-        desc: "선택한 브랜치의 최근 커밋 상세 내용을 작업라인에 표시합니다.",
+        desc: "선택한 브랜치의 최근 커밋 히스토리를 등록합니다.",
+      },
+      {
+        title: "커밋 댓글 읽기",
+        desc: "선택한 브랜치의 커밋 댓글 히스토리를 등록합니다.",
       },
     ],
-    permission: ["repo", "read:user"].join(" "),
+    permission: ["repo", "read:user", "write:repo_hook"].join(" "),
     extraParams: {},
   },
   Figma: {
@@ -51,8 +56,8 @@ const APPCONNECT: Record<string, RedirectConfig> = {
     icon: <FigmaIcon />,
     scopes: [
       {
-        title: "프로젝트 파일 리스트",
-        desc: "디자인 파일 목록을 조회하여 워크스페이스와 연동합니다.",
+        title: "파일 메타 정보",
+        desc: "파일 링크 기준으로 유효성을 검사하고 해당 파일키를 저장합니다.",
       },
       {
         title: "버전 히스토리 및 댓글",
@@ -64,7 +69,6 @@ const APPCONNECT: Record<string, RedirectConfig> = {
       "file_comments:read",
       "file_metadata:read",
       "file_versions:read",
-      "projects:read",
     ].join(","),
     extraParams: {
       response_type: "code",
@@ -76,12 +80,12 @@ const APPCONNECT: Record<string, RedirectConfig> = {
     icon: <NotionIcon />,
     scopes: [
       {
-        title: "개인 및 공유 페이지 목록",
-        desc: "유저가 선택하여 권한을 부여한 페이지 리스트를 불러옵니다.",
+        title: "데이터베이스 목록",
+        desc: "유저가 선택하여 권한을 부여한 데이터베이스 리스트를 불러옵니다.",
       },
       {
-        title: "하위 페이지 변경 및 댓글 이력",
-        desc: "선택한 페이지 하위의 문서 추가 이력과 댓글을 가져옵니다.",
+        title: "데이터베이스 페이지 추가와 하위 페이지 수정 이력",
+        desc: "선택한 데이터베이스 하위의 문서 추가 이력과 수정 이력을 가져옵니다.",
       },
     ],
     permission: "",
@@ -96,12 +100,8 @@ const APPCONNECT: Record<string, RedirectConfig> = {
     icon: <SlackIcon />,
     scopes: [
       {
-        title: "채널 리스트 조회",
-        desc: "워크스페이스 내부의 공개 채널 목록을 가져옵니다.",
-      },
-      {
         title: "채널 메시지 히스토리",
-        desc: "선택한 채널의 실시간 대화 피드 및 메시지 이력을 페이징하여 읽어옵니다.",
+        desc: "봇을 등록한 공개 채널에 설정한 키워드가 포함된 메세지를 가져옵니다.",
       },
     ],
     permission: ["channels:read", "channels:history"].join(","),
@@ -124,6 +124,18 @@ export default function IntegrationTab({
   const { connectedApps, appList } = useAppStore();
   const savedClientId = connectedApps[activeTab.toUpperCase()]?.clientId || "";
   const isLinked = appList.includes(activeTab.toUpperCase());
+
+  const { openConfirm } = useConfirmation();
+
+  const handleComfirm = () => {
+    openConfirm({
+      message: "연결 해제 이후 더 이상 히스토리는 수집되지 않습니다.",
+      onConfirm: () => {
+        unConnectService();
+      },
+      onCancel: () => {},
+    });
+  };
 
   const [inputs, setInputs] = useState({
     clientId: "",
@@ -155,8 +167,36 @@ export default function IntegrationTab({
     if (isLinked) {
       return savedClientId;
     }
-
     return label === "clientId" ? clientId : clientSecret;
+  };
+
+  const unConnectService = async () => {
+    if (!appList.includes(activeTab.toUpperCase())) return;
+    try {
+      const result = await fetch(
+        `/app/delete?appType=${activeTab.toUpperCase()}`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      if (!result.ok) throw new Error("app unconnecting error ...");
+
+      setAlertConfig((props) => ({
+        ...props,
+        type: "success",
+        isOpen: true,
+        message: "앱 연결이 정상적으로 해제 되었습니다.",
+      }));
+
+      window.location.reload();
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -196,12 +236,25 @@ export default function IntegrationTab({
       {/** */}
       <div className="lg:col-span-3 bg-[var(--card)] border border-[var(--border)] rounded-xl p-6 space-y-6 shadow-sm">
         <div>
-          {APPCONNECT[activeTab].icon}
-          <h2 className="text-lg font-bold text-[var(--foreground)] tracking-wide mb-[1.7px] mt-1">
-            {activeTab} 연동
-          </h2>
+          <div className="flex justify-between">
+            <h2 className="text-lg font-bold text-[var(--foreground)] tracking-wide mb-[1.7px] mt-1">
+              {APPCONNECT[activeTab].icon} {activeTab} 연동
+            </h2>
+            {appList.includes(activeTab.toUpperCase()) && (
+              <button
+                onClick={() => {
+                  handleComfirm();
+                }}
+                className="px-5 my-[8.5px] border border-[var(--primary)] text-[var(--primary)] 
+                font-bold rounded-lg text-[11px] shadow-sm hover:bg-[var(--primary)] hover:text-[var(--background)]
+                transition-all uppercase cursor-pointer"
+              >
+                연결 해제
+              </button>
+            )}
+          </div>
           <p className="text-sm text-[var(--muted-foreground)] font-medium">
-            작업을 불러오기 위해 어플리케이션 자격 정보 동기화 후 불러옵니다.
+            작업을 불러오기 위해서는 OAuth2 연동이 필요합니다.
           </p>
         </div>
 

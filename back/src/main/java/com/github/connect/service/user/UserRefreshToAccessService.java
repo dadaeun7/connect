@@ -23,7 +23,7 @@ public class UserRefreshToAccessService {
     private final KeycloakProperties keycloakProperties;
     
     public Mono<String> getReAccessToken(String email){
-        return stringRedisRepository.redisGetValue(RedisConstants.authRedisKey, email)
+        return stringRedisRepository.redisGetValue(RedisConstants.AUTH_REDIS_KEY, email)
         .flatMap(refreshToken -> refreshToAccessToken(email, refreshToken))
         .map(String::toString);
     }

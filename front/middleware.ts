@@ -1,17 +1,73 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { createRemoteJWKSet, jwtVerify, decodeJwt } from "jose";
-import { BACKEND } from "./lib/constant";
+import { BACKEND, keycloak } from "./lib/constant";
 
 // keycloak JWT_SECRET_KEY
 const JWKS = createRemoteJWKSet(
-  new URL("http://localhost:8079/realms/connect/protocol/openid-connect/certs"),
+  new URL(keycloak + "/realms/connect/protocol/openid-connect/certs"),
 );
 
 export async function middleware(request: NextRequest) {
   // HttpOnly true 설정 ✔️
   const token = request.cookies.get("accessToken")?.value;
-  const { pathname } = request.nextUrl;
+  const { pathname, searchParams } = request.nextUrl;
+
+  if (pathname === "/auth/login" || pathname === "/auth/signup") {
+    if (token) {
+      try {
+        await jwtVerify(token, JWKS);
+        return NextResponse.redirect(new URL("/", request.url));
+      } catch {
+        const response = NextResponse.next();
+        response.cookies.set("accessToken", "", {
+          domain: ".daeun-tech.site",
+          path: "/",
+          maxAge: 0,
+        });
+        return response;
+      }
+    }
+    return NextResponse.next();
+  }
+
+  // 2. 초댓장 수락 페이지 접근 처리
+  if (pathname.startsWith("/invite/accept")) {
+    if (!token) {
+      const loginUrl = new URL("/auth/login", request.url);
+      const response = NextResponse.redirect(loginUrl);
+
+      const projectId = searchParams.get("projectId");
+      const inviteToken = searchParams.get("token");
+
+      const cookieOptions = {
+        path: "/",
+        domain: ".daeun-tech.site", // 백엔드/인증 도메인과 맞춰줌 (로컬 테스트 시에는 제거하거나 환경변수 처리)
+        sameSite: "lax" as const,
+        httpOnly: false, // 클라이언트(React Component)에서 읽어야 한다면 false, 서버/API에서만 읽는다면 true
+      };
+
+      if (projectId) {
+        response.cookies.set(
+          "pending_invite_projectId",
+          projectId,
+          cookieOptions,
+        );
+      }
+
+      if (inviteToken) {
+        response.cookies.set(
+          "pending_invite_token",
+          inviteToken,
+          cookieOptions,
+        );
+      }
+
+      return response;
+    }
+
+    return NextResponse.next();
+  }
 
   if (token) {
     try {
@@ -25,6 +81,8 @@ export async function middleware(request: NextRequest) {
           const payload = decodeJwt(token);
           const email = payload.email as string;
 
+          console.log("AccessToken 발급 주체 이메일: ", email);
+
           if (!email) throw new Error("Token 에 이메일 정보가 없습니다");
 
           const refresh = await fetch(BACKEND + "/retoken", {
@@ -37,30 +95,39 @@ export async function middleware(request: NextRequest) {
             }),
           });
 
-          if (refresh.status === 401) {
+          if (refresh.status === 401 || !refresh.ok) {
             const loginResponse = NextResponse.redirect(
               new URL("/auth/login", request.url),
             );
-            loginResponse.cookies.delete("accessToken");
+            loginResponse.cookies.set("accessToken", "", {
+              domain: ".daeun-tech.site",
+              path: "/",
+              maxAge: 0,
+            });
             return loginResponse;
           }
-
-          if (!refresh.ok)
-            throw new Error("토큰 재발급 실패, 관리자에게 문의하세요.");
 
           const setCookieHeader = refresh.headers.get("set-cookie");
           const newAccessToken = parseTokenFromSetCookie(setCookieHeader);
 
+          if (!newAccessToken) {
+            throw new Error("새로운 AccessToken 파싱 실패");
+          }
+
+          const requestHeaders = new Headers(request.headers);
+          requestHeaders.set("cookie", `accessToken=${newAccessToken}`);
+
           const response = NextResponse.next({
             request: {
-              headers: new Headers(request.headers),
+              headers: requestHeaders,
             },
           });
 
-          response.headers.set("Cookie", `accessToken=${newAccessToken}`);
-
           if (setCookieHeader) {
-            response.headers.set("set-cookie", setCookieHeader);
+            const cookies = refresh.headers.getSetCookie();
+            cookies.forEach((cookie) => {
+              response.headers.append("set-cookie", cookie);
+            });
           }
 
           console.log("토큰 세션 갱신 완료");
@@ -71,7 +138,12 @@ export async function middleware(request: NextRequest) {
           const loginResponse = NextResponse.redirect(
             new URL("/auth/login", request.url),
           );
-          loginResponse.cookies.delete("accessToken");
+
+          loginResponse.cookies.set("accessToken", "", {
+            domain: ".daeun-tech.site",
+            path: "/",
+            maxAge: 0,
+          });
           return loginResponse;
         }
       }
@@ -79,11 +151,7 @@ export async function middleware(request: NextRequest) {
   }
 
   if (!token && pathname.startsWith("/project")) {
-    return NextResponse.redirect(new URL("/", request.url));
-  }
-
-  if (token && (pathname === "/auth/login" || pathname === "/auth/signup")) {
-    return NextResponse.redirect(new URL("/", request.url));
+    return NextResponse.redirect(new URL("/auth/login", request.url));
   }
 }
 
@@ -94,6 +162,7 @@ export const config = {
     "/auth/signup",
     "/project",
     "/refresh",
+    "/invite/accept",
   ],
 };
 

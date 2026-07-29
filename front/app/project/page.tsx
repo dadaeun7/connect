@@ -1,12 +1,10 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useProjectStore } from "../store/useProjectStore";
 import CreatePage from "@/components/create/CreateProject";
 import ProjectLoading from "./[projectId]/loading";
 
 export default function ProjectMainPage() {
-  const router = useRouter();
   const { projects, isLoading } = useProjectStore();
 
   // 1. 프로젝트 생성 API 요청 핸들러
@@ -21,7 +19,7 @@ export default function ProjectMainPage() {
 
       if (res.ok) {
         // 성공 시 윈도우 주소를 새로고침하여 상위 레이아웃이 데이터를 다시 긁어오도록 처리
-        router.replace("/project");
+        window.location.reload();
       }
     } catch (err) {
       console.error(err);

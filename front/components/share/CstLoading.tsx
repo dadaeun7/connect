@@ -4,24 +4,29 @@ import Image from "next/image";
 export default function CstLoading({
   imageName,
   description,
+  customMinH = "85vh",
 }: {
   readonly imageName: string;
   readonly description: string;
+  readonly customMinH?: string;
 }) {
   return (
-    <div className="flex min-h-[85vh] flex-col items-center justify-center px-4">
+    <div
+      className={`flex min-h-[${customMinH}] flex-col items-center justify-center px-4`}
+    >
       <div className="flex flex-col items-center space-y-8 text-center">
         {/* 1. 가고 있는 느낌을 주는 무빙 로켓/인증 아이콘 영역 */}
-
-        <div className="relative h-32 w-32 animate-[float_2.5s_infinite_ease-in-out]">
-          <Image
-            src={`/${imageName}.png`} // public/clay.png 기준
-            alt="로딩 체인"
-            fill
-            className="object-contain"
-            priority
-          />
-        </div>
+        {imageName !== "" && (
+          <div className="relative h-62 w-32 animate-[float_2.5s_infinite_ease-in-out]">
+            <Image
+              src={`/${imageName}.png`} // public/clay.png 기준
+              alt=""
+              fill
+              className="object-contain"
+              priority
+            />
+          </div>
+        )}
 
         {/* 2. 텍스트 및 진행 바 (Progress) 영역 */}
         <div className="space-y-3">

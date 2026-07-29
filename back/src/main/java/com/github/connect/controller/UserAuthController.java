@@ -92,8 +92,10 @@ public class UserAuthController {
     private ResponseCookie setCookie(String accessToken){
         return ResponseCookie.from("accessToken", accessToken)
             .httpOnly(true)
-            .secure(false) // dev 환경
+            .secure(true)
             .path("/")
+            .sameSite("None")
+            .domain(".daeun-tech.site")
             .maxAge(3600)
             .build();
     }

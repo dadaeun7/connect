@@ -3,26 +3,28 @@ import { usePathname, useRouter } from "next/navigation";
 import React, { useState } from "react";
 import {
   Layers,
-  Calendar,
   PlusSquare,
   Settings,
   User,
-  CreditCard,
   ChevronLeft,
   ChevronRight,
   ArrowRight,
   Plus,
   ChevronDown,
   AlignStartVertical,
+  SquareArrowRightExit,
 } from "lucide-react";
 import ThemeBtn from "./ThemeBtn";
 import { useProjectStore } from "@/app/store/useProjectStore";
 import { Tooltip } from "./ToolTip";
+import { useUserInfoStore } from "@/app/store/useUserInfoStore";
 
-export default function Sidebar({ showMenu }: { showMenu: boolean }) {
+export default function Sidebar({ showMenu }: Readonly<{ showMenu: boolean }>) {
   const router = useRouter();
   const pathname = usePathname();
   const [isExpanded, setIsExpanded] = useState(true);
+
+  const { userInfo } = useUserInfoStore();
 
   const {
     projects,
@@ -62,6 +64,31 @@ export default function Sidebar({ showMenu }: { showMenu: boolean }) {
     } catch (err) {
       console.error("네트워크 에러 또는 파싱 에러: " + err);
       alert("서버 통신 중 오류가 발생했습니다. 관리자에게 문의하세요.");
+    }
+  };
+
+  const logout = async () => {
+    try {
+      const res = await fetch("/user/logout", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (res.status === 401) {
+        window.location.href = "/";
+        return;
+      }
+
+      if (!res.ok) {
+        throw new Error("logout error");
+      }
+
+      window.location.href = "/";
+    } catch (error) {
+      console.error("로그아웃 중 서버에 문제가 발생했습니다. ", error);
     }
   };
 
@@ -107,12 +134,6 @@ export default function Sidebar({ showMenu }: { showMenu: boolean }) {
             icon: <User size={16} />,
             show: showMenu,
           },
-          {
-            name: "결제",
-            path: `/project/${currentProject?.id}/payment`,
-            icon: <CreditCard size={16} />,
-            show: showMenu,
-          },
         ],
       },
     ],
@@ -137,6 +158,16 @@ export default function Sidebar({ showMenu }: { showMenu: boolean }) {
           />
         </Link>
         {isExpanded && <ThemeBtn />}
+      </div>
+
+      <div className="pl-5 mt-3">
+        {userInfo.name !== null ? (
+          <>
+            <span className="text-[17px] font-bold">{userInfo.name}</span> 님
+          </>
+        ) : (
+          <span>이름을 설정해주세요.</span>
+        )}
       </div>
 
       {/* 프로젝트 셀렉터 */}
@@ -291,7 +322,7 @@ export default function Sidebar({ showMenu }: { showMenu: boolean }) {
                       className={`shrink-0 transition-colors ${
                         isActive
                           ? "text-[var(--sidebar-primary)]"
-                          : "text-[var(--sidebar-foreground)]/35 group-hover:text-[var(--sidebar-foreground)]/70"
+                          : "text-[var(--sidebar-foreground)]/70 group-hover:text-[var(--sidebar-foreground)]/70"
                       }`}
                     >
                       {item.icon}
@@ -309,8 +340,23 @@ export default function Sidebar({ showMenu }: { showMenu: boolean }) {
         ))}
       </div>
 
+      <div
+        onClick={logout}
+        className="hover:bg-[var(--sidebar-accent)] transition-all m-3 rounded-xl cursor-pointer"
+      >
+        <button className="text-[var(--sidebar-foreground)]/60 text-[13px] font-semibold p-2 cursor-pointer">
+          {isExpanded ? (
+            <div className="flex items-center">
+              <SquareArrowRightExit size={16} />{" "}
+              <span className="ml-3">로그아웃 </span>
+            </div>
+          ) : (
+            <SquareArrowRightExit size={16} />
+          )}
+        </button>
+      </div>
       {/* 접기/펼치기 */}
-      <div className="border-t border-[var(--sidebar-border)]/60 bg-[var(--sidebar)]">
+      <div className="border-t border-[var(--sidebar-border)]/60 bg-[var(--sidebar)] mb-2">
         <button
           className={`h-12 w-full flex items-center text-[var(--sidebar-foreground)]/30 hover:text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)]/40 transition-all ${
             isExpanded ? "px-5 justify-end" : "justify-center"

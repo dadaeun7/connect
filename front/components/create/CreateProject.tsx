@@ -6,6 +6,32 @@ interface ProjectEmptyStateProps {
   onCreateClick?: (projectName: string) => void;
 }
 
+interface Description {
+  icon: string;
+  title: string;
+  description: string;
+}
+
+const createCard: Description[] = [
+  {
+    icon: "🔌",
+    title: "프로젝트 생성",
+    description:
+      "하나의 작업 라인을 만들기 위한 프로젝트 이름을 먼저 정해보세요.",
+  },
+  {
+    icon: "🧩",
+    title: "외부 플랫폼 연동",
+    description:
+      "Github, Slack, Figma, Notion 을 연동 후 하위 작업들을 분리하고 관리해보세요",
+  },
+  {
+    icon: "👥",
+    title: "팀원 초대 관리",
+    description:
+      "작업에 필요한 인원을 이메일 초대를 통해 권한을 각각 다르게 부여하여 협업 합니다.",
+  },
+];
 export default function CreatePage({ onCreateClick }: ProjectEmptyStateProps) {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [projectName, setProjectName] = useState("");
@@ -49,52 +75,36 @@ export default function CreatePage({ onCreateClick }: ProjectEmptyStateProps) {
 
       {/* 2. 메인 카피 및 설명 */}
       <div className="text-center space-y-2 max-w-l mb-10">
-        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+        <p className="text-gray-500 text-m leading-relaxed">
+          아직 본인 소유 프로젝트가 없네요.
+        </p>
+        <h1 className="text-2xl font-bold text-[var(--foreground)] tracking-tight">
           첫 번째 프로젝트를 생성해 주세요!
         </h1>
-        <p className="text-gray-500 text-m leading-relaxed">
-          프로젝트를 생성하면 여러 외부 앱을 연동하여 작업을 하나로 관리할 수
-          있습니다.
-        </p>
       </div>
 
       {/* 3. 유저의 이해를 돕는 간결한 기능 프리뷰 가이드 (3열 구성) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full mb-10">
         {/* 카드 1*/}
-        <div className="p-5 border border-gray-100 rounded-2xl bg-gray-50/30 space-y-2 transition-all duration-300 ease-in-out hover:-translate-y-1 hover:border-gray-300 hover:bg-white hover:shadow-md cursor-default">
-          <div className="text-xl">🔌</div>
-          <h3 className="font-semibold text-lg text-gray-800">프로젝트 생성</h3>
-          <p className="text-s text-gray-400 leading-normal">
-            하나의 작업 라인을 만들기 위한 프로젝트 이름을 먼저 정해보세요.
-          </p>
-        </div>
-        {/* 카드 2*/}
-        <div className="p-5 border border-gray-100 rounded-2xl bg-gray-50/30 space-y-2 transition-all duration-300 ease-in-out hover:-translate-y-1 hover:border-gray-300 hover:bg-white hover:shadow-md cursor-default">
-          <div className="text-xl">🎯</div>
-          <h3 className="font-semibold text-lg text-gray-800">
-            외부 플랫폼 연동
-          </h3>
-          <p className="text-s text-gray-400 leading-normal">
-            Github, Slack, Figma, Notion 을 연동 후 하위 작업들을 분리하고
-            관리해보세요
-          </p>
-        </div>
-        {/* 카드 3*/}
-        <div className="p-5 border border-gray-100 rounded-2xl bg-gray-50/30 space-y-2 transition-all duration-300 ease-in-out hover:-translate-y-1 hover:border-gray-300 hover:bg-white hover:shadow-md cursor-default">
-          <div className="text-xl">👥</div>
-          <h3 className="font-semibold text-lg text-gray-800">
-            팀원 초대 관리
-          </h3>
-          <p className="text-s text-gray-400 leading-normal">
-            작업에 필요한 인원을 이메일 초대를 통해 권한을 각각 다르게 부여하여
-            협업 합니다.
-          </p>
-        </div>
+        {createCard.map((card, index) => (
+          <div
+            key={index}
+            className="p-5 border border-[var(--muted-foreground)]/40 rounded-2xl bg-[var(--background)] space-y-2 transition-all duration-300 ease-in-out hover:-translate-y-1 hover:border-gray-300 hover:bg-[var(--card)] hover:shadow-md cursor-default"
+          >
+            <div className="text-xl">{card.icon}</div>
+            <h3 className="font-semibold text-lg text-[var(--foreground)]">
+              {card.title}
+            </h3>
+            <p className="text-s text-[var(--muted-foreground)] leading-normal">
+              {card.description}
+            </p>
+          </div>
+        ))}
       </div>
 
       {/* 폼 및 버튼 제어 영역 */}
       <div className="w-full max-w-sm flex flex-col items-center space-y-4">
-        {/* 💡 3. 버튼 위에 등장하는 프로젝트 이름 입력란 (애니메이션 적용) */}
+        {/*  3. 버튼 위에 등장하는 프로젝트 이름 입력란 (애니메이션 적용) */}
         <div
           className={`w-full transition-all duration-300 ease-in-out overflow-hidden ${
             isFormOpen
@@ -112,7 +122,7 @@ export default function CreatePage({ onCreateClick }: ProjectEmptyStateProps) {
           />
         </div>
 
-        {/* 💡 4. 동적으로 텍스트와 이벤트를 전환하는 메인 버튼 */}
+        {/*  4. 동적으로 텍스트와 이벤트를 전환하는 메인 버튼 */}
         <button
           onClick={handleButtonClick}
           className="flex items-center justify-center space-x-2 w-full max-w-[220px] px-6 py-3 bg-gray-900 hover:bg-gray-800 text-white font-medium text-sm rounded-xl shadow-sm transition-all duration-200 group transform active:scale-95"
@@ -128,7 +138,7 @@ export default function CreatePage({ onCreateClick }: ProjectEmptyStateProps) {
             xmlns="http://www.w3.org/2000/svg"
           >
             {isFormOpen ? (
-              // 💡 폼이 열렸을 때는 체크 아이콘(V)으로 스위칭
+              //  폼이 열렸을 때는 체크 아이콘(V)으로 스위칭
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -136,7 +146,7 @@ export default function CreatePage({ onCreateClick }: ProjectEmptyStateProps) {
                 d="M5 13l4 4L19 7"
               />
             ) : (
-              // 💡 기본 상태일 때는 플러스 아이콘(+)
+              //  기본 상태일 때는 플러스 아이콘(+)
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -146,7 +156,7 @@ export default function CreatePage({ onCreateClick }: ProjectEmptyStateProps) {
             )}
           </svg>
 
-          {/* 💡 상태에 따라 버튼 명칭 변경 */}
+          {/*  상태에 따라 버튼 명칭 변경 */}
           <span>
             {isFormOpen ? "등록 후 시작하기" : "새 프로젝트 생성하기"}
           </span>

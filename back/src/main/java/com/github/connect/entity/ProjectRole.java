@@ -28,4 +28,7 @@ public class ProjectRole {
     @Column("invited_at")
     private OffsetDateTime invitedAt;
 
+    @Column("state")
+    private String state;
+
 }

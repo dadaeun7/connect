@@ -21,10 +21,12 @@ import com.github.connect.properties.KeycloakProperties;
 import com.github.connect.repository.StringRedisRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class KeycloakAuthService {
 
     private final WebClient keycloakClient;
@@ -138,8 +140,50 @@ public class KeycloakAuthService {
             });
     }
 
+    public Mono<Void> keycloakLogout(String email){
+
+        return stringRedisRepository.redisGetValue(RedisConstants.AUTH_REDIS_KEY, email)
+            .switchIfEmpty(Mono.defer(() -> {
+                log.warn("Redis에서 RefreshToken을 찾을 수 없습니다. email: {}", email);
+                return Mono.empty();
+            }))
+            .flatMap(refreshToken -> {
+                return keycloakClient.post()
+                    .uri(keycloakProperties.getBaseUrl()+"/realms/"+keycloakProperties.getClientId()+"/protocol/openid-connect/logout")
+                    .header("Content-Type", "application/x-www-form-urlencoded")
+                    .body(BodyInserters.fromFormData("client_id", keycloakProperties.getClientId())
+                            .with("client_secret",keycloakProperties.getSecretClient())
+                            .with("refresh_token", refreshToken))
+                    .retrieve()
+                    .bodyToMono(Void.class)
+                    .doOnSuccess(v -> log.info("Keycloak 로그아웃 성공: {}", email))
+                    .doOnError(e -> log.error("Keycloak 로그아웃 실패: {}", e.getMessage()))
+                    .onErrorResume(e -> {
+                        log.warn("[Keycloak] Keycloak 로그아웃 실패했으나 내 서비스 로그아웃을 계속 진행합니다. cause: {}", e.getMessage());
+                        return Mono.empty();
+                    });
+            })
+            .switchIfEmpty(Mono.defer(() -> {
+                log.warn("[Keycloak] Redis에서 RefreshToken을 찾을 수 없어 Keycloak 로그아웃을 스킵합니다. email: {}", email);
+                return Mono.empty();
+            }))
+            .then();
+    }
+
+    public Mono<Void> keycloakWithdraw(String adminAccessToken, String uuid){
+
+        return keycloakClient.delete()
+            .uri(keycloakProperties.getBaseUrl() + "/admin/realms/" + keycloakProperties.getClientId() + "/users/"+uuid)
+            .header("Authorization", "Bearer " + adminAccessToken)
+            .retrieve()
+            .bodyToMono(Void.class)
+            .doOnSuccess(v -> log.info("[Keycloak] 회원 탈퇴 성공: uuid={}", uuid))
+            .doOnError(e -> log.error("[Keycloak] 회원 탈퇴 실패: uuid={}, cause={}", uuid, e.getMessage()))
+            .then();
+    }
+
     public Mono<Void> saveRedisKey(String email, String refreshToken){
-        return stringRedisRepository.redisSaveKey(RedisConstants.authRedisKey, email, refreshToken)
+        return stringRedisRepository.redisSaveKey(RedisConstants.AUTH_REDIS_KEY, email, refreshToken)
         .then();
     }
 

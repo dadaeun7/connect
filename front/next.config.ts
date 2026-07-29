@@ -1,6 +1,5 @@
 import type { NextConfig } from "next";
-
-const backend = "http://localhost:8080";
+import { BACKEND, backend } from "./lib/constant";
 
 const nextConfig: NextConfig = {
   output: "standalone",
@@ -16,19 +15,63 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/u/retoken",
-        destination: backend + "/retoken",
+        destination: BACKEND + "/retoken",
       },
       {
         source: "/project/list",
-        destination: backend + "/project/list",
+        destination: BACKEND + "/project/list",
       },
       {
         source: "/project/save",
-        destination: backend + "/project/save",
+        destination: BACKEND + "/project/save",
       },
       {
         source: "/api/app/list",
-        destination: backend + "/app/list",
+        destination: BACKEND + "/app/list",
+      },
+      {
+        source: "/issue/:path*",
+        destination: BACKEND + "/issue/:path*",
+      },
+      {
+        source: "/project/invite/:path*",
+        destination: BACKEND + "/invite/:path*",
+      },
+      {
+        source: "/user/logout",
+        destination: BACKEND + "/user/logout",
+      },
+      {
+        source: "/update/info",
+        destination: BACKEND + "/update/info",
+      },
+      {
+        source: "/keyword/:path*",
+        destination: BACKEND + "/new-issue/keyword/:path*",
+      },
+      {
+        source: "/new-issue/:path*",
+        destination: BACKEND + "/new-issue/:path*",
+      },
+      {
+        source: "/get/keyword",
+        destination: BACKEND + "/keyword/get",
+      },
+      {
+        source: "/invite/:path*",
+        destination: BACKEND + "/invite/:path*",
+      },
+      {
+        source: "/app/:path*",
+        destination: BACKEND + "/api/app/:path*",
+      },
+      {
+        source: "/notion/reconnect",
+        destination: BACKEND + "/api/oauth/reprepare",
+      },
+      {
+        source: "/user/withdraw",
+        destination: BACKEND + "/user/withdraw",
       },
     ];
   },

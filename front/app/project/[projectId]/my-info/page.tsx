@@ -60,5 +60,30 @@ export default function Page() {
     redirect(finalAuthRequestUrl);
   };
 
-  return <InfoPage appConnectHanlder={appConnectHanlder} />;
+  const userWithDraw = async (): Promise<boolean> => {
+    "use server";
+    try {
+      const result = await fetch(BACKEND + "/user/withdraw", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: (await headers()).get("cookie") || "",
+        },
+      });
+
+      if (!result.ok) return false;
+
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  };
+
+  return (
+    <InfoPage
+      appConnectHanlder={appConnectHanlder}
+      userWithDraw={userWithDraw}
+    />
+  );
 }

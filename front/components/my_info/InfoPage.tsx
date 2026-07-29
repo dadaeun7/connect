@@ -6,6 +6,7 @@ import IntegrationTab, { RedirectConfig } from "./app/AppConnectTab";
 
 export default function InfoPage({
   appConnectHanlder,
+  userWithDraw,
 }: Readonly<{
   appConnectHanlder: (
     clientId: string,
@@ -13,6 +14,7 @@ export default function InfoPage({
     activeTab: string,
     config: RedirectConfig,
   ) => Promise<void>;
+  userWithDraw: () => Promise<boolean>;
 }>) {
   const [activeTab, setActiveTab] = useState<"info" | "integration">("info");
 
@@ -53,7 +55,7 @@ export default function InfoPage({
         className={`${activeTab === "info" ? "max-w-3xl mx-auto" : "max-w-4xl mx-auto"}`}
       >
         {activeTab === "info" ? (
-          <MyInfoTab />
+          <MyInfoTab userWithDraw={userWithDraw} />
         ) : (
           <IntegrationTab appConnectHanlder={appConnectHanlder} />
         )}

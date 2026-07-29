@@ -1,37 +1,28 @@
-import { ArrowRight, Link2, RefreshCw } from "lucide-react";
+import { useState } from "react";
+import ConnectBtn from "./ConnectBtn";
+import DetailImageShow from "./DetailImageShow";
 
 const FIGMA_OPTIONS = [
   { value: "file_comments:read", label: "파일 댓글 조회" },
   { value: "file_metadata:read", label: "파일 미리보기 조회" },
   { value: "file_versions:read", label: "파일 히스토리 조회" },
-  { value: "projects:read", label: "프로젝트 조회" },
 ];
 
 interface FigmaSectionProps {
   app: any;
-  figmaUrl: string;
-  setFigmaUrl: (url: string) => void;
-  selectedScopes: string[];
-  onScopeChange: (value: string) => void;
-  onSave: () => void;
 }
 
-export default function FigmaSection({
-  app,
-  figmaUrl,
-  setFigmaUrl,
-  selectedScopes,
-  onScopeChange,
-  onSave,
-}: FigmaSectionProps) {
+export default function FigmaSection({ app }: FigmaSectionProps) {
   const isConnected = app.status === "연동됨";
+
+  const [show, setShow] = useState(false);
 
   return (
     <div
       className={`px-5 pt-5 border-t bg-[var(--background)]/40 space-y-4 transition-all ${
         isConnected
           ? "border-[var(--border)]/55"
-          : "border-[var(--border)]/40 opacity-75"
+          : "border-[var(--border)]/40 opacity-90"
       }`}
     >
       {/* 헤더 */}
@@ -60,55 +51,34 @@ export default function FigmaSection({
             </p>
           </div>
         </div>
-        {!isConnected && (
-          <button className="flex items-center space-x-1.5 bg-[var(--primary)] text-[var(--primary-foreground)] font-black px-4 py-2 rounded-lg text-xs shadow-sm hover:opacity-90 transition-opacity">
-            <span>연동하기</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
-        )}
+        {!isConnected && <ConnectBtn />}
       </div>
+
+      {show && <DetailImageShow imgUrl="/figma_scopes.png" setShow={setShow} />}
 
       {/* 바디 설정 */}
       {isConnected ? (
         <div className="space-y-4">
-          <div className="space-y-2">
-            <label className="text-sm font-bold uppercase text-[var(--muted-foreground)] tracking-wider flex flex-col gap-1">
-              <div className="flex items-center">
-                <Link2 className="w-4 h-4 mr-2" /> 동기화할 피그마 팀 페이지 URL
-              </div>
-              <div className="font-normal text-black/80">
-                서비스 이용을 위해{" "}
-                <strong className="text-black/80">팀 아이디</strong>가
-                필요합니다. 아래 형식의 URL을 붙여 넣어주세요.
-              </div>
-            </label>
-            <input
-              type="text"
-              className="w-full max-w-xl border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-[var(--foreground)] bg-[var(--card)] focus:outline-none focus:border-[var(--primary)] font-semibold"
-              placeholder="https://www.figma.com/team/..."
-              value={figmaUrl}
-              onChange={(e) => setFigmaUrl(e.target.value)}
-            />
-          </div>
-
           <div className="space-y-2.5">
             <label className="text-sm font-bold text-[var(--muted-foreground)]">
-              요청할 API 권한 범위 (Scopes)
+              필수 API 권한 범위 (Scopes){" "}
+              <button
+                className="ml-1 bg-[var(--foreground)]/70 hover:bg-[var(--foreground)]
+                  text-[var(--background)] px-3 py-1 text-[11px] rounded-xl cursor-pointer transition-colors"
+                onClick={() => {
+                  setShow(true);
+                }}
+              >
+                권한 설정 위치 보기
+              </button>
             </label>
             <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
               {FIGMA_OPTIONS.map((option) => {
-                const isChecked = selectedScopes.includes(option.value);
                 return (
                   <label
                     key={option.value}
-                    className="flex items-center space-x-3 p-3 rounded-lg border border-[var(--border)]/60 bg-[var(--card)] hover:border-[var(--primary)]/50 cursor-pointer transition-colors"
+                    className="flex pl-7 items-center space-x-3 p-3 rounded-lg border border-[var(--border)]/60 bg-[var(--card)] hover:border-[var(--primary)]/50 cursor-pointer transition-colors"
                   >
-                    <input
-                      type="checkbox"
-                      className="w-4 h-4 rounded text-[var(--primary)] focus:ring-[var(--primary)] border-[var(--border)] bg-[var(--background)]"
-                      checked={isChecked}
-                      onChange={() => onScopeChange(option.value)}
-                    />
                     <div className="flex flex-col space-y-0.5">
                       <span className="text-sm font-bold text-[var(--foreground)]">
                         {option.label}
@@ -121,16 +91,6 @@ export default function FigmaSection({
                 );
               })}
             </div>
-          </div>
-
-          <div className="flex justify-end pt-1">
-            <button
-              onClick={onSave}
-              className="flex items-center space-x-1.5 bg-[var(--foreground)] text-[var(--background)] font-bold px-4 py-2.5 rounded-lg text-xs hover:opacity-90 transition-opacity shadow-sm"
-            >
-              <RefreshCw className="w-3.5 h-3.5" />
-              <span>변경된 설정으로 권한 갱신 요청</span>
-            </button>
           </div>
         </div>
       ) : (

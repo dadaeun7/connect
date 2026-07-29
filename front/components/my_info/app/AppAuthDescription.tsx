@@ -2,6 +2,8 @@
 
 import { BadgeAlert } from "lucide-react";
 import { RedirectConfig } from "./AppConnectTab";
+import { useState } from "react";
+import { ImageModal } from "@/components/share/ImageModal";
 
 export default function AppIntegrationSet({
   redirectUrl,
@@ -12,6 +14,15 @@ export default function AppIntegrationSet({
   activeTab: string;
   app: RedirectConfig;
 }>) {
+  const RedirectDescription: Record<string, string> = {
+    GITHUB: "/github_redirect.png",
+    FIGMA: "/figma_redirect.png",
+    NOTION: "/notion_redirect.png",
+    SLACK: "/slack_redirect.png",
+  };
+
+  const [showImage, setShowImage] = useState(false);
+
   return (
     <div className="pt-2">
       <div className="flex items-center gap-2 mb-2">
@@ -34,7 +45,10 @@ export default function AppIntegrationSet({
             </span>
           </div>
 
-          <button className="px-5 py-2 bg-[var(--primary)] text-[var(--primary-foreground)] font-black rounded-lg text-[11px] shadow-sm hover:opacity-90 transition-opacity uppercase cursor-pointer">
+          <button
+            onClick={() => setShowImage(true)}
+            className="px-5 py-2 bg-[var(--primary)] text-[var(--primary-foreground)] font-black rounded-lg text-[11px] shadow-sm hover:opacity-90 transition-opacity uppercase cursor-pointer"
+          >
             위치 확인
           </button>
         </div>
@@ -76,6 +90,14 @@ export default function AppIntegrationSet({
           </p>
         </div>
       </div>
+
+      {showImage && (
+        <ImageModal
+          src={RedirectDescription[activeTab.toUpperCase()]}
+          alt={RedirectDescription[activeTab.toUpperCase()]}
+          onClose={() => setShowImage(false)}
+        />
+      )}
     </div>
   );
 }

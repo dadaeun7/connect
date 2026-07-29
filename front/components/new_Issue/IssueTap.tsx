@@ -1,8 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
+import { MenuKey } from "./MainNewIssue";
 
-export default function IssueTap({ menu }: { menu: string[] }) {
+export default function IssueTap({
+  menu,
+  setCurStateMenu,
+}: Readonly<{
+  menu: string[];
+  setCurStateMenu: Dispatch<SetStateAction<MenuKey>>;
+}>) {
   const [activeTab, setActiveTab] = useState("전체");
 
   return (
@@ -10,7 +17,10 @@ export default function IssueTap({ menu }: { menu: string[] }) {
       {menu.map((tab) => (
         <button
           key={tab}
-          onClick={() => setActiveTab(tab)}
+          onClick={() => {
+            setActiveTab(tab);
+            setCurStateMenu(tab as MenuKey);
+          }}
           className={`pb-3 text-sm font-bold tracking-wider transition-all relative uppercase ${
             activeTab === tab
               ? "text-[var(--primary)] font-black"

@@ -44,14 +44,12 @@ public class ExternalUserGetAuth {
         if(map.get("email") == null || map.get("sub") == null){
             return Mono.error(new JwtDecodedException("필수 정보가 누락되어있습니다. (email or sub)"));
         }
-
-        Users users = new Users();
-        users.setEmail(map.get("email").toString());
-        users.setUuid(map.get("sub").toString());
-        users.setIsActive(EntityFieldStandardType.USER_ACTIVE);
-        users.setJoinType(type);
-
-        return usersRepository.save(users).then();
+        
+        return usersRepository.insertIgnoreOnConflict(
+            map.get("sub").toString(),
+            map.get("email").toString(),
+            type.toString(),
+            EntityFieldStandardType.USER_ACTIVE).then();
     }
 
     private Mono<Map<String, String>> returnAccessToken(String email, String accessToken, String refreshToken){

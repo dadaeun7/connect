@@ -23,8 +23,9 @@ export default function GeneralTab() {
             프로젝트 이름
           </label>
           <input
-            className="mt-2 w-full border border-[var(--border)] rounded-lg px-4 py-3 text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--primary)] font-semibold transition-colors"
+            className="mt-2 w-full border border-[var(--border)] rounded-lg px-4 py-3 text-sm text-[var(--foreground)] focus:outline-none font-semibold transition-colors"
             defaultValue={currentProject?.name}
+            readOnly
           />
         </div>
       </div>

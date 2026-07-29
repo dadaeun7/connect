@@ -3,66 +3,10 @@
 import { ArrowRight, Zap, GitBranch, LayoutGrid } from "lucide-react";
 import Link from "next/link";
 import LoginStateToggle from "./LoginStateToggle";
-import { useState, useEffect, useRef, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import GithubIcon from "../share/svg_icon/GithubIcon";
-import NotionIcon from "../share/svg_icon/NotionIcon";
-import FigmaIcon from "../share/svg_icon/FigmaIcon";
-import SlackIcon from "../share/svg_icon/SlackIcon";
 import ServiceDashboard from "./ServiceDashboard";
-
-// ─── 서비스 연결 플로우 인터랙티브 컴포넌트 ────────────────────────────────────
-const SERVICE_NODES = [
-  {
-    id: "github",
-    label: "GitHub",
-    color: "var(--github-text)",
-    bg: "var(--github-bg)",
-    border: "var(--github-border)",
-    icon: <GithubIcon />,
-    eventIcon: GithubIcon,
-    events: ["PR merged", "Issue closed", "Commit pushed"],
-  },
-  {
-    id: "figma",
-    label: "Figma",
-    color: "var(--figma-text)",
-    bg: "var(--figma-bg)",
-    border: "var(--figma-border)",
-    icon: <FigmaIcon />,
-    eventIcon: FigmaIcon,
-    events: ["Frame updated", "Comment added", "Design exported"],
-  },
-  {
-    id: "notion",
-    label: "Notion",
-    color: "var(--notion-text)",
-    bg: "var(--notion-bg)",
-    border: "var(--notion-border)",
-    icon: <NotionIcon />,
-    eventIcon: NotionIcon,
-    events: ["Page created", "Doc updated", "Task checked"],
-  },
-  {
-    id: "slack",
-    label: "Slack",
-    color: "var(--slack-text)",
-    bg: "var(--slack-bg)",
-    border: "var(--slack-border)",
-    icon: <SlackIcon />,
-    eventIcon: SlackIcon,
-    events: ["Message sent", "Channel alert", "Webhook triggered"],
-  },
-];
-
-const dateFormat = () => {
-  const now = new Date();
-  const hours = now.getHours();
-  const minutes = now.getMinutes();
-  const seconds = now.getSeconds();
-
-  return `${hours}시 ${minutes}분 ${seconds}초`;
-};
+import { useUserInfoStore } from "@/app/store/useUserInfoStore";
 
 // ─── 피처 카드 ────────────────────────────────────────────────────────────────
 const FEATURES = [
@@ -70,7 +14,7 @@ const FEATURES = [
     icon: <Zap size={18} />,
     label: "Realtime sync",
     title: "하나의 태스크로 인덱싱",
-    desc: "Webhook 연동으로 각 서비스 이벤트를 실시간 수집 후, 단일 태스크 노드로 통합합니다.",
+    desc: "Webhook 으로 각 서비스 이벤트를 실시간 수집 후, 관련 이슈에 통합 합니다.",
     accent: "var(--task-amber)",
     accentBg: "var(--task-amber-bg)",
   },
@@ -78,7 +22,7 @@ const FEATURES = [
     icon: <GitBranch size={18} />,
     label: "Tree data model",
     title: "트리 구조 데이터 모델",
-    desc: "마일스톤 → 이슈 → 커밋/코멘트로 이어지는 계층 구조로 협업 맥락을 보존합니다.",
+    desc: "프로젝트 → 이슈 → 활동내역을 이슈로 그룹지어 확인합니다.",
     accent: "var(--task-violet)",
     accentBg: "var(--task-violet-bg)",
   },
@@ -86,13 +30,13 @@ const FEATURES = [
     icon: <LayoutGrid size={18} />,
     label: "Borderless workflow",
     title: "경계 없는 작업 흐름",
-    desc: "기획자·디자이너·개발자가 각자의 툴을 유지하면서도 하나의 타임라인 안에서 소통합니다.",
+    desc: "기획자·디자이너·개발자가 하나의 타임라인으로 작업 흐름을 확인합니다.",
     accent: "var(--task-teal)",
     accentBg: "var(--task-teal-bg)",
   },
 ];
 
-const items = ["Slack 대화", "Figma 작업", "Notion 기획", "GitHub 커밋"];
+const items = ["Slack 대화", "Figma 작업", "Notion DB", "GitHub 커밋"];
 
 // ─── 통합 서비스 배지 ─────────────────────────────────────────────────────────
 interface MainPageProps {
@@ -101,7 +45,6 @@ interface MainPageProps {
 
 export default function MainPage({ isLoggedIn }: MainPageProps) {
   const [index, setIndex] = useState(0);
-
   useEffect(() => {
     const timer = setInterval(() => {
       setIndex((prevIndex) => (prevIndex + 1) % items.length);
@@ -116,26 +59,7 @@ export default function MainPage({ isLoggedIn }: MainPageProps) {
         <div className="flex justify-start">
           <img src="/logo.png" className="w-7 h-7 object-contain" alt="logo" />
         </div>
-        <div className="flex gap-16 text-[11px] font-bold uppercase tracking-widest text-[var(--muted-foreground)]">
-          <a
-            href="#"
-            className="hover:text-[var(--foreground)] transition-colors"
-          >
-            작업 흐름
-          </a>
-          <a
-            href="#"
-            className="hover:text-[var(--foreground)] transition-colors"
-          >
-            통합 목록
-          </a>
-          <a
-            href="#"
-            className="hover:text-[var(--foreground)] transition-colors"
-          >
-            요금제
-          </a>
-        </div>
+        <div className="flex gap-16 text-[11px] font-bold uppercase tracking-widest text-[var(--muted-foreground)]"></div>
         <div className="flex justify-end">
           <Suspense
             fallback={<div className="p-4 bg-gray-100 animate-pulse">...</div>}
@@ -175,12 +99,14 @@ export default function MainPage({ isLoggedIn }: MainPageProps) {
           </div>
           {/*데이터 연결하기 및 github 가기 */}
           <div className="flex gap-3 mt-8">
-            <button
-              className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold text-[var(--primary-foreground)] transition-all hover:opacity-90 hover:scale-[1.02]"
-              style={{ background: "var(--foreground)" }}
-            >
-              데이터 연결하기 <ArrowRight size={15} />
-            </button>
+            <Link href="/project">
+              <button
+                className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold text-[var(--primary-foreground)] transition-all hover:opacity-90 hover:scale-[1.02]"
+                style={{ background: "var(--foreground)" }}
+              >
+                데이터 연결하기 <ArrowRight size={15} />
+              </button>
+            </Link>
             <Link href="https://github.com/dadaeun7/connect">
               <button className="px-6 py-3 rounded-xl text-sm font-bold border border-[var(--border)] bg-[var(--card)] text-[var(--foreground)] hover:bg-[var(--muted)] transition-colors">
                 GitHub 보러가기
@@ -190,7 +116,7 @@ export default function MainPage({ isLoggedIn }: MainPageProps) {
         </section>
 
         {/* Features */}
-        <section className="px-8 py-10 max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+        <section className="px-8 py-10 max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-3">
           {FEATURES.map((f, i) => (
             <div
               key={i}
@@ -223,10 +149,10 @@ export default function MainPage({ isLoggedIn }: MainPageProps) {
               <span className="text-[10px] font-black uppercase tracking-widest text-[var(--muted-foreground)] relative z-10">
                 {f.label}
               </span>
-              <h3 className="text-sm font-bold mt-1.5 mb-2.5 text-[var(--foreground)] relative z-10">
+              <h3 className="text-s font-bold mt-1.5 mb-2.5 text-[var(--foreground)] relative z-10">
                 {f.title}
               </h3>
-              <p className="text-sm text-[var(--muted-foreground)] leading-relaxed font-medium relative z-10">
+              <p className="text-s text-[var(--muted-foreground)] leading-relaxed font-medium relative z-10">
                 {f.desc}
               </p>
             </div>

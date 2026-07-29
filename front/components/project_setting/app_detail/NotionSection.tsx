@@ -1,4 +1,5 @@
-import { ArrowRight, RefreshCw } from "lucide-react";
+import { RefreshCw } from "lucide-react";
+import ConnectBtn from "./ConnectBtn";
 
 interface NotionSectionProps {
   app: any;
@@ -42,12 +43,7 @@ export default function NotionSection({ app, onSave }: NotionSectionProps) {
             </p>
           </div>
         </div>
-        {!isConnected && (
-          <button className="flex items-center space-x-1.5 bg-[var(--primary)] text-[var(--primary-foreground)] font-black px-4 py-2 rounded-lg text-xs shadow-sm hover:opacity-90 transition-opacity">
-            <span>연동하기</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
-        )}
+        {!isConnected && <ConnectBtn />}
       </div>
 
       {/* 바디 설정 */}
@@ -61,7 +57,7 @@ export default function NotionSection({ app, onSave }: NotionSectionProps) {
               <strong>[노션 권한 및 페이지 재설정]</strong> 버튼을 통해 노션
               권한 창에서 직접 제어해 주셔야 합니다.
             </p>
-            <div className="p-3 text-[var(--foreground)]/80 bg-[var(--card)] rounded-lg border border-[var(--border)]/60 space-y-1">
+            <div className="p-3 pl-7 text-[var(--foreground)]/80 bg-[var(--card)] rounded-lg border border-[var(--border)]/60 space-y-1">
               <div className="flex items-center text-[var(--foreground)] font-bold mb-1">
                 📌 권한 변경 방법
               </div>

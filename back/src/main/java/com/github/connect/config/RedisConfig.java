@@ -1,7 +1,12 @@
 package com.github.connect.config;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.connect.dto.internal.AppConnecInfoDto;
 import com.github.connect.dto.internal.AppTokenCacheDto;
+import com.github.connect.dto.internal.SlackHookInfoDto;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -21,6 +26,7 @@ import tools.jackson.databind.jsontype.PolymorphicTypeValidator;
 
 @Configuration
 class RedisConfig {
+
 
     @Bean
     public ReactiveRedisConnectionFactory reactiveRedisConnectionFactory(
@@ -56,6 +62,7 @@ class RedisConfig {
         PolymorphicTypeValidator ptv = BasicPolymorphicTypeValidator.builder()
                 .allowIfSubType(AppTokenCacheDto.class)
                 .allowIfSubType(AppConnecInfoDto.class)
+                .allowIfSubType(SlackHookInfoDto.class)
                 .build();
 
         /* https://docs.spring.io/spring-data/redis/reference/api/java/org/springframework/data/redis/serializer/GenericJacksonJsonRedisSerializer.html#builder(java.util.function.Supplier)
@@ -74,5 +81,16 @@ class RedisConfig {
                 .build();
 
         return new ReactiveRedisTemplate<>(redisConnectionFactory, context);
+    }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        objectMapper.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
+        objectMapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL);
+        return objectMapper;
     }
 }

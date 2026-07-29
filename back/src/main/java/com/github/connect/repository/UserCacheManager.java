@@ -1,5 +1,7 @@
 package com.github.connect.repository;
 
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.springframework.stereotype.Component;
@@ -13,7 +15,6 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class UserCacheManager {
  
-    
     private final UsersRepository usersRepository;
     private final AsyncCache<String, Long> userEmailToIdsCache;
     private final AsyncCache<Long, String> userIdToEmailCache;
@@ -40,7 +41,7 @@ public class UserCacheManager {
             userIdToEmailCache.put(userId, CompletableFuture.completedFuture(userEmail))
         );
     }
-
+    
     public Mono<Void> saveCacheUserId(Long userId, String email){
         return Mono.fromRunnable(()-> userEmailToIdsCache.put(email, CompletableFuture.completedFuture(userId)));
     }
