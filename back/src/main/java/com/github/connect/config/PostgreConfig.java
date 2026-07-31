@@ -1,5 +1,7 @@
 package com.github.connect.config;
 
+import io.r2dbc.pool.ConnectionPool;
+import io.r2dbc.pool.ConnectionPoolConfiguration;
 import io.r2dbc.postgresql.PostgresqlConnectionConfiguration;
 import io.r2dbc.postgresql.PostgresqlConnectionFactory;
 import io.r2dbc.spi.ConnectionFactory;
@@ -13,6 +15,7 @@ import org.springframework.data.r2dbc.config.AbstractR2dbcConfiguration;
 import org.springframework.data.r2dbc.convert.R2dbcCustomConversions;
 import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -53,11 +56,20 @@ public class PostgreConfig extends AbstractR2dbcConfiguration {
         return new PostgresqlConnectionFactory(config);
     }
 
-    // 2. 부팅 에러를 내던 추상 메서드를 상단 빈과 완벽히 동치 처리
     @Override
     @Bean
     public ConnectionFactory connectionFactory() {
-        return postgresqlConnectionFactory();
+
+        PostgresqlConnectionFactory baseFactory = postgresqlConnectionFactory();
+        
+        ConnectionPoolConfiguration poolConfig = ConnectionPoolConfiguration.builder(baseFactory)
+            .initialSize(10) // 초기 생성 커넥션 수
+            .maxSize(30) // 최대 커넥션 수
+            .maxAcquireTime(Duration.ofSeconds(3)) // 풀에서 커넥션 획득 대기 시간
+            .maxIdleTime(Duration.ofMinutes(5)) // 미사용 커넥션 유지 시간
+            .build();
+            
+        return new ConnectionPool(poolConfig);
     }
 
     // 3. 내장 컨버터 풀에 LocalDateTime ↔ OffsetDateTime 변환기 안전하게 주입

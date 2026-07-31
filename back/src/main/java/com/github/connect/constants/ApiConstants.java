@@ -4,8 +4,8 @@ public class ApiConstants {
 
     private ApiConstants() {}
 
-    public static final String FRONT = "https://connect.daeun-tech.site";
-    public static final String BACK = "https://api-cn.daeun-tech.site";
+    public static final String FRONT = "http://localhost:3000";
+    public static final String BACK = "http://localhost:8082";
     
     // ******************** auth 
     public static final String LOGIN_AUTH_BASE = "/auth";

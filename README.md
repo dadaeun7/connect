@@ -2,7 +2,8 @@
 
 ## 프로젝트 개요
 
-본 프로젝트는 다양한 외부 B2B SaaS(Slack, GitHub, Figma, Notion 등)의 데이터를 통합하여 이슈 매핑 및 프로젝트 액티비티 타임라인을 제공하는 서비스입니다.
+본 프로젝트는 다양한 외부 B2B SaaS(Slack, GitHub, Figma, Notion 등)의 데이터를 통합하여 <br/>
+이슈 매핑 및 프로젝트 액티비티 타임라인을 제공하는 서비스입니다.<br/>
 아래 서비스에 방문해보세요!
 
 [![Live Demo](https://img.shields.io/badge/Live_Demo-connect.daeun--tech.site-4F46E5?style=for-the-badge&logo=googlechrome&logoColor=white)](https://connect.daeun-tech.site/)

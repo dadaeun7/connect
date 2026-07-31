@@ -21,7 +21,6 @@ export async function middleware(request: NextRequest) {
       } catch {
         const response = NextResponse.next();
         response.cookies.set("accessToken", "", {
-          domain: ".daeun-tech.site",
           path: "/",
           maxAge: 0,
         });
@@ -42,8 +41,6 @@ export async function middleware(request: NextRequest) {
 
       const cookieOptions = {
         path: "/",
-        domain: ".daeun-tech.site", // 백엔드/인증 도메인과 맞춰줌 (로컬 테스트 시에는 제거하거나 환경변수 처리)
-        sameSite: "lax" as const,
         httpOnly: false, // 클라이언트(React Component)에서 읽어야 한다면 false, 서버/API에서만 읽는다면 true
       };
 
@@ -100,7 +97,6 @@ export async function middleware(request: NextRequest) {
               new URL("/auth/login", request.url),
             );
             loginResponse.cookies.set("accessToken", "", {
-              domain: ".daeun-tech.site",
               path: "/",
               maxAge: 0,
             });
@@ -140,7 +136,6 @@ export async function middleware(request: NextRequest) {
           );
 
           loginResponse.cookies.set("accessToken", "", {
-            domain: ".daeun-tech.site",
             path: "/",
             maxAge: 0,
           });

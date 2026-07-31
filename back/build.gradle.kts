@@ -18,6 +18,7 @@ repositories {
 }
 
 dependencies {
+	implementation("io.r2dbc:r2dbc-pool")
 	implementation("org.springframework.boot:spring-boot-starter-cache")
 	implementation("com.github.ben-manes.caffeine:caffeine")
 	implementation("com.auth0:java-jwt:4.4.0")

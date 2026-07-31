@@ -1,7 +1,7 @@
 export const BASE = "/u";
-export const BACKEND = "http://cn-backend:8080";
-export const backend = "https://api-cn.daeun-tech.site";
-export const keycloak = "https://auth.daeun-tech.site";
+export const BACKEND = "http://localhost:8082";
+export const backend = "http://localhost:8082";
+export const keycloak = "http://localhost:8079";
 
 export const LOGIN_COMPANY = BASE + "/login";
 export const LOGIN_GITHUB = BASE + "/github";

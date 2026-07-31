@@ -49,9 +49,7 @@ public class UserController {
     private ResponseCookie deleteCookie(){
         return ResponseCookie.from("accessToken","")
             .httpOnly(true)
-            .secure(true)
-            .sameSite("None")
-            .domain(".daeun-tech.site")
+            .secure(false)
             .path("/")
             .maxAge(0)
             .build();

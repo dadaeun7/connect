@@ -39,7 +39,10 @@ public class SecurityConfig {
                 })
             )
             .authorizeExchange(auth -> auth
-                .pathMatchers( "/auth/**", "/", ApiConstants.REFRESH_TOKEN, ApiConstants.APP_CONNECT+"/**","/webhooks/**").permitAll()
+                .pathMatchers( 
+                    "/auth/**", 
+                    "/",  ApiConstants.ISSUE_VIEW_LIST,
+                ApiConstants.REFRESH_TOKEN, ApiConstants.APP_CONNECT+"/**","/webhooks/**").permitAll()
                 .anyExchange().authenticated());
 
         
