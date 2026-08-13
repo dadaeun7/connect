@@ -3,6 +3,7 @@ package com.github.connect.controller;
 import java.net.URI;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseCookie;
@@ -36,6 +37,15 @@ public class UserAuthController {
     private final CompanyUserGetAuthService companyUserGetAuthService;
     private final UserRefreshToAccessService userRefreshToAccessService;
     private final ExternalUserGetAuth externalUserGetAuth;
+
+    @Value("${app.cookie.secure}")
+    private boolean cookieSecure;
+
+    @Value("${app.cookie.same-site}")
+    private String cookieSameSite;
+
+    @Value("${app.cookie.domain:}")
+    private String cookieDomain;
 
     @PostMapping(ApiConstants.LOGIN_COMPANY)
     public Mono<ResponseEntity<Map<String, String>>> getKeycloakGetAuth(@RequestBody CompanyUserGetAuthReq req){
@@ -90,11 +100,21 @@ public class UserAuthController {
     }
 
     private ResponseCookie setCookie(String accessToken){
-        return ResponseCookie.from("accessToken", accessToken)
+
+        ResponseCookie.ResponseCookieBuilder builder = ResponseCookie.from("accessToken", accessToken)
             .httpOnly(true)
-            .secure(false)
+            .secure(cookieSecure)
             .path("/")
-            .maxAge(3600)
-            .build();
+            .maxAge(3600);
+
+        if(cookieSameSite != null && !cookieSameSite.isBlank()){
+            builder.sameSite(cookieSameSite);
+        }
+
+        if(cookieDomain != null && !cookieDomain.isBlank()){
+            builder.domain(cookieDomain);
+        }
+
+        return builder.build();
     }
 }

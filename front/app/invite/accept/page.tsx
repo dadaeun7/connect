@@ -18,9 +18,6 @@ function InviteAcceptContent() {
     if (token) {
       const result = token.split(":");
 
-      console.log("result[0]:", result[0]);
-      console.log("result[1]:", result[1]);
-
       if (result[1] !== userInfo.email) {
         router.push("/project");
       }
@@ -29,9 +26,6 @@ function InviteAcceptContent() {
     }
     if (projectId) {
       const result = projectId.split(":");
-
-      console.log("result[0]:", result[0]);
-      console.log("result[1]:", result[1]);
 
       if (result[1] !== userInfo.email) {
         router.push("/project");

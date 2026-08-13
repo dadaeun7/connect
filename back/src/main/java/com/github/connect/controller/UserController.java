@@ -1,5 +1,6 @@
 package com.github.connect.controller;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,6 +25,15 @@ public class UserController {
     
     private final UsersService usersService;
 
+        @Value("${app.cookie.secure}")
+    private boolean cookieSecure;
+
+    @Value("${app.cookie.same-site}")
+    private String cookieSameSite;
+
+    @Value("${app.cookie.domain:}")
+    private String cookieDomain;
+
     @GetMapping(ApiConstants.GET_INFO)
     public Mono<UserInfoResponse> getUserInfo(@LoginUser String email){
         return usersService.getUserInfo(email);
@@ -47,11 +57,20 @@ public class UserController {
     }
 
     private ResponseCookie deleteCookie(){
-        return ResponseCookie.from("accessToken","")
+        ResponseCookie.ResponseCookieBuilder builder = ResponseCookie.from("accessToken", "")
             .httpOnly(true)
-            .secure(false)
+            .secure(cookieSecure)
             .path("/")
-            .maxAge(0)
-            .build();
+            .maxAge(0);
+
+        if(cookieSameSite != null && !cookieSameSite.isBlank()){
+            builder.sameSite(cookieSameSite);
+        }
+
+        if(cookieDomain != null && !cookieDomain.isBlank()){
+            builder.domain(cookieDomain);
+        }
+
+        return builder.build();
     }
 }
