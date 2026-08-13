@@ -160,8 +160,8 @@ public class InviteProjectService {
                 helper.setSubject("[Connect] 프로젝트 초대 메일이 도착했습니다.");
 
                 String inviteLink = (token != null) 
-                        ? String.format(ApiConstants.FRONT+"/invite/accept?token=%s", token)
-                        : String.format(ApiConstants.FRONT+"/invite/accept?projectId=%s", projectId);
+                        ? String.format(ApiConstants.FRONT+"/invite/accept?token=%s", token+":"+toEmail)
+                        : String.format(ApiConstants.FRONT+"/invite/accept?projectId=%s", projectId+":"+toEmail);
 
                 String htmlContent = String.format(
                     "<div style='background-color: #fafafa; padding: 40px 20px; font-family: \"Pretendard\", \"Google Sans\", \"Gothic A1\", sans-serif; color: #111318; line-height: 1.6;'>" +

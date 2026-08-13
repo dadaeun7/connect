@@ -44,8 +44,8 @@ public interface UsersRepository extends ReactiveCrudRepository<Users, Long>{
     Mono<String> findByUserEmail(Long userId);
 
     @Query("SELECT u.uuid, u.id, ac.app_pk_id FROM \"Users\" u "+
-        "JOIN \"App_Connect\" ac ON u.id = ac.user_id "+
-        "WHERE u.email = :email AND ac.type = 'SLACK'")
+        "LEFT JOIN \"App_Connect\" ac ON u.id = ac.user_id AND ac.type = 'SLACK' "+
+        "WHERE u.email = :email")
     Mono<UserUuidAndIdDto> findUuidAndUserIdByEmail(String email);
 
     @Query("SELECT u.name, u.email, u.affiliation, u.join_type FROM \"Users\" u WHERE u.email = :email")

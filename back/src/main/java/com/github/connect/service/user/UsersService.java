@@ -55,8 +55,9 @@ public class UsersService {
             .flatMap(info -> 
                 keycloakAuthService.getAccessTokenKeycloak()
                     .flatMap(dto -> {
-                        // 1. Keycloak 회원탈퇴 Mono
-                        Mono<Void> keycloakWithdrawMono = keycloakAuthService.keycloakWithdraw(dto.getAccessToken(), info.uuid());
+
+                         Mono<Void> keycloakWithdrawMono = (info.uuid() != null) ? keycloakAuthService.keycloakWithdraw(dto.getAccessToken(), info.uuid())
+                                    : Mono.empty();
 
                         // 2. Redis 앱 토큰 삭제 Mono들의 모음 (Flux -> Mono 변환)
                         Mono<Void> redisAppDeletes = Flux.fromIterable(appList)
@@ -64,7 +65,8 @@ public class UsersService {
                             .then();
 
                         // 3. Slack Hook 정보 삭제 Mono
-                        Mono<Void> slackDeleteMono = slackHookInfoRedisRepository.redisDeleteValue(info.appPkId());
+                        Mono<Void> slackDeleteMono =  (info.appPkId() != null) ? slackHookInfoRedisRepository.redisDeleteValue(info.appPkId())
+                        :  Mono.empty();
 
                         // Mono.when을 사용해 모든 비동기 작업을 병렬/동시에 실행하고 전부 완료될 때까지 기다림
                         return Mono.when(keycloakWithdrawMono, redisAppDeletes, slackDeleteMono);

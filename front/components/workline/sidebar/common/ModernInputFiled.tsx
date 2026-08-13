@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "lucide-react";
 import { ProjectSimpleDto } from "@/app/store/useProjectStore";
-import { Tooltip } from "@/components/share/ToolTip";
 
 interface FieldProps {
   label: string;
@@ -25,6 +24,9 @@ export default function ModernInputField({
   onSelectProject,
 }: Readonly<FieldProps>) {
   const [isOpen, setIsOpen] = useState(false);
+  const tomorrowStr = new Date(Date.now() + 86400000).toLocaleDateString(
+    "sv-SE",
+  );
 
   return (
     <div className="relative flex flex-col w-full">
@@ -39,6 +41,7 @@ export default function ModernInputField({
         <input
           type={type}
           id={id}
+          min={type === "date" ? tomorrowStr : ""}
           disabled={id === "project"}
           placeholder={placeholder}
           value={value}

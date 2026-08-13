@@ -76,12 +76,15 @@ export default function InviteFormSection({
       });
 
       if (!result.ok) {
-        // 💡 백엔드 에러 메시지를 안전하게 가져오기 위해 text나 json 파싱을 고려하면 좋습니다.
-        const errorText = (await result.statusText) || "";
+        const errorData = await result.json().catch(() => null);
+        const errorMessage =
+          errorData?.body?.detail || "요청 처리에 실패했습니다.";
+
         setAlertConfig((props) => ({
           ...props,
           isOpen: true,
-          message: errorText || "초대에 실패했습니다.",
+          type: "error",
+          message: errorMessage,
         }));
         return;
       }

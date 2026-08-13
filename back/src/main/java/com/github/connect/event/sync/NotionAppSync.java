@@ -74,25 +74,6 @@ public class NotionAppSync {
             );
     }
 
-    // private Mono<String> fetchDataSourceId(String databaseId, String token) {
-
-    //     log.info("[fetchDataSourceId] Notion API Token: {}", token);
-    //     return defauClient.get()
-    //         .uri("https://api.notion.com/v1/databases/{databaseId}", databaseId)
-    //         .header("Authorization", "Bearer " + token)
-    //         .header("Notion-Version", EntityFieldStandardType.NOTION_API_VERSION)
-    //         .retrieve()
-    //         .bodyToMono(NotionDatabaseResponse.class)
-    //         .flatMap(response -> {
-    //             if (response.getDataSources() != null && !response.getDataSources().isEmpty()) {
-    //                 // 첫 번째 데이터 소스 ID 반환
-    //                 return Mono.just(response.getDataSources().get(0).getId());
-    //             }
-    //             return Mono.error(new IllegalStateException("data_sources 필드가 비어 있습니다."));
-    //         })
-    //         .doOnError(err -> log.error("[Notion API] 데이터베이스 조회 실패: {}", err.getMessage()));
-    // }
-
     // 새 페이지 조회 (데이터베이스 쿼리 API)
     private Mono<List<NotionQueryResponse.NotionPage>> fetchNewNotionPages(String dataSourceId, String token, String since) {
 

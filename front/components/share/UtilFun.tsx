@@ -41,11 +41,8 @@ export const getMonthRange = (viewDate: Date) => {
   const year = viewDate.getFullYear();
   const month = viewDate.getMonth();
 
-  // 해당 월 1일 00:00:00
-  const start = new Date(year, month, 1, 0, 0, 0);
-
-  // 해당 월 마지막 날 23:59:59 (다음 달 0일 = 이번 달 마지막 날)
-  const end = new Date(year, month + 1, 0, 23, 59, 59);
+  const start = new Date(year, month - 1, 1, 0, 0, 0);
+  const end = new Date(year, month + 2, 0, 23, 59, 59);
 
   return {
     startDate: toISOWithOffset(start),

@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import Sidebar from "@/components/share/SideBar";
 import { useAppStore } from "../store/useAppStore";
 import { useIssueStore } from "../store/useIssueStore"; // 💡 이슈 전역 스토어 추가 임포트
+import { ArrowLeft, Menu, X } from "lucide-react";
 
 export default function SuperProjectLayout({
   children,
@@ -93,9 +94,66 @@ export default function SuperProjectLayout({
     setShowMenu(currentProject?.myRole === "ADMIN");
   }, [currentProject?.id, currentProject?.myRole, fetchIssues]);
 
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   return (
-    <section className="flex h-screen overflow-hidden">
-      <Sidebar showMenu={showMenu} />
+    <section className="flex flex-col md:flex-row h-screen overflow-hidden">
+      {/* 1. 모바일 전용 헤더 바 (md 미만에서만 표시) */}
+      <header className="flex md:hidden items-center justify-between px-4 py-2 bg-[var(--sidebar)] border-b border-[var(--sidebar-border)] shrink-0 z-30">
+        <div className="flex items-center gap-2">
+          {/* 뒤로가기 버튼 */}
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="p-1.5 rounded-lg text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)] transition-colors"
+            aria-label="뒤로가기"
+          >
+            <ArrowLeft size={18} />
+          </button>
+        </div>
+
+        {/* 햄버거 메뉴 아이콘 */}
+        <button
+          type="button"
+          onClick={() => setIsMobileMenuOpen(true)}
+          className="p-1.5 rounded-lg text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)] transition-colors"
+          aria-label="메뉴 열기"
+        >
+          <Menu size={20} />
+        </button>
+      </header>
+
+      {/* 2. 데스크톱 전용 사이드바 (md 이상에서만 표시) */}
+      <div className="hidden md:block">
+        <Sidebar showMenu={showMenu} />
+      </div>
+
+      {/* 3. 모바일 전용 전체 화면 사이드바 오버레이 (isMobileMenuOpen true일 때 전면 노출) */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-50 bg-[var(--sidebar)] flex flex-col md:hidden animate-in fade-in duration-200">
+          {/* 모바일 닫기 헤더 */}
+          <div className="flex items-center justify-between px-4 py-2 border-b border-[var(--sidebar-border)]">
+            <button
+              type="button"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="p-2 rounded-lg text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)]"
+              aria-label="메뉴 닫기"
+            >
+              <X size={20} />
+            </button>
+          </div>
+
+          {/* 화면 전체를 채우는 사이드바 내용 */}
+          <div
+            className="flex-1 overflow-y-auto"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            <Sidebar showMenu={showMenu} />
+          </div>
+        </div>
+      )}
+
+      {/* 메인 콘텐츠 영역 */}
       <main className="custom-scrollbar flex-1 h-full overflow-y-auto">
         {isLoading ? <ProjectLoading /> : children}
       </main>

@@ -1,5 +1,3 @@
-.env
-
 # USERPROFILE
 %USERPROFILE*
 
@@ -16,3 +14,15 @@ connect-backup1.json
 
 .env
 backBuild.ps1
+
+front/.env.local
+front/.next/*
+front/node_modules/*
+front/next.config.ts
+front/package-lock.json
+
+back/src/main/resources/*
+back/build/*
+back/bin/*
+back/.gradle/*
+back/gradle/*

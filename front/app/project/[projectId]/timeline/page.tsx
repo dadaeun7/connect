@@ -42,13 +42,13 @@ export default function Page() {
     try {
       if (projectId === undefined) return;
 
-      const encodedStart = encodeURIComponent(startDate);
-      const encodedEnd = encodeURIComponent(endDate);
+      const startIso = new Date(startDate).toISOString();
+      const endIso = new Date(endDate).toISOString();
 
       const result = await fetch(
         BACKEND +
           `/issue/month/list?` +
-          `projectId=${projectId}&startDate=${encodedStart}&endDate=${encodedEnd}`,
+          `projectId=${projectId}&startDate=${startIso}&endDate=${endIso}`,
         {
           method: "GET",
           headers: {

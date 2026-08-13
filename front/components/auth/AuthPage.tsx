@@ -104,7 +104,7 @@ export default function AuthPage({
 
       if (jsonBody.loginIn) {
         resPopHandler("success", "로그인 성공했습니다.");
-        router.push("/");
+        window.location.href = "/";
         return;
       }
 

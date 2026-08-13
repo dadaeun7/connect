@@ -66,6 +66,12 @@ public class GlobalExceptionHandler{
     public ResponseEntity<DefaultErrorResponse> handleSQLException(SQLException e){
         return createDefaultErrorResponse(e.getMessage(),500);
     }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<DefaultErrorResponse> handleIllegalState(IllegalStateException e){
+        return createDefaultErrorResponse(e.getMessage(),409);
+    }
+
     private ResponseEntity<DefaultErrorResponse> createDefaultErrorResponse(String message, int statusCode){
         DefaultErrorResponse response = new DefaultErrorResponse(message, statusCode);
         return new ResponseEntity<>(response, response.getStatusCode());

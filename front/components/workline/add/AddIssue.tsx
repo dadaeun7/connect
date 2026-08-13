@@ -137,9 +137,6 @@ export default function AddIssue({
       notionDbId: curNotionDb?.id || null,
       notionDbTitle: curNotionDb?.title || null,
     };
-    console.log("currentStatusId: ", currentStatusId);
-    console.log("currentPriorityId: ", currentPriorityId);
-
     try {
       const response = await fetch("/issue/create", {
         method: "POST",

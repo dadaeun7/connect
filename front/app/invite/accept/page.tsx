@@ -2,25 +2,51 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useUserInfoStore } from "@/app/store/useUserInfoStore";
 
 // 1. 실제 useSearchParams를 사용하는 컴포넌트
 function InviteAcceptContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [statusMessage, setStatusMessage] = useState(
-    "초대 정보를 확인하고 수락 절차를 진행 중입니다...",
-  );
+  const [statusMessage, setStatusMessage] = useState("이동중...");
+  const { userInfo } = useUserInfoStore();
 
   const token = searchParams.get("token");
   const projectId = searchParams.get("projectId");
 
   useEffect(() => {
-    if (token) localStorage.setItem("pending_invite_token", token);
-    if (projectId) localStorage.setItem("pending_invite_projectId", projectId);
+    if (token) {
+      const result = token.split(":");
+
+      console.log("result[0]:", result[0]);
+      console.log("result[1]:", result[1]);
+
+      if (result[1] !== userInfo.email) {
+        router.push("/project");
+      }
+
+      localStorage.setItem("pending_invite_token", result[0]);
+    }
+    if (projectId) {
+      const result = projectId.split(":");
+
+      console.log("result[0]:", result[0]);
+      console.log("result[1]:", result[1]);
+
+      if (result[1] !== userInfo.email) {
+        router.push("/project");
+      }
+      localStorage.setItem("pending_invite_projectId", result[0]);
+    }
+
+    setStatusMessage("초대 내용을 확인중에 있습니다...");
 
     const acceptPayload = {
-      token: token || localStorage.getItem("pending_invite_token"),
-      projectId: projectId || localStorage.getItem("pending_invite_projectId"),
+      token:
+        token?.split(":")[0] || localStorage.getItem("pending_invite_token"),
+      projectId:
+        projectId?.split(":")[0] ||
+        localStorage.getItem("pending_invite_projectId"),
     };
 
     const submitAccept = async () => {
@@ -59,9 +85,6 @@ function InviteAcceptContent() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-6">
       <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-md text-center">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">
-          Project Connection
-        </h2>
         <p className="text-gray-600 font-medium">{statusMessage}</p>
       </div>
     </div>

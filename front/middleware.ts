@@ -151,14 +151,7 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/project/:auth*",
-    "/auth/login",
-    "/auth/signup",
-    "/project",
-    "/refresh",
-    "/invite/accept",
-  ],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 };
 
 export function parseTokenFromSetCookie(
