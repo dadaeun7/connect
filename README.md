@@ -33,7 +33,6 @@
 ![Spring WebFlux](https://img.shields.io/badge/Spring_WebFlux-6DB33F?style=for-the-badge&logo=spring&logoColor=white)
 ![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
-![Apache Kafka](https://img.shields.io/badge/Apache_Kafka-231F20?style=for-the-badge&logo=apachekafka&logoColor=white)
 ![Keycloak](https://img.shields.io/badge/Keycloak-000000?style=for-the-badge&logo=keycloak&logoColor=white)
 
 ### 📊 Codebase Distribution
@@ -89,4 +88,4 @@
   - 다수의 외부 SaaS API 동기 호출 시 발생하는 I/O 병목을 해결하기 위해 **Spring WebFlux(WebClient)** 를 활용한 비동기/논블로킹 요청 처리.
 - **Defensive Parsing & Fault Tolerance**
   - 외부 API 응답 오류, Rate Limit 걸림, Empty Body 반환 시 시스템 전체로 장애가 전파되지 않도록 Exception Handler 및 Guard 로직 적용
-  - Kafka 기반 이벤트 버퍼링을 활용하여 특정 시간대에 트래픽이 생길 수 있는(Github Commit) 부분을 사전 서비스 영향도 최소화 할 수 있도록 설계
+  - Redis의 Push, Poll을 활용하여 특정 시간대에 트래픽이 생길 수 있는(Github Commit) 부분을 사전 서비스 영향도 최소화 할 수 있도록 설계
