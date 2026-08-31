@@ -2,7 +2,8 @@
 
 import { Tooltip } from "@/components/share/ToolTip";
 import { ChevronLeft } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useIssueHistoryLine } from "../../hooks/useIssueHistoryLine";
 
 interface IssueHistoryResponse {
   id: number;
@@ -23,38 +24,11 @@ export default function IssueHistoryLine({
   showHistory,
   setShowHistory,
   issueId,
-}: IssueHistoryTimelineProps) {
+}: Readonly<IssueHistoryTimelineProps>) {
   if (!showHistory) return null;
 
-  const [loading, setLoading] = useState(false);
-  const [historys, setHistorys] = useState<IssueHistoryResponse[]>([]);
-
-  useEffect(() => {
-    const getHistory = async () => {
-      try {
-        setLoading(true);
-
-        const response = await fetch(`/issue/history/list?issueId=${issueId}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setHistorys(data);
-        }
-      } catch (error) {
-        console.error("히스토리 내역 불러오는 중 에러: ", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getHistory();
-  }, [showHistory]);
+  const historyData = useIssueHistoryLine({ showHistory, issueId });
+  const historys = historyData?.historys ?? [];
 
   const renderHistory = () => {
     if (!historys || historys.length === 0) {

@@ -1,57 +1,38 @@
 "use client";
 
-import React, { useState } from "react";
+import { useCreateProject } from "./hooks/useCreateProject";
 
 interface ProjectEmptyStateProps {
   onCreateClick?: (projectName: string) => void;
 }
 
-interface Description {
-  icon: string;
-  title: string;
-  description: string;
-}
+export default function CreatePage({
+  onCreateClick,
+}: Readonly<ProjectEmptyStateProps>) {
+  const { isFormOpen, projectName, setProjectName, handleButtonClick } =
+    useCreateProject({ onCreateClick });
 
-const createCard: Description[] = [
-  {
-    icon: "🔌",
-    title: "프로젝트 생성",
-    description:
-      "하나의 작업 라인을 만들기 위한 프로젝트 이름을 먼저 정해보세요.",
-  },
-  {
-    icon: "🧩",
-    title: "외부 플랫폼 연동",
-    description:
-      "Github, Slack, Figma, Notion 을 연동 후 하위 작업들을 분리하고 관리해보세요",
-  },
-  {
-    icon: "👥",
-    title: "팀원 초대 관리",
-    description:
-      "작업에 필요한 인원을 이메일 초대를 통해 권한을 각각 다르게 부여하여 협업 합니다.",
-  },
-];
-export default function CreatePage({ onCreateClick }: ProjectEmptyStateProps) {
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [projectName, setProjectName] = useState("");
-
-  // 버튼 클릭 시 핸들러
-  const handleButtonClick = () => {
-    if (!isFormOpen) {
-      // 1. 처음 누르면 입력창 열기
-      setIsFormOpen(true);
-    } else {
-      // 2. 입력창이 열린 상태에서 누르면 검증 후 등록 처리
-      if (!projectName.trim()) {
-        alert("프로젝트 이름을 입력해 주세요.");
-        return;
-      }
-      if (onCreateClick) {
-        onCreateClick(projectName.trim());
-      }
-    }
-  };
+  // 기존에 파일 최상단에 선언된 createCard 상수 유지
+  const createCard = [
+    {
+      icon: "🔌",
+      title: "프로젝트 생성",
+      description:
+        "하나의 작업 라인을 만들기 위한 프로젝트 이름을 먼저 정해보세요.",
+    },
+    {
+      icon: "🧩",
+      title: "외부 플랫폼 연동",
+      description:
+        "Github, Slack, Figma, Notion 을 연동 후 하위 작업들을 분리하고 관리해보세요",
+    },
+    {
+      icon: "👥",
+      title: "팀원 초대 관리",
+      description:
+        "작업에 필요한 인원을 이메일 초대를 통해 권한을 각각 다르게 부여하여 협업 합니다.",
+    },
+  ];
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[75vh] w-full max-w-5xl mx-auto px-6 py-12">
@@ -124,6 +105,7 @@ export default function CreatePage({ onCreateClick }: ProjectEmptyStateProps) {
 
         {/*  4. 동적으로 텍스트와 이벤트를 전환하는 메인 버튼 */}
         <button
+          type="button"
           onClick={handleButtonClick}
           className="flex items-center justify-center space-x-2 w-full max-w-[220px] px-6 py-3 bg-gray-900 hover:bg-gray-800 text-white font-medium text-sm rounded-xl shadow-sm transition-all duration-200 group transform active:scale-95"
         >

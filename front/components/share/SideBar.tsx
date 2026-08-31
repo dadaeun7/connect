@@ -143,7 +143,7 @@ export default function Sidebar({ showMenu }: Readonly<{ showMenu: boolean }>) {
   return (
     <aside
       className={`scrollbar-gutter-stable min-h-screen border-r border-[var(--sidebar-border)] bg-[var(--sidebar)] text-[var(--sidebar-foreground)] flex flex-col shrink-0 transition-all duration-300 ${
-        isExpanded ? "w-[220px]" : "w-[58px]"
+        isExpanded ? "md:w-[220px]" : "md:w-[58px]"
       }`}
     >
       {/* 로고 + 테마 */}
@@ -160,7 +160,7 @@ export default function Sidebar({ showMenu }: Readonly<{ showMenu: boolean }>) {
         {isExpanded && <ThemeBtn />}
       </div>
 
-      <div className="pl-5 mt-3">
+      <div className="px-4 mt-3 text-left">
         {userInfo.name !== null ? (
           <>
             <span className="text-[17px] font-bold">{userInfo.name}</span> 님
@@ -175,7 +175,7 @@ export default function Sidebar({ showMenu }: Readonly<{ showMenu: boolean }>) {
         {/**프로젝트 추가 */}
         <div className="relative w-full">
           {/* 토글 트리거 버튼 */}
-          <button
+          <div
             onClick={() => setShowProjects(!showProjects)}
             className={`w-full flex items-center bg-[var(--sidebar-accent)] border border-[var(--sidebar-border)] rounded-xl py-3 cursor-pointer hover:border-[var(--sidebar-primary)]/30 transition-all ${
               isExpanded ? "px-3 justify-between gap-2" : "justify-center px-0"
@@ -203,7 +203,7 @@ export default function Sidebar({ showMenu }: Readonly<{ showMenu: boolean }>) {
                 </span>
               </>
             )}
-          </button>
+          </div>
 
           {/* 토글 드롭다운 목록 */}
           {showProjects && (
@@ -213,6 +213,7 @@ export default function Sidebar({ showMenu }: Readonly<{ showMenu: boolean }>) {
                   .filter((p) => p.id !== currentProject?.id)
                   .map((p) => (
                     <button
+                      type="button"
                       key={p.id}
                       onClick={() => {
                         setCurrentProject(p.id);
@@ -257,6 +258,7 @@ export default function Sidebar({ showMenu }: Readonly<{ showMenu: boolean }>) {
                     />
                     <Tooltip content="프로젝트 추가" placement="top">
                       <button
+                        type="button"
                         onClick={handleCreateProject}
                         className="text-s text-[var(--secondary-foreground)] font-bold cursor-pointer mt-2"
                       >
@@ -265,6 +267,7 @@ export default function Sidebar({ showMenu }: Readonly<{ showMenu: boolean }>) {
                     </Tooltip>
                     <Tooltip content="나가기" placement="top">
                       <button
+                        type="button"
                         onClick={() => setIsAdding(false)}
                         className="text-s text-[var(--secondary-foreground)] cursor-pointer mt-2"
                       >
@@ -297,7 +300,7 @@ export default function Sidebar({ showMenu }: Readonly<{ showMenu: boolean }>) {
             className={`px-3 ${section.show ? "block" : "hidden"}`}
           >
             {isExpanded && (
-              <div className="text-[13px] font-black text-[var(--sidebar-foreground)]/30 mb-4 px-2 tracking-widest uppercase">
+              <div className="text-[13px] font-black text-[var(--sidebar-foreground)]/30 mb-4 px-3 text-left tracking-widest uppercase">
                 {section.title}
               </div>
             )}
@@ -344,7 +347,7 @@ export default function Sidebar({ showMenu }: Readonly<{ showMenu: boolean }>) {
         onClick={logout}
         className="hover:bg-[var(--sidebar-accent)] transition-all m-3 rounded-xl cursor-pointer"
       >
-        <button className="text-[var(--sidebar-foreground)]/60 text-[13px] font-semibold p-2 cursor-pointer">
+        <div className="text-[var(--sidebar-foreground)]/60 text-[13px] font-semibold p-2 cursor-pointer">
           {isExpanded ? (
             <div className="flex items-center">
               <SquareArrowRightExit size={16} />{" "}
@@ -353,11 +356,11 @@ export default function Sidebar({ showMenu }: Readonly<{ showMenu: boolean }>) {
           ) : (
             <SquareArrowRightExit size={16} />
           )}
-        </button>
+        </div>
       </div>
       {/* 접기/펼치기 */}
-      <div className="border-t border-[var(--sidebar-border)]/60 bg-[var(--sidebar)] mb-2">
-        <button
+      <div className="hidden md:block border-t border-[var(--sidebar-border)]/60 bg-[var(--sidebar)] mb-2">
+        <div
           className={`h-12 w-full flex items-center text-[var(--sidebar-foreground)]/30 hover:text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)]/40 transition-all ${
             isExpanded ? "px-5 justify-end" : "justify-center"
           }`}
@@ -365,7 +368,7 @@ export default function Sidebar({ showMenu }: Readonly<{ showMenu: boolean }>) {
           title={isExpanded ? "사이드바 닫기" : "사이드바 열기"}
         >
           {isExpanded ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}
-        </button>
+        </div>
       </div>
     </aside>
   );

@@ -2,14 +2,7 @@
 
 import React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-
-interface TimelineHeaderProps {
-  viewDate: Date;
-  isMobile: boolean;
-  onPrev: () => void;
-  onNext: () => void;
-  goToToday: () => void;
-}
+import { TimelineHeaderProps } from "../types/timeline";
 
 export default function TimelineHeader({
   viewDate,
@@ -17,7 +10,7 @@ export default function TimelineHeader({
   onPrev,
   onNext,
   goToToday,
-}: TimelineHeaderProps) {
+}: Readonly<TimelineHeaderProps>) {
   return (
     <div className="flex justify-between items-center mb-4">
       <div>
@@ -25,7 +18,7 @@ export default function TimelineHeader({
           {viewDate.getFullYear()}년 {viewDate.getMonth() + 1}월
           {isMobile && (
             <span className="text-xs text-[var(--muted-foreground)] ml-2 font-sans font-normal">
-              (7일 보기)
+              (일주일)
             </span>
           )}
         </h2>

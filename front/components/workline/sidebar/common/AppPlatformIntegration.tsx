@@ -11,6 +11,7 @@ import NotionInput from "../inputs/NotionInput";
 import FigmaInput from "../inputs/FigmaInput";
 import GithubInput from "../inputs/GihubInput";
 import { IssueViewResponse } from "@/app/store/useIssueStore";
+import { useAppPlatformIntegration } from "../../hooks/useAppPlatformIntegration";
 
 interface PlatformProps {
   activeIssue?: IssueViewResponse;
@@ -55,27 +56,22 @@ export default function AppPlatformIntegration({
   setCurNotionDb,
   getFigmaState,
 }: Readonly<PlatformProps>) {
-  const [gitRepoShow, setGitRepoShow] = useState(false);
-  const [gitBranchShow, setGitBranchShow] = useState(false);
-  const [notionDbShow, setNotionDbShow] = useState(false);
-
-  // 💡 가이드라인 준수: 값이 아직 할당되지 않은 (신규 등록) 모드 일때만 첫 번째 배열 인덱스로 자동 초기화 지정
-  useEffect(() => {
-    if (githubRepo.length > 0 && !curGitRepo) {
-      const current = githubRepo.find((r) => r.full_name === selectedRepo);
-      if (current) {
-        setCurGitRepo(current);
-        setGitRepoShow(true);
-        setGitBranchShow(true);
-      }
-    }
-  }, [githubRepo]);
-
-  useEffect(() => {
-    if (githubBranch.length > 0 && !curGitBranch) {
-      setCurGitBranch(githubBranch[0]);
-    }
-  }, [curGitBranch, curGitRepo]);
+  const {
+    gitRepoShow,
+    setGitRepoShow,
+    gitBranchShow,
+    setGitBranchShow,
+    notionDbShow,
+    setNotionDbShow,
+  } = useAppPlatformIntegration(
+    githubRepo,
+    curGitRepo,
+    selectedRepo,
+    setCurGitRepo,
+    githubBranch,
+    curGitBranch,
+    setCurGitBranch,
+  );
 
   return (
     <div>

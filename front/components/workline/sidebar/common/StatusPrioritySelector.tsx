@@ -1,22 +1,18 @@
 import React from "react";
-import { PRIORITY_MAP, STATUS_MAP } from "../../type";
-
-interface SelectorProps {
-  currentStatusId: number;
-  setCurrentStatusId: (id: number) => void;
-  currentPriorityId: number;
-  setCurrentPriorityId: (id: number) => void;
-}
-
-export const statusId = [1, 2, 3, 4, 5];
-export const priorityId = [6, 7, 8];
+import {
+  PRIORITY_MAP,
+  priorityId,
+  SelectorProps,
+  STATUS_MAP,
+  statusId,
+} from "../../types/type";
 
 export default function StatusPrioritySelector({
   currentStatusId,
   setCurrentStatusId,
   currentPriorityId,
   setCurrentPriorityId,
-}: SelectorProps) {
+}: Readonly<SelectorProps>) {
   return (
     <div className="space-y-3">
       <div className="grid grid-cols-1 md:grid-cols-5 gap-2">

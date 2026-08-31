@@ -1,46 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMAinIssue } from "./hooks/useMainIssue";
 import IssueList from "./IssueList";
 import IssueSearch from "./IssueSearch";
 import IssueTap from "./IssueTap";
-import { useProjectStore } from "@/app/store/useProjectStore";
-
-const filteredIssues = ["전체", "OPEN", "MERGE"];
-export type MenuKey = "전체" | "OPEN" | "MERGE";
 
 export default function IssueListView() {
-  const [keyword, setKeyword] = useState("");
-  const [already, setAlready] = useState(false);
-  const { currentProject } = useProjectStore();
-  const [curStateMenu, setCurStateMenu] = useState<MenuKey>("전체");
-  const [searchKeyword, setSearchKeyword] = useState<string>("");
-
-  useEffect(() => {
-    const getKeyword = async () => {
-      try {
-        const result = await fetch(
-          `/get/keyword?projectId=${currentProject?.id}`,
-          {
-            method: "GET",
-            credentials: "include",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          },
-        );
-
-        if (!result.ok) throw new Error("get keyword error");
-
-        const data = await result.text();
-        setKeyword(data);
-        setAlready(true);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    getKeyword();
-  }, []);
+  const {
+    filteredIssues,
+    keyword,
+    setKeyword,
+    already,
+    setAlready,
+    curStateMenu,
+    setCurStateMenu,
+    searchKeyword,
+    setSearchKeyword,
+  } = useMAinIssue();
 
   return (
     <div className="flex-1 bg-[var(--background)] min-h-screen p-8 text-[var(--foreground)] selection:bg-[var(--primary)]/20 selection:text-[var(--primary)] animate-in fade-in duration-300">

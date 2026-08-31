@@ -1,27 +1,11 @@
 "use client";
 
 import { CopyMinus, GitPullRequestArrow, X } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
 import { offsetTimePlusNine } from "../share/UtilFun";
 import { Tooltip } from "../share/ToolTip";
 import CstAlert from "../share/CstAlert";
-import { useProjectStore } from "@/app/store/useProjectStore";
-import { MenuKey } from "./MainNewIssue";
-
-interface NewIssue {
-  id: number;
-  matchKeyword: string;
-  status: string;
-  createdAt: string;
-  originalMessage: string;
-  slackUrl: string;
-  detectedMessage: string;
-}
-
-interface IssueAllList {
-  id: number;
-  title: string;
-}
+import { useIssueList } from "./hooks/useIssueList";
+import { MenuKey } from "./types/issueType";
 
 const STATE_COLOR_MAP: Record<string, string> = {
   OPEN: "px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide border bg-[var(--status-done)]/10 text-[var(--status-done)] border-[var(--status-done)]/10",
@@ -40,166 +24,32 @@ export default function IssueList({
   curStateMenu: MenuKey;
   searchKeyword: string;
 }>) {
-  const { currentProject } = useProjectStore();
-
-  const [newIssue, setNewIssue] = useState<NewIssue[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [issueAllList, setIssueAllList] = useState<IssueAllList[]>([]);
-
-  const [curIssueId, setCurIssueId] = useState(0);
-  const [curNewIssueId, setCurNewIssueId] = useState(0);
+  const {
+    currentProject,
+    filterNewIssue,
+    issueAllList,
+    isModalOpen,
+    curIssueId,
+    getIssueList,
+    setIsModalOpen,
+    setCurNewIssueId,
+    setCurIssueId,
+    alertConfig,
+    deleteKeyword,
+    mergeIssue,
+  } = useIssueList(searchKeyword, curStateMenu);
 
   const handleClose = () => {
     setIsModalOpen(false);
   };
 
-  const [alertConfig, setAlertConfig] = useState({
-    isOpen: false,
-    message: "에러가 발생했습니다.",
-    type: "error" as "success" | "error" | "info",
-    onClose: () => {
-      setAlertConfig((props) => ({ ...props, isOpen: false }));
-    },
-  });
-
-  const filterNewIssue = useMemo(() => {
-    const trimmedKeyword = searchKeyword.trim().toLowerCase();
-
-    let result = newIssue.filter((ni) => {
-      if (!trimmedKeyword) return true;
-      const isOriginMessage = ni.originalMessage
-        .toLowerCase()
-        .includes(trimmedKeyword);
-      const isDetectedMessage = ni.detectedMessage
-        .toLowerCase()
-        .includes(trimmedKeyword);
-
-      return Boolean(isOriginMessage || isDetectedMessage);
-    });
-
-    if (curStateMenu !== "전체") {
-      result = result.filter((ni) => ni.status === curStateMenu);
-    }
-
-    return [...result].sort((a, b) => {
-      const dataA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-      const dataB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-
-      return dataB - dataA;
-    });
-  }, [curStateMenu, searchKeyword, newIssue]);
-
-  useEffect(() => {
-    const getNewIssue = async () => {
-      try {
-        const result = await fetch(
-          `/new-issue/get?projectId=${currentProject?.id}`,
-          {
-            method: "GET",
-            credentials: "include",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          },
-        );
-
-        if (!result.ok) throw new Error("get new issue error");
-
-        const data = await result.json();
-        setNewIssue(data);
-
-        console.log(keyword);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    getNewIssue();
-  }, []);
-
-  const deleteKeyword = async (newIssueId: number) => {
-    try {
-      const result = await fetch(`/new-issue/delete?newIssueId=${newIssueId}`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!result.ok) throw new Error("new issue delete error");
-
-      setAlertConfig((props) => ({
-        ...props,
-        message: "이슈를 성공적으로 삭제했습니다.",
-        type: "info",
-        isOpen: true,
-      }));
-
-      setIsModalOpen(false);
-      setTimeout(() => {
-        window.location.reload();
-      }, 3000);
-    } catch (error) {
-      console.error(error);
-      setAlertConfig((props) => ({
-        ...props,
-        isOpen: true,
-      }));
-    }
-  };
-
-  const getIssueList = async () => {
-    try {
-      const result = await fetch(
-        `/issue/title/list?projectId=${currentProject?.id}`,
-        {
-          method: "GET",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
-
-      if (!result.ok) throw new Error("new issue delete error");
-
-      const data = await result.json();
-      setIssueAllList(data);
-    } catch (error) {
-      console.error(error);
-      setAlertConfig((props) => ({
-        ...props,
-        isOpen: true,
-      }));
-    }
-  };
-
-  const mergetIssue = async () => {
-    try {
-      const result = await fetch(
-        `/new-issue/merge?issueId=${curIssueId}&newIssueId=${curNewIssueId}`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
-
-      if (!result.ok) throw new Error("new issue delete error");
-
-      setIsModalOpen(false);
-      window.location.reload();
-    } catch (error) {
-      console.error(error);
-      setAlertConfig((props) => ({
-        ...props,
-        isOpen: true,
-      }));
-    }
-  };
+  if (issueAllList.length < 1) {
+    return (
+      <div className="w-full py-20 text-center text-sm font-medium text-slate-400">
+        아직 등록된 이슈가 없습니다.
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-1">
@@ -259,6 +109,7 @@ export default function IssueList({
                 <div className="flex items-center gap-2">
                   <Tooltip content="이슈에서 제외합니다.">
                     <button
+                      type="button"
                       onClick={() => {
                         deleteKeyword(issue.id);
                       }}
@@ -270,6 +121,7 @@ export default function IssueList({
 
                   <Tooltip content="기존 이슈와 병합합니다.">
                     <button
+                      type="button"
                       onClick={() => {
                         setIsModalOpen(true);
                         setCurNewIssueId(issue.id);
@@ -296,6 +148,7 @@ export default function IssueList({
                 기존이슈 선택하기
               </h3>
               <button
+                type="button"
                 onClick={handleClose}
                 className="text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors p-1"
               >
@@ -349,7 +202,7 @@ export default function IssueList({
                 type="button"
                 disabled={!keyword.trim()}
                 onClick={() => {
-                  mergetIssue();
+                  mergeIssue();
                 }}
                 className="px-4 py-2 rounded-lg text-s font-semibold bg-[var(--foreground)] text-[var(--card)] hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
               >

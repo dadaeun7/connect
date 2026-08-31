@@ -1,21 +1,9 @@
 "use client";
 
-import { IssueTitleResponse } from "@/app/store/useIssueStore";
 import { Tooltip } from "@/components/share/ToolTip";
-import { PRIORITY_MAP, STATUS_MAP } from "@/components/workline/type";
+import { PRIORITY_MAP, STATUS_MAP } from "@/components/workline/types/type";
 import React from "react";
-
-interface TimelineTaskRowProps {
-  rowIdx: number;
-  assignedTasks: {
-    issue: IssueTitleResponse;
-    row: number;
-    segment: { startIdx: number; endIdx: number };
-  }[];
-  colWidthPct: number;
-  expandedId: number | null;
-  onToggleExpand: (id: number) => void;
-}
+import { TimelineTaskRowProps } from "../types/timeline";
 
 export const TimelineTaskRow = React.memo(
   ({
@@ -24,7 +12,7 @@ export const TimelineTaskRow = React.memo(
     colWidthPct,
     expandedId,
     onToggleExpand,
-  }: TimelineTaskRowProps) => (
+  }: Readonly<TimelineTaskRowProps>) => (
     <div className="relative h-[48px] w-full">
       {assignedTasks
         .filter((t) => t.row === rowIdx)
@@ -50,10 +38,15 @@ export const TimelineTaskRow = React.memo(
                 className="w-full h-full flex items-center px-3.5 py-3 gap-1 bg-[var(--secondary-foreground)]/[0.06] hover:bg-[var(--secondary-foreground)]/[0.12] text-[var(--foreground)] border border-[var(--border)] shadow-sm transition-all duration-150 cursor-pointer text-left overflow-hidden rounded-lg"
                 onClick={() => onToggleExpand(issue.id)}
               >
-                <div className="min-w-0 flex-1 overflow-hidden">
-                  <Tooltip key={issue.id} content={issue.title} placement="top">
+                <div className="flex-1 shrink-0 min-w-[50px] overflow-hidden">
+                  <Tooltip
+                    key={issue.id}
+                    content={issue.title}
+                    placement="top"
+                    className="w-full flex items-center"
+                  >
                     <span
-                      className="block text-[13px] text-[var(--secondary-foreground)] font-bold tracking-tight truncate"
+                      className="block text-[13px] text-[var(--secondary-foreground)] font-bold tracking-tight truncate min-w-[18px]"
                       style={{ display: "flex", alignItems: "center" }}
                     >
                       {issue.title}

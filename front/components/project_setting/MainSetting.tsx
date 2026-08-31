@@ -1,13 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useActiveTab } from "./hooks/useActiveTab";
 import GeneralTab from "./GeneralTab";
 import AffiliationTab from "./AffiliationTab";
 
 export default function SettingPage() {
-  const [activeTab, setActiveTab] = useState<"general" | "affiliation">(
-    "general",
-  );
+  const { activeTab, setActiveTab } = useActiveTab({ initialTab: "general" });
 
   return (
     <div className="flex-1 bg-[var(--background)] min-h-screen p-8 text-[var(--foreground)] selection:bg-[var(--primary)]/20 selection:text-[var(--primary)] animate-in fade-in duration-300">

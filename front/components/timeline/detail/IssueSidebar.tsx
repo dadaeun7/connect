@@ -1,37 +1,15 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React from "react";
 import {
   ChevronLeft,
   ChevronRight,
   SquareArrowOutUpRight,
   X,
 } from "lucide-react";
-import { PRIORITY_MAP, STATUS_MAP } from "@/components/workline/type";
-import {
-  ActivityResponse,
-  IssueTitleResponse,
-  IssueViewResponse,
-} from "@/app/store/useIssueStore";
-
-const TASK_COLORS = [
-  { color: "var(--task-blue)" },
-  { color: "var(--task-teal)" },
-  { color: "var(--task-violet)" },
-  { color: "var(--task-amber)" },
-  { color: "var(--task-rose)" },
-  { color: "var(--task-sky)" },
-];
-
-interface IssueSidebarProps {
-  getActivity: (
-    issueId: number | null,
-    newPage: number,
-  ) => Promise<ActivityResponse[]>;
-  expandedId: number | null;
-  activeIssue: IssueTitleResponse | null;
-  onClose: () => void;
-}
+import { PRIORITY_MAP, STATUS_MAP } from "@/components/workline/types/type";
+import { IssueSidebarProps } from "../types/timeline";
+import { useIssueSidebar } from "../hooks/useIssueSidebar";
 
 export default function IssueSidebar({
   getActivity,
@@ -39,59 +17,15 @@ export default function IssueSidebar({
   activeIssue,
   onClose,
 }: Readonly<IssueSidebarProps>) {
-  const activeTaskColor = useMemo(() => {
-    if (!activeIssue) return null;
-    return TASK_COLORS[activeIssue.id % TASK_COLORS.length];
-  }, [activeIssue]);
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
-  const [currentActivity, setCurrentActivity] = useState<ActivityResponse[]>(
-    [],
-  );
-  const [hasNextPage, setHasNextPage] = useState(false);
-
-  const fetchActivityPage = useCallback(
-    async (newPage: number) => {
-      if (!expandedId) return;
-      setIsLoading(true);
-
-      try {
-        const data = await getActivity(expandedId, newPage);
-
-        if (data && data.length > 0) {
-          console.log(data.length);
-          setCurrentActivity(data);
-          setCurrentPage(newPage);
-
-          setHasNextPage(data.length === 10);
-        }
-      } catch (error) {
-        console.error(`issue activity get page error: `, error);
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [expandedId],
-  );
-
-  useEffect(() => {
-    if (expandedId) {
-      fetchActivityPage(0);
-    }
-  }, [expandedId, fetchActivityPage]);
-
-  const handlePrevPage = () => {
-    if (currentPage > 0 && !isLoading) {
-      fetchActivityPage(currentPage - 1);
-    }
-  };
-
-  const handleNextPage = () => {
-    if (hasNextPage && !isLoading) {
-      fetchActivityPage(currentPage + 1);
-    }
-  };
+  const {
+    activeTaskColor,
+    currentPage,
+    isLoading,
+    currentActivity,
+    hasNextPage,
+    handlePrevPage,
+    handleNextPage,
+  } = useIssueSidebar({ getActivity, expandedId, activeIssue });
 
   if (!activeIssue || !activeTaskColor) return null;
 
@@ -99,7 +33,8 @@ export default function IssueSidebar({
     <div
       className={`fixed inset-0 z-50 transition-all duration-300 ${expandedId ? "visible" : "invisible pointer-events-none"}`}
     >
-      <div
+      <button
+        type="button"
         className={`absolute inset-0 bg-[var(--foreground)]/30 backdrop-blur-sm transition-opacity duration-300 cursor-pointer ${expandedId ? "opacity-100" : "opacity-0"}`}
         onClick={onClose}
       />
@@ -151,7 +86,7 @@ export default function IssueSidebar({
             {currentActivity.length > 0 &&
               currentActivity.map((ca, index) => (
                 <div
-                  key={index}
+                  key={`${ca.activityTitle}-${index}`}
                   className="flex flex-col px-5 py-3 bg-[var(--card)] border-b border-[var(--border)] hover:border-[var(--muted-foreground)]/30 transition-colors"
                 >
                   <div className="flex items-center justify-between">

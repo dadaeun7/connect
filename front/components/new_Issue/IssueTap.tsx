@@ -1,7 +1,7 @@
 "use client";
 
 import { Dispatch, SetStateAction, useState } from "react";
-import { MenuKey } from "./MainNewIssue";
+import { MenuKey } from "./types/issueType";
 
 export default function IssueTap({
   menu,
@@ -16,6 +16,7 @@ export default function IssueTap({
     <div className="flex gap-8 border-b border-[var(--border)] mb-3 px-1">
       {menu.map((tab) => (
         <button
+          type="button"
           key={tab}
           onClick={() => {
             setActiveTab(tab);

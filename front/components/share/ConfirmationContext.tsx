@@ -1,3 +1,4 @@
+"use client";
 // ConfirmationContext.tsx
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
@@ -48,10 +49,18 @@ export const ConfirmationProvider = ({ children }: { children: ReactNode }) => {
           <div style={modalBoxStyle}>
             <p style={messageStyle}>{options.message}</p>
             <div style={buttonGroupStyle}>
-              <button onClick={handleConfirm} style={confirmButtonStyle}>
+              <button
+                type="button"
+                onClick={handleConfirm}
+                style={confirmButtonStyle}
+              >
                 진행
               </button>
-              <button onClick={closeConfirm} style={cancelButtonStyle}>
+              <button
+                type="button"
+                onClick={closeConfirm}
+                style={cancelButtonStyle}
+              >
                 취소
               </button>
             </div>
@@ -62,7 +71,6 @@ export const ConfirmationProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// Hook 제공
 export const useConfirmation = () => {
   const context = useContext(ConfirmationContext);
   if (!context) {

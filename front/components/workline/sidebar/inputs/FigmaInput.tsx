@@ -1,9 +1,8 @@
 import { FigmaState } from "@/app/project/[projectId]/workline/page";
-import { useAppStore } from "@/app/store/useAppStore";
 import CstAlert from "@/components/share/CstAlert";
 import FigmaIcon from "@/components/share/svg_icon/FigmaIcon";
 import { SquareArrowOutUpRight } from "lucide-react";
-import { useState } from "react";
+import { useFigmaInput } from "../../hooks/useFigmaInput";
 
 export default function FigmaInput({
   figmaFileUrl,
@@ -18,43 +17,11 @@ export default function FigmaInput({
   setFigmaState: (s: FigmaState) => void;
   getFigmaState: (url: string) => Promise<FigmaState>;
 }>) {
-  const [loading, setLoading] = useState(false);
-
-  const [alertConfig, setAlertConfig] = useState({
-    isOpen: false,
-    message: "Figma를 먼저 연동해주세요.",
-    type: "error" as "success" | "error" | "info",
-    onClose: () => {
-      setAlertConfig((props) => ({ ...props, isOpen: false }));
-    },
-  });
-
-  const { appList } = useAppStore();
-
-  const handleCheck = async () => {
-    if (!figmaFileUrl.trim()) return;
-
-    if (!appList.includes("FIGMA")) {
-      setAlertConfig((props) => ({
-        ...props,
-        isOpen: true,
-      }));
-      return;
-    }
-
-    setLoading(true);
-    try {
-      // 💡 서버 액션 직접 호출!
-      const result = await getFigmaState(figmaFileUrl);
-      if (result) {
-        setFigmaState(result);
-      }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { alertConfig, loading, handleCheck } = useFigmaInput(
+    figmaFileUrl,
+    getFigmaState,
+    setFigmaState,
+  );
 
   return (
     <div className="bg-[var(--card)] space-y-3">
@@ -89,28 +56,30 @@ export default function FigmaInput({
           </button>
         )}
       </div>
-      {loading ? (
-        "유효성 확인중.. "
-      ) : (
-        <input
-          type="text"
-          placeholder="예) https://www.figma.com/file/XYZ123456789/Project-Name?..."
-          value={`https://www.figma.com/file/${figmaFileUrl}`}
-          onChange={(e) => setFigmaFileUrl(e.target.value)}
-          className="w-full border border-[var(--border)] rounded-lg px-3 py-[11.5px] text-[12px] bg-[var(--background)] focus:outline-none focus:border-[var(--primary)] font-medium"
-        />
-      )}
-      <button
-        type="button"
-        onClick={(e) => {
-          e.preventDefault();
-          handleCheck();
-        }}
-        className="absolute mt-1.5 right-8 
-          px-5 py-2 text-[11px] font-black text-[var(--primary-foreground)] bg-[var(--primary)] rounded-lg shadow-sm hover:opacity-90 transition-opacity cursor-pointer"
-      >
-        유효성 확인
-      </button>
+      <div className="relative w-full flex items-center">
+        {loading ? (
+          "유효성 확인중.. "
+        ) : (
+          <input
+            type="text"
+            placeholder="예) https://www.figma.com/file/XYZ123456789/Project-Name?..."
+            value={`https://www.figma.com/file/${figmaFileUrl}`}
+            onChange={(e) => setFigmaFileUrl(e.target.value)}
+            className="w-full border border-[var(--border)] rounded-lg pl-3 pr-28 py-[11.5px] text-[12px] bg-[var(--background)] focus:outline-none focus:border-[var(--primary)] font-medium"
+          />
+        )}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            handleCheck();
+          }}
+          className="absolute right-2 top-1/2 -translate-y-1/2
+          px-4 py-2 text-[11px] font-black text-[var(--primary-foreground)] bg-[var(--primary)] rounded-lg shadow-sm hover:opacity-90 transition-opacity cursor-pointer"
+        >
+          유효성 확인
+        </button>
+      </div>
       {!loading && figmaState?.message && (
         <div
           className="text-sm font-semibold flex items-center gap-1"

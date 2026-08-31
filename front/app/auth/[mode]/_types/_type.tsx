@@ -1,0 +1,31 @@
+import { LOGIN_COMPANY } from "@/lib/constant";
+
+export type AuthMode = "login" | "signup";
+
+export const Menu: Record<
+  AuthMode,
+  [string, string, string, boolean, string, string, string, string, string]
+> = {
+  login: [
+    "어서오세요",
+    "email",
+    "password",
+    true,
+    "로그인",
+    LOGIN_COMPANY,
+    "Mail",
+    "KeyRound",
+    "/",
+  ],
+  signup: [
+    "계정 생성",
+    "email",
+    "password",
+    false,
+    "다음",
+    LOGIN_COMPANY,
+    "Mail",
+    "KeyRound",
+    "/auth/verify",
+  ],
+} as const;

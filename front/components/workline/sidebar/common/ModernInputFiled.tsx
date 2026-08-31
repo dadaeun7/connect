@@ -1,17 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "lucide-react";
-import { ProjectSimpleDto } from "@/app/store/useProjectStore";
-
-interface FieldProps {
-  label: string;
-  id: string;
-  type?: string;
-  placeholder?: string;
-  value?: string;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  projects?: ProjectSimpleDto[];
-  onSelectProject?: (project: ProjectSimpleDto) => void;
-}
+import { FieldProps } from "../../types/type";
 
 export default function ModernInputField({
   label,

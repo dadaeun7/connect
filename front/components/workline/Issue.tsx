@@ -1,18 +1,15 @@
 import { ChevronRight } from "lucide-react";
 import ActivityLog from "./ActivityLog";
-import { PRIORITY_MAP, STATUS_MAP } from "./type";
+import { IssueCardProps, PRIORITY_MAP, STATUS_MAP } from "./types/type";
 import GithubIcon from "../share/svg_icon/GithubIcon";
 import FigmaIcon from "../share/svg_icon/FigmaIcon";
 import NotionIcon from "../share/svg_icon/NotionIcon";
-import { IssueViewResponse } from "@/app/store/useIssueStore";
 import { useProjectStore } from "@/app/store/useProjectStore";
 
-interface IssueCardProps {
-  issue: IssueViewResponse;
-  onDetailClick?: (id: number) => void;
-}
-
-export default function Issue({ issue, onDetailClick }: IssueCardProps) {
+export default function Issue({
+  issue,
+  onDetailClick,
+}: Readonly<IssueCardProps>) {
   // 1. 상태 및 우선순위 테마 설정 맵 매핑
   const statusConfig = STATUS_MAP[issue.preveiw.statusCode] || {
     label: "Unknown",
@@ -66,70 +63,75 @@ export default function Issue({ issue, onDetailClick }: IssueCardProps) {
       }}
     >
       {/* 헤더 */}
-      <div className="flex justify-between items-start mb-4 mt-1 px-3">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 mb-4 mt-1 px-1">
+        {/* 1. 제목 및 마감일 영역 */}
         <div className="space-y-2 flex-1 min-w-0">
-          <div className="flex items-center gap-3 mb-2.5">
-            <h2 className="text-[17px] font-bold text-[var(--foreground)] tracking-tight leading-snug truncate">
+          <div className="flex items-center gap-2 mb-2.5 flex-wrap sm:flex-nowrap">
+            <h2 className="text-[17px] font-bold text-[var(--foreground)] tracking-tight leading-snug truncate shrink min-w-0">
               {issue.preveiw.title}
             </h2>
             {issue.preveiw.dueDate && (
+              /* 👈 whitespace-nowrap 및 shrink-0 추가로 D-Day 배지 찌그러짐 방지 */
               <span
-                className="text-[12px] font-black px-2 py-0.5 rounded font-mono bg-[var(--destructive)]/10"
+                className="text-[12px] font-black px-2 py-0.5 rounded font-mono bg-[var(--destructive)]/10 whitespace-nowrap shrink-0"
                 style={{ color: "var(--destructive)" }}
               >
                 {dDayText}
               </span>
             )}
           </div>
-          <div className="flex items-center gap-2 flex-wrap ml-1">
-            <div className="flex items-center gap-3 text-[13px] font-bold text-[var(--muted-foreground)] uppercase">
-              <span>
-                마감일{" "}
-                <span className="text-[var(--destructive)] font-mono">
-                  {formattedDueDate}
-                </span>
+
+          {/* 마감일 & 연동 리소스 정보 */}
+          <div className="flex items-center gap-2 flex-wrap text-[13px] font-bold text-[var(--muted-foreground)] uppercase">
+            {/* 👈 whitespace-nowrap 추가로 날짜 줄바꿈 방지 */}
+            <span className="whitespace-nowrap">
+              마감일{" "}
+              <span className="text-[var(--destructive)] font-mono">
+                {formattedDueDate}
               </span>
-              <div className="flex gap-1">
-                <span className="mr-1">연동중 </span>
-                <div>{issue.preveiw.githubRepoName && <GithubIcon />}</div>
-                <div>{issue.preveiw.figmaFileKey && <FigmaIcon />}</div>
-                <div>
-                  {(issue.preveiw.notionDbId || issue.preveiw.notionPageId) && (
-                    <NotionIcon />
-                  )}
-                </div>
+            </span>
+
+            <div className="flex items-center gap-1 whitespace-nowrap shrink-0">
+              <span className="mr-1">연동중</span>
+              <div className="flex items-center gap-1">
+                {issue.preveiw.githubRepoName && <GithubIcon />}
+                {issue.preveiw.figmaFileKey && <FigmaIcon />}
+                {(issue.preveiw.notionDbId || issue.preveiw.notionPageId) && (
+                  <NotionIcon />
+                )}
               </div>
             </div>
           </div>
         </div>
 
-        {/* 💡 피드백 적용: 매핑 칩 동적 변환 */}
-        <div className="flex gap-2 items-center shrink-0 ml-3 mt-[1.5px]">
-          <span
-            className="px-3 py-1 rounded-lg text-[13px] font-bold transition-colors"
-            style={{
-              color: statusConfig.color,
-              backgroundColor: statusConfig.bg,
-            }}
-          >
-            {statusConfig.label}
-          </span>
-          <span
-            className="px-3 py-1 rounded-lg text-[13px] font-bold transition-colors"
-            style={{
-              color: priorityConfig.color,
-              backgroundColor: priorityConfig.bg,
-            }}
-          >
-            {priorityConfig.label}
-          </span>
-        </div>
+        {/* 2. 상태 칩 & 상세 화살표 버튼 영역 */}
+        <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0 pt-1">
+          <div className="flex gap-1.5 items-center">
+            <span
+              className="px-2.5 py-1 rounded-lg text-[12px] sm:text-[13px] font-bold transition-colors whitespace-nowrap"
+              style={{
+                color: statusConfig.color,
+                backgroundColor: statusConfig.bg,
+              }}
+            >
+              {statusConfig.label}
+            </span>
+            <span
+              className="px-2.5 py-1 rounded-lg text-[12px] sm:text-[13px] font-bold transition-colors whitespace-nowrap"
+              style={{
+                color: priorityConfig.color,
+                backgroundColor: priorityConfig.bg,
+              }}
+            >
+              {priorityConfig.label}
+            </span>
+          </div>
 
-        <div className="flex items-center gap-1 shrink-0 ml-4">
           {currentProject?.myRole !== "VIEWER" && (
             <button
+              type="button"
               onClick={() => onDetailClick?.(issue.preveiw.id)}
-              className="p-[5px] border border-[var(--border)] bg-[var(--card)] hover:bg-[var(--muted)] rounded-lg text-[var(--muted-foreground)] transition-colors cursor-pointer"
+              className="p-[5px] border border-[var(--border)] bg-[var(--card)] hover:bg-[var(--muted)] rounded-lg text-[var(--muted-foreground)] transition-colors cursor-pointer shrink-0 ml-1"
             >
               <ChevronRight size={13} />
             </button>
@@ -137,10 +139,9 @@ export default function Issue({ issue, onDetailClick }: IssueCardProps) {
         </div>
       </div>
 
-      {/* 💡 하단 실시간 연결 리소스 로그 액션 (선택 데이터만 렌더링) */}
+      {/* 하단 리소스 로그 */}
       <div className="space-y-1.5 pt-2 border-t border-[var(--border)]/40">
         <ActivityLog activity={issue.activity} />
-        {/* 아무것도 연결 안 된 상태 처리 */}
         {issue.activity.length <= 0 && (
           <div className="text-[11px] font-medium text-[var(--muted-foreground)]/60 px-3 py-1.5">
             연동된 외부 리소스가 없습니다.

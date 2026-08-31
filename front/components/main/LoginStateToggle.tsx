@@ -9,7 +9,9 @@ interface ToggleProps {
   isLoggedIn: boolean;
 }
 
-export default function LoginStateToggle({ isLoggedIn }: ToggleProps) {
+export default function LoginStateToggle({
+  isLoggedIn,
+}: Readonly<ToggleProps>) {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -59,6 +61,7 @@ export default function LoginStateToggle({ isLoggedIn }: ToggleProps) {
   return (
     <>
       <button
+        type="button"
         onClick={handleClick}
         className="px-5 py-2.5 rounded-lg text-xs font-bold tracking-wider border border-[var(--border)] bg-[var(--muted)] hover:bg-[var(--primary)] hover:text-[var(--primary-foreground)] transition-colors"
       >

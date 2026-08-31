@@ -1,5 +1,5 @@
 import { offsetTimePlusNine } from "@/components/share/UtilFun";
-import { InviteHistoryResponse } from "../AffiliationTab";
+import { InviteHistoryResponse } from "../api/affiliation";
 
 export default function InvitationHistorySection({
   inviteHistory,

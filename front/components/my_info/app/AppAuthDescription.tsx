@@ -46,6 +46,7 @@ export default function AppIntegrationSet({
           </div>
 
           <button
+            type="button"
             onClick={() => setShowImage(true)}
             className="px-5 py-2 bg-[var(--primary)] text-[var(--primary-foreground)] font-black rounded-lg text-[11px] shadow-sm hover:opacity-90 transition-opacity uppercase cursor-pointer"
           >

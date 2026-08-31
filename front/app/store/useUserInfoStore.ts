@@ -1,5 +1,6 @@
 "use client";
 
+import { getUserInfo } from "@/actions/workline";
 import { create } from "zustand";
 
 export interface UserInfo {
@@ -12,6 +13,7 @@ export interface UserInfo {
 interface UserInfoStore {
   userInfo: UserInfo;
   setUserInfo: (info: UserInfo) => void;
+  fetchUserInfo: () => Promise<void>;
 }
 
 export const useUserInfoStore = create<UserInfoStore>((set, _get) => ({
@@ -22,4 +24,14 @@ export const useUserInfoStore = create<UserInfoStore>((set, _get) => ({
     joinType: "",
   },
   setUserInfo: (info) => set({ userInfo: info }),
+  fetchUserInfo: async () => {
+    try {
+      const info = await getUserInfo();
+      if (info) {
+        set({ userInfo: info });
+      }
+    } catch (error) {
+      console.error("유저 정보 로드 실패:", error);
+    }
+  },
 }));

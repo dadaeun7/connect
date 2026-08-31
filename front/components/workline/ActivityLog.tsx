@@ -1,4 +1,4 @@
-import { ExternalLink, GitBranch } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import GithubIcon from "../share/svg_icon/GithubIcon";
 import FigmaIcon from "../share/svg_icon/FigmaIcon";
 import NotionIcon from "../share/svg_icon/NotionIcon";

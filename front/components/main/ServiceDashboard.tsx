@@ -13,7 +13,7 @@ interface ServiceCardSliderProps {
 
 export default function ServiceCardSlider({
   activeIndex,
-}: ServiceCardSliderProps) {
+}: Readonly<ServiceCardSliderProps>) {
   const cards = [
     {
       id: 0,

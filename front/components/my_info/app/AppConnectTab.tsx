@@ -210,6 +210,7 @@ export default function IntegrationTab({
       <div className="space-y-2">
         {["Github", "Figma", "Slack", "Notion"].map((tab) => (
           <button
+            type="button"
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`w-full flex items-center justify-between py-4 px-5 rounded-xl border text-left text-sm transition-all ${
@@ -242,6 +243,7 @@ export default function IntegrationTab({
             </h2>
             {appList.includes(activeTab.toUpperCase()) && (
               <button
+                type="button"
                 onClick={() => {
                   handleComfirm();
                 }}
@@ -276,6 +278,7 @@ export default function IntegrationTab({
             </div>
           ))}
           <button
+            type="button"
             disabled={isLinked}
             className="w-full disabled:bg-[var(--primary)]/50 bg-[var(--primary)] text-[var(--primary-foreground)] font-black py-3 rounded-lg text-xs uppercase tracking-widest shadow-md enabled:cursor-pointer"
             onClick={() => {

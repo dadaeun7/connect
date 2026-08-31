@@ -1,20 +1,11 @@
-"use client";
-
 import React from "react";
-
-const DAY_NAMES = ["일", "월", "화", "수", "목", "금", "토"];
-
-interface TimelineGridHeaderProps {
-  visibleDays: Date[];
-  colWidthPct: number;
-  today: Date;
-}
+import { DAY_NAMES, TimelineGridHeaderProps } from "../types/timeline";
 
 export default function TimelineGridHeader({
   visibleDays,
   colWidthPct,
   today,
-}: TimelineGridHeaderProps) {
+}: Readonly<TimelineGridHeaderProps>) {
   return (
     <div className="flex w-full border-b border-[var(--border)] bg-[var(--muted)]/40 sticky top-0 z-30 backdrop-blur-md">
       {visibleDays.map((d, idx) => {

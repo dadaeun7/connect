@@ -8,6 +8,7 @@ export default function ConnectBtn() {
 
   return (
     <button
+      type="button"
       className="flex items-center space-x-1.5 bg-[var(--primary)] text-[var(--primary-foreground)]
                           font-black px-4 py-2 rounded-lg text-xs shadow-sm hover:opacity-90 transition-opacity"
       onClick={() => {

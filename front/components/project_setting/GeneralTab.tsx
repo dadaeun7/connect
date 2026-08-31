@@ -1,5 +1,4 @@
 import { useProjectStore } from "@/app/store/useProjectStore";
-import { ChevronDown, Mail } from "lucide-react";
 import AppDetailModify from "./app_detail/AppDatailModify";
 
 export default function GeneralTab() {

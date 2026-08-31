@@ -35,6 +35,7 @@ export default function InfoPage({
           { id: "affiliation", label: "OAuth 연동" },
         ].map((tab) => (
           <button
+            type="button"
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
             className={`pb-3 text-sm font-bold tracking-wider transition-all relative ${

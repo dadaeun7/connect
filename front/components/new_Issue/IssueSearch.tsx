@@ -1,13 +1,10 @@
 "use client";
 
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { useAppStore } from "@/app/store/useAppStore";
+import { Dispatch, SetStateAction } from "react";
 import { Plus, Search, X } from "lucide-react";
-import { useConfirmation } from "../share/ConfirmationContext";
-import { useProjectStore } from "@/app/store/useProjectStore";
-import { useRouter } from "next/navigation";
 import CstAlert from "../share/CstAlert";
 import { ImageModal } from "../share/ImageModal";
+import { useIssueSearch } from "./hooks/useIssueSearch";
 
 interface SearchProps {
   keyword: string;
@@ -26,90 +23,22 @@ export default function IssueSearch({
   already,
   setAlready,
 }: Readonly<SearchProps>) {
-  const { appList } = useAppStore();
-  const router = useRouter();
-  const { openConfirm, closeConfirm } = useConfirmation();
-  const { currentProject } = useProjectStore();
-
-  const [showImage, setShowImage] = useState(false);
-  // 1. 모달 상태 및 입력값 상태 관리
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const [alertConfig, setAlertConfig] = useState({
-    isOpen: false,
-    message: "정상적으로 등록되었습니다. 공개 채널을 통해 이슈를 등록하세요",
-    type: "success" as "success" | "error" | "info",
-    onClose: () => {
-      setAlertConfig((props) => ({ ...props, isOpen: false }));
-    },
+  const {
+    currentProject,
+    showImage,
+    setShowImage,
+    isModalOpen,
+    alertConfig,
+    handleClose,
+    handleSubmit,
+    registryKeyword,
+    updateKeyword,
+  } = useIssueSearch({
+    keyword,
+    setKeyword,
+    already,
+    setAlready,
   });
-
-  const handleClose = () => {
-    setIsModalOpen(false);
-
-    if (!already) {
-      setKeyword("");
-    }
-  };
-
-  const handleSubmit = async () => {
-    if (!keyword.trim()) return;
-
-    try {
-      const res = await fetch(`/keyword/create?keyword=${keyword}`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!res.ok) throw new Error("keyword create error");
-
-      setAlertConfig((props) => ({
-        ...props,
-        isOpen: true,
-      }));
-
-      setAlready(true);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      handleClose();
-      closeConfirm();
-    }
-  };
-
-  const registryKeyword = () => {
-    if (!appList.includes("SLACK")) {
-      openConfirm({
-        message:
-          currentProject?.myRole === "ADMIN"
-            ? "슬랙 연동전입니다. 내 정보 > OAuth 연동에서 연동해주세요."
-            : "슬랙 연동전입니다. 관리자에게 문의하세요.",
-        onConfirm: () => {
-          currentProject?.myRole === "ADMIN"
-            ? router.push(`/project/${currentProject?.id}/my-info`)
-            : "";
-        },
-        onCancel: () => {},
-      });
-      return;
-    }
-    // 슬랙 연동이 되어있으면 키워드 등록 모달 열기
-    setIsModalOpen(true);
-  };
-
-  const updateKeyword = () => {
-    openConfirm({
-      message:
-        "키워드는 하나만 등록가능합니다. 기존 키워드로는 더 이상 이슈를 받을 수 없습니다.",
-      onConfirm: () => {
-        handleSubmit();
-      },
-      onCancel: () => {},
-    });
-  };
 
   return (
     <>
@@ -139,6 +68,7 @@ export default function IssueSearch({
         {currentProject?.myRole !== "VIEWER" && (
           <>
             <button
+              type="button"
               onClick={registryKeyword}
               className="flex items-center gap-1
             bg-[var(--card)] border border-[var(--border)] px-5 py-2 rounded-lg text-sm font-bold text-[var(--muted-foreground)] 
@@ -148,6 +78,7 @@ export default function IssueSearch({
               <span>키워드 {keyword !== "" ? "수정하기" : "등록하기"}</span>
             </button>
             <button
+              type="button"
               onClick={() => {
                 setShowImage(true);
               }}
@@ -173,6 +104,7 @@ export default function IssueSearch({
                 키워드 등록하기
               </h3>
               <button
+                type="button"
                 onClick={handleClose}
                 className="text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors p-1"
               >
