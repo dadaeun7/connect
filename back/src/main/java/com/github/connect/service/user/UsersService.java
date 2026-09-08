@@ -10,6 +10,7 @@ import com.github.connect.repository.AppTokenRedisRepository;
 import com.github.connect.repository.SlackHookInfoRedisRepository;
 import com.github.connect.repository.StringRedisRepository;
 import com.github.connect.repository.UsersRepository;
+import com.github.connect.service.api.GithubApiService;
 import com.github.connect.service.keycloak.KeycloakAuthService;
 
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ public class UsersService {
     private final StringRedisRepository stringRedisRepository;
     private final AppTokenRedisRepository appTokenRedisRepository;
     private final SlackHookInfoRedisRepository slackHookInfoRedisRepository;
+    private final GithubApiService githubApiService;
 
 
     public Mono<UserInfoResponse> getUserInfo(String email){
@@ -68,8 +70,11 @@ public class UsersService {
                         Mono<Void> slackDeleteMono =  (info.appPkId() != null) ? slackHookInfoRedisRepository.redisDeleteValue(info.appPkId())
                         :  Mono.empty();
 
+                        // 4. 등록된 Githu Hook들 정보 삭제
+                        Mono<Void> githubWebhookDelete = githubApiService.deleteWebhook(email).then();
+
                         // Mono.when을 사용해 모든 비동기 작업을 병렬/동시에 실행하고 전부 완료될 때까지 기다림
-                        return Mono.when(keycloakWithdrawMono, redisAppDeletes, slackDeleteMono);
+                        return Mono.when(keycloakWithdrawMono, redisAppDeletes, slackDeleteMono, githubWebhookDelete);
                     })
             )
             .then(usersRepository.withDrawUser(email))

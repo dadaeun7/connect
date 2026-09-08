@@ -36,6 +36,9 @@ export const appConnectHanlder = async (
 
     param.append("client_id", clientId);
     param.append("redirect_uri", config.url);
+
+    console.log("state, encodeURI:", encodeURIComponent(state));
+
     param.append("state", encodeURIComponent(state));
 
     if (config.permission) {

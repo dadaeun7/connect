@@ -35,10 +35,11 @@ export async function getProjectListAction() {
 
 export async function getAppListAction() {
   try {
-    const res = await fetch(BACKEND + "/api/app/list", {
+    const res = await fetch(BACKEND + "/app/list", {
       method: "GET",
       headers: await auth.getAuthHeaders(),
     });
+
     if (!res.ok) return [];
     return await res.json();
   } catch (error) {

@@ -128,6 +128,9 @@ export const useMainWorkline = (
   );
 
   useEffect(() => {
+    console.log("currentProjectId:", currentProject?.id);
+    console.log("worklineIssue.length:", worklineIssue.length);
+
     if (currentProject?.id && worklineIssue.length === 0) {
       getNextIssue(0);
     }

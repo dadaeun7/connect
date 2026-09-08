@@ -11,10 +11,12 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 import com.github.connect.constants.EntityFieldStandardType;
 import com.github.connect.dto.internal.AppTokenCacheDto;
+import com.github.connect.dto.internal.GitWebhookDto;
 import com.github.connect.dto.request.GithubWebhookReqDto;
 import com.github.connect.dto.response.GithubBranchResponse;
 import com.github.connect.dto.response.GithubRepoResponse;
 import com.github.connect.repository.AppTokenRedisRepository;
+import com.github.connect.repository.IssueRepository;
 import com.github.connect.repository.UserCacheManager;
 import com.github.connect.util.AesUtil;
 
@@ -109,6 +111,46 @@ public class GithubApiService {
                         .then();
         });                  
 
+    }
+
+    private Mono<GitWebhookDto> findHookId(String email){
+
+        return getUserRepositories(email)
+            .next()
+            .flatMap(res -> {
+                String[] parts = res.fullName().split("/");
+                String owner = parts[0];
+                String repo = parts[1];
+
+                return getAccessToken(email)
+                    .flatMap(token -> {
+                        String decryptedToken = aesUtil.decrypt(token.getAccessToken());
+
+                        return defauClient.get()
+                        .uri("https://api.github.com/repos/{owner}/{repo}/hooks", owner, repo)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + decryptedToken)
+                        .retrieve()
+                        .bodyToMono(String.class)
+                        .map(id-> new GitWebhookDto(owner, repo, id, decryptedToken));
+                    });
+            })
+            .onErrorResume(WebClientResponseException.NotFound.class, ex-> {
+                log.info("등록된 웹훅이 존재하지 않아 스킵합니다. (email:{})", email);
+                return Mono.empty();
+            });
+    }
+
+    public Mono<Void> deleteWebhook(String email){
+        return findHookId(email)
+        .flatMap(dto -> {
+            return defauClient.delete()
+                .uri("https://api.github.com/repos/{owner}/{repo}/hooks/{hook_id}", dto.getOwner(), dto.getRepo(), dto.getHookId())
+                .header(HttpHeaders.AUTHORIZATION, dto.getAccessToken())
+                .header(HttpHeaders.ACCEPT, "application/vnd.github+json")
+                .retrieve()
+                .bodyToMono(Void.class);
+        })
+        .doOnError(error-> { log.error("Git Webhook 삭제 중 에러 발생 (email: {}): {}",email,error.getMessage());});
     }
 
 }

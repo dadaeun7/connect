@@ -4,8 +4,9 @@ public class ApiConstants {
 
     private ApiConstants() {}
 
-    public static final String FRONT = ApiProperties.FRONT;
-    public static final String BACK = ApiProperties.BACK;
+    public static final String FRONT = "http://localhost:3000";
+    public static final String BACK = "http://localhost:8082";
+
     
     // ******************** auth 
     public static final String LOGIN_AUTH_BASE = "/auth";
